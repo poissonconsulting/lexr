@@ -18,6 +18,6 @@ A ggplot2 object.
 Plot Section
 }
 \examples{
-plot_station(qlexdatr::section, qlexdatr::section_polygons)
+plot_station(qlexdatr::station, qlexdatr::section_polygons)
 }
 

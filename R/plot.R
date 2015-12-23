@@ -40,7 +40,7 @@ plot_section <- function(section, section_polygons = NULL) {
 #' @return A ggplot2 object.
 #' @export
 #' @examples
-#' plot_station(qlexdatr::section, qlexdatr::section_polygons)
+#' plot_station(qlexdatr::station, qlexdatr::section_polygons)
 plot_station <- function(station, section_polygons = NULL) {
   ggplot2::ggplot(data = station, ggplot2::aes_(x = ~StationX / 1000,
                                                 y = ~StationY / 1000)) +
@@ -49,4 +49,23 @@ plot_station <- function(station, section_polygons = NULL) {
     ggplot2::coord_equal() +
     ggplot2::scale_x_continuous(name = "Easting (km)", labels = scales::comma) +
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
+}
+
+#' Plot Lex Data
+#'
+#' Plots lake exploitation package data to a pdf.
+#'
+#' @inheritParams load_lex_data
+#' @param file A string of the pdf file name.
+#' @export
+plot_lex_data <- function(package, file = paste0(package, ".pdf")) {
+  load_lex_data(package)
+
+  if (!assertthat::is.string(file)) check_stop("file must be a string")
+
+  pdf(file)
+  on.exit(dev.off())
+
+  print(plot_section(section, section_polygons))
+  print(plot_station(station, section_polygons))
 }

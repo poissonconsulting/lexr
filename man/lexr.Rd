@@ -4,17 +4,8 @@
 \name{lexr}
 \alias{lexr}
 \alias{lexr-package}
-\title{Exploitation Study Analysis}
+\title{Lake Exploitation Study Data Plotting and Analysis}
 \description{
-\code{lexr} is the R data package.
-}
-\examples{
-\donttest{
-pdf("klex.pdf")
-
-plot_section()
-
-dev.off()
-}
+Lake Exploitation Study Data Plotting and Analysis
 }
 

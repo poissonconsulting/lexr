@@ -1,16 +1,6 @@
-#' Exploitation Study Analysis
-#'
-#' \code{lexr} is the R data package.
+#' Lake Exploitation Study Data Plotting and Analysis
 #'
 #' @docType package
 #' @name lexr
 #' @importFrom magrittr %<>% %>%
-#' @examples
-#' \donttest{
-#' pdf("klex.pdf")
-#'
-#' plot_section()
-#'
-#' dev.off()
-#' }
 NULL

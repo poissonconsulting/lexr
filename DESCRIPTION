@@ -1,23 +1,24 @@
 Package: lexr
-Title: What the Package Does (one line, title case)
+Title: Lake Exploitation Study Data Plotting and Analysis
 Version: 0.0.0.9000
 Authors@R: c(
     person("Joe", "Thorley", email = "joe@poissonconsulting.ca", role = c("aut", "cre")),
     person("Gary", "Pavan", role = "aut"),
     person("Bernhard", "Konrad", role = "aut"))
-Description: What the package does (one paragraph).
+Description: An R package to plot and analyse lake exploitation data.
 Depends:
     R (>= 3.2.3)
 Imports:
+    assertthat,
+    dplyr,
     broom,
     ggplot2 (>= 2.0.0),
     magrittr,
-    scales,
-    sp
+    scales
 Suggests:
     klesdatr,
-    testthat,
-    qlexdatr
-License: What license is it under?
+    qlexdatr,
+    testthat
+License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 5.0.1
