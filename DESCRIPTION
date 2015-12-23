@@ -1,0 +1,23 @@
+Package: lexr
+Title: What the Package Does (one line, title case)
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Joe", "Thorley", email = "joe@poissonconsulting.ca", role = c("aut", "cre")),
+    person("Gary", "Pavan", role = "aut"),
+    person("Bernhard", "Konrad", role = "aut"))
+Description: What the package does (one paragraph).
+Depends:
+    R (>= 3.2.3)
+Imports:
+    broom,
+    ggplot2 (>= 2.0.0),
+    magrittr,
+    scales,
+    sp
+Suggests:
+    klesdatr,
+    testthat,
+    qlexdatr
+License: What license is it under?
+LazyData: true
+RoxygenNote: 5.0.1
