@@ -9,7 +9,8 @@ plot_section(section, section_polygons = NULL)
 \arguments{
 \item{section}{A data frame of the section data.}
 
-\item{section_polygons}{A xx.}
+\item{section_polygons}{A spatial polygons data frame of the sections
+or NULL.}
 }
 \value{
 A ggplot2 object.

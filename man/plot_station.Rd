@@ -2,20 +2,21 @@
 % Please edit documentation in R/plot.R
 \name{plot_station}
 \alias{plot_station}
-\title{Plot Section}
+\title{Plot Station}
 \usage{
 plot_station(station, section_polygons = NULL)
 }
 \arguments{
-\item{station}{A data frame of the section data.}
+\item{station}{A data frame of the station data.}
 
-\item{section_polygons}{A xx.}
+\item{section_polygons}{A spatial polygons data frame of the sections
+or NULL.}
 }
 \value{
 A ggplot2 object.
 }
 \description{
-Plot Section
+Plot Station
 }
 \examples{
 plot_station(qlexdatr::station, qlexdatr::section_polygons)

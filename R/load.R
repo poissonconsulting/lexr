@@ -3,7 +3,7 @@ section_polygons <- NULL
 section_distance <- NULL
 station <- NULL
 receiver <- NULL
-receiver_deployment <- NULL
+station_deployment <- NULL
 recapture <- NULL
 detection <- NULL
 depth <- NULL
@@ -16,7 +16,7 @@ load_lex_data <- function(package) {
   if (!assertthat::is.string(package)) check_stop("package must be a string")
 
   data("section", "section_polygons", "section_distance",
-       "station", "receiver", "receiver_deployment",
+       "station", "receiver", "station_deployment",
        "recapture", "detection", "depth", "capture",
        package = package, verbose = FALSE, envir = parent.frame())
 }

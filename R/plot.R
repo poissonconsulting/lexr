@@ -1,3 +1,7 @@
+#' Tidy Section Polygons
+#'
+#' @param section_polygons A spatial polygons data frame of the sections
+#' or NULL.
 tidy_section_polygons <- function(section_polygons) {
   if (!is.null(section_polygons)) {
     section_polygons %<>% broom::tidy()
@@ -14,8 +18,8 @@ tidy_section_polygons <- function(section_polygons) {
 
 #' Plot Section
 #'
+#' @inheritParams tidy_section_polygons
 #' @param section A data frame of the section data.
-#' @param section_polygons A xx.
 #' @return A ggplot2 object.
 #' @export
 #' @examples
@@ -33,10 +37,10 @@ plot_section <- function(section, section_polygons = NULL) {
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
 }
 
-#' Plot Section
+#' Plot Station
 #'
-#' @param station A data frame of the section data.
-#' @param section_polygons A xx.
+#' @inheritParams tidy_section_polygons
+#' @param station A data frame of the station data.
 #' @return A ggplot2 object.
 #' @export
 #' @examples
@@ -49,6 +53,20 @@ plot_station <- function(station, section_polygons = NULL) {
     ggplot2::coord_equal() +
     ggplot2::scale_x_continuous(name = "Easting (km)", labels = scales::comma) +
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
+}
+
+#' Plot Station
+#'
+#' @inheritParams plot_station
+#' @param station_deployment A data frame of the receiver deployment data.
+#' @return A ggplot2 object.
+#' @export
+#' @examples
+#' plot_station_deployment(qlexdatr::station_deployment, qlexdatr::station)
+plot_station_deployment <- function(station_deployment, station) {
+
+  station_deployment %<>% dplyr::inner_join(station, by = "Station")
+
 }
 
 #' Plot Lex Data
@@ -68,4 +86,5 @@ plot_lex_data <- function(package, file = paste0(package, ".pdf")) {
 
   print(plot_section(section, section_polygons))
   print(plot_station(station, section_polygons))
+  print(plot_station_deployment(station_deployment, station))
 }
