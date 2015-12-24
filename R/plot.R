@@ -67,6 +67,7 @@ plot_station_deployment <- function(station_deployment, station) {
 
   station_deployment %<>% dplyr::inner_join(station, by = "Station")
 
+
 }
 
 #' Plot Lex Data
