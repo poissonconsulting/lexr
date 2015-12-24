@@ -1,4 +1,57 @@
+plural <- function(x, n = 1, end = "") paste0(x, ifelse(n > 1, "s", ""), end)
+
+punctuate_strings <- function(x, qualifier = "or") {
+  if (length(x) == 1)
+    return(x)
+  n <- length(x)
+  paste(paste(x[-n], collapse = ", "), qualifier, x[n])
+}
+
 check_stop <- function(...) stop(..., call. = FALSE)
+
+check_section <- function(section) {
+
+  if (!dplyr::is.tbl(section)) check_stop("section is not a tbl data frame")
+  if (!nrow(section)) check_stop("section must contain at least one row of data")
+
+  columns <- list("Section" = "integer", "SectionArea" = "double",
+               "SectionX" = "double", "SectionY" = "double")
+
+  if (!all(names(columns) %in% colnames(section)))
+    check_stop("section must include ", plural("column", length(columns)),
+               " ", punctuate_strings(names(columns), "and"))
+
+  if (!identical(sapply(section[,names(columns)], storage.mode), unlist(columns)))
+    check_stop("section ", plural("column", length(columns)),
+               " ", punctuate_strings(names(columns), "and"),
+               " must have ", plural("mode", length(columns)),
+               " ", punctuate_strings(unlist(columns), "and"),
+               " respectively")
+
+  if (!noNA(section[,names(columns)]))
+    check_stop("section cannot include missing values in ",
+               punctuate_strings(names(columns), "or"))
+
+  if (any(section$SectionArea <= 0))
+    check_stop("section areas must be positive numbers")
+
+  TRUE
+}
+
+check_section_polygons <- function(section_polygons) {
+
+  if (class(section_polygons) != "SpatialPolygonsDataFrame")
+    check_stop("section_polygons is not a spatial polygons data frame")
+
+  TRUE
+}
+
+check_capture <- function(capture) {
+
+  if (!dplyr::is.tbl(capture)) check_stop("capture is not a tbl data frame")
+
+  TRUE
+}
 
 #' Check Lake Exploitation Data
 #'
@@ -11,9 +64,8 @@ check_stop <- function(...) stop(..., call. = FALSE)
 check_lex_data <- function(package) {
   load_lex_data(package)
 
-  if (!dplyr::is.tbl(section)) check_stop("section is not a tbl data frame")
-  if (class(section_polygons) != "SpatialPolygonsDataFrame")
-    check_stop("section_distance is not a spatial polygons data frame")
+  check_section(section)
+  check_section_polygons(section_polygons)
   if (!is.matrix(section_distance)) check_stop("section_distance is not a matrix")
   if (!dplyr::is.tbl(station)) check_stop("station is not a tbl data frame")
   if (!dplyr::is.tbl(receiver)) check_stop("receiver is not a tbl data frame")
@@ -22,8 +74,7 @@ check_lex_data <- function(package) {
   if (!dplyr::is.tbl(recapture)) check_stop("recapture is not a tbl data frame")
   if (!dplyr::is.tbl(detection)) check_stop("detection is not a tbl data frame")
   if (!dplyr::is.tbl(depth)) check_stop("depth is not a tbl data frame")
-  if (!dplyr::is.tbl(capture)) check_stop("capture is not a tbl data frame")
-
+  check_capture(capture)
 
   TRUE
 }

@@ -3,4 +3,5 @@
 #' @docType package
 #' @name lexr
 #' @importFrom magrittr %<>% %>%
+#' @import assertthat
 NULL
