@@ -11,7 +11,7 @@ check_stop <- function(...) stop(..., call. = FALSE)
 
 check_section <- function(section) {
 
-  if (!dplyr::is.tbl(section)) check_stop("section is not a tbl data frame")
+  if (!is.data.frame(section)) check_stop("section is not a data frame")
   if (!nrow(section)) check_stop("section must contain at least one row of data")
 
   columns <- list("Section" = "integer", "SectionArea" = "double",
@@ -26,7 +26,7 @@ check_section <- function(section) {
                " ", punctuate_strings(names(columns), "and"),
                " must have ", plural("mode", length(columns)),
                " ", punctuate_strings(unlist(columns), "and"),
-               " respectively")
+               ", respectively")
 
   if (!noNA(section[,names(columns)]))
     check_stop("section cannot include missing values in ",
@@ -48,7 +48,7 @@ check_section_polygons <- function(section_polygons) {
 
 check_capture <- function(capture) {
 
-  if (!dplyr::is.tbl(capture)) check_stop("capture is not a tbl data frame")
+  if (!is.data.frame(capture)) check_stop("capture is not a data frame")
 
   TRUE
 }
@@ -67,13 +67,13 @@ check_lex_data <- function(package) {
   check_section(section)
   check_section_polygons(section_polygons)
   if (!is.matrix(section_distance)) check_stop("section_distance is not a matrix")
-  if (!dplyr::is.tbl(station)) check_stop("station is not a tbl data frame")
-  if (!dplyr::is.tbl(receiver)) check_stop("receiver is not a tbl data frame")
-  if (!dplyr::is.tbl(station_deployment))
-    check_stop("station_deployment is not a tbl data frame")
-  if (!dplyr::is.tbl(recapture)) check_stop("recapture is not a tbl data frame")
-  if (!dplyr::is.tbl(detection)) check_stop("detection is not a tbl data frame")
-  if (!dplyr::is.tbl(depth)) check_stop("depth is not a tbl data frame")
+  if (!is.data.frame(station)) check_stop("station is not a data frame")
+  if (!is.data.frame(receiver)) check_stop("receiver is not a data frame")
+  if (!is.data.frame(station_deployment))
+    check_stop("station_deployment is not a data frame")
+  if (!is.data.frame(recapture)) check_stop("recapture is not a data frame")
+  if (!is.data.frame(detection)) check_stop("detection is not a data frame")
+  if (!is.data.frame(depth)) check_stop("depth is not a data frame")
   check_capture(capture)
 
   TRUE
