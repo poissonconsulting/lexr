@@ -66,16 +66,15 @@ plot_station <- function(station, section_polygons = NULL) {
 plot_station_deployment <- function(station_deployment, station) {
 
   station_deployment %<>% dplyr::inner_join(station, by = "Station")
-  print(station_deployment)
-
   tz <- lubridate::tz(station_deployment$ReceiverDateTimeIn[1])
 
   ggplot2::ggplot(data = station_deployment, ggplot2::aes_(y = ~Station)) +
     ggplot2::facet_grid(Section~., scales = "free_y", space = "free_y") +
   ggplot2::geom_segment(ggplot2::aes_(
-    x = ~ReceiverDateTimeIn, xend = ~ReceiverDateTimeOut, yend = ~Station)) +
+    x = ~ReceiverDateTimeIn, xend = ~ReceiverDateTimeOut, yend = ~Station),
+    alpha = 1/2, size = 3) +
     ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz)) +
-    ggplot2::scale_y_continuous(name = "Station", labels = scales::date_format("%b %Y", tz))
+    ggplot2::scale_y_continuous()
 }
 
 #' Plot Lex Data
