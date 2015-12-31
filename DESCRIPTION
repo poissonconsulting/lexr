@@ -1,6 +1,6 @@
 Package: lexr
 Title: Lake Exploitation Study Data Plotting and Analysis
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: c(
     person("Joe", "Thorley", email = "joe@poissonconsulting.ca", role = c("aut", "cre")),
     person("Gary", "Pavan", role = "aut"),
@@ -10,16 +10,16 @@ Depends:
     R (>= 3.2.3)
 Imports:
     assertthat,
-    dplyr,
     broom,
+    datacheckr (>= 0.0.1),
+    dplyr,
     ggplot2 (>= 2.0.0),
-    magrittr,
     lubridate,
+    magrittr,
     scales
 Suggests:
     klesdatr,
-    qlexdatr,
-    testthat
+    qlexdatr
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 5.0.1

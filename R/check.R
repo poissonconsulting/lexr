@@ -1,54 +1,100 @@
-plural <- function(x, n = 1, end = "") paste0(x, ifelse(n > 1, "s", ""), end)
-
-punctuate_strings <- function(x, qualifier = "or") {
-  if (length(x) == 1)
-    return(x)
-  n <- length(x)
-  paste(paste(x[-n], collapse = ", "), qualifier, x[n])
-}
-
 check_stop <- function(...) stop(..., call. = FALSE)
 
 check_section <- function(section) {
+  values <- list(Section = c(1L, .Machine$integer.max),
+                 SectionArea = c(0, Inf),
+                 SectionX = 1,
+                 SectionY = 1)
 
-  if (!is.data.frame(section)) check_stop("section is not a data frame")
-  if (!nrow(section)) check_stop("section must contain at least one row of data")
-
-  columns <- list("Section" = "integer", "SectionArea" = "double",
-               "SectionX" = "double", "SectionY" = "double")
-
-  if (!all(names(columns) %in% colnames(section)))
-    check_stop("section must include ", plural("column", length(columns)),
-               " ", punctuate_strings(names(columns), "and"))
-
-  if (!identical(sapply(section[,names(columns)], storage.mode), unlist(columns)))
-    check_stop("section ", plural("column", length(columns)),
-               " ", punctuate_strings(names(columns), "and"),
-               " must have ", plural("mode", length(columns)),
-               " ", punctuate_strings(unlist(columns), "and"),
-               ", respectively")
-
-  if (!noNA(section[,names(columns)]))
-    check_stop("section cannot include missing values in ",
-               punctuate_strings(names(columns), "or"))
-
-  if (any(section$SectionArea <= 0))
-    check_stop("section areas must be positive numbers")
-
+  datacheckr::check_data(section, values)
   TRUE
 }
 
 check_section_polygons <- function(section_polygons) {
 
-  if (class(section_polygons) != "SpatialPolygonsDataFrame")
-    check_stop("section_polygons is not a spatial polygons data frame")
+  if (!inherits(section_polygons, "SpatialPolygonsDataFrame"))
+    check_stop("section_polygons must be a spatial polygons data frame")
 
+  values <- list(Section = c(1L, .Machine$integer.max))
+  datacheckr::check_data(section_polygons@data, values)
+  TRUE
+}
+
+check_section_distance <- function(section_distance) {
+  if (!inherits(section_distance, "matrix"))
+    check_stop("section_distance must be a matrix")
+
+  if (!is.integer(section_distance))
+    check_stop("section_distance must be an integer matrix")
+  TRUE
+}
+
+check_station <- function(station) {
+  values <- list(Station = c(1L, .Machine$integer.max),
+                 Section = c(1L, .Machine$integer.max),
+                 StationX = 1,
+                 StationY = 1)
+
+  datacheckr::check_data(station, values)
+  TRUE
+}
+
+check_station_deployment <- function(station_deployment) {
+  values <- list(Station = c(1L, .Machine$integer.max),
+                 Receiver = c(1L, .Machine$integer.max),
+                 ReceiverDateTimeIn = Sys.time(),
+                 ReceiverDateTimeOut = Sys.time())
+
+  datacheckr::check_data(station_deployment, values)
+  TRUE
+}
+
+check_recapture <- function(recapture) {
+  values <- list(RecaptureDateTime = Sys.time(),
+                 Capture = c(1L, .Machine$integer.max),
+                 Section = c(1L, .Machine$integer.max),
+                 TBarTag1 = TRUE,
+                 TBarTag2 = TRUE,
+                 TagsRemoved = TRUE,
+                 Released = TRUE)
+
+  datacheckr::check_data(recapture, values)
+  TRUE
+}
+
+check_detection <- function(detection) {
+
+  values <- list(DetectionDateTime = Sys.time(),
+                 Capture = c(1L, .Machine$integer.max),
+                 Receiver = c(1L, .Machine$integer.max),
+                 Detections = c(1L, .Machine$integer.max))
+
+  datacheckr::check_data(detection, values)
+  TRUE
+}
+
+check_depth <- function(depth) {
+
+  values <- list(
+    DepthDateTime = Sys.time(),
+    Capture = c(1L, .Machine$integer.max),
+    Receiver = c(1L, .Machine$integer.max),
+    Depth = c(0, Inf))
+  datacheckr::check_data(depth, values)
   TRUE
 }
 
 check_capture <- function(capture) {
-
-  if (!is.data.frame(capture)) check_stop("capture is not a data frame")
+  values <- list(
+    Capture = c(1L, .Machine$integer.max),
+    CaptureDateTime = Sys.time(),
+    Section = c(1L, .Machine$integer.max),
+    Species = factor(""),
+    Length = c(1L, 1000L),
+    Weight = c(0, Inf, NA),
+    Reward1 = c(1, 10, 100),
+    Reward2 = c(1, 10, 100),
+    TagExpireDateTime = Sys.time())
 
   TRUE
 }
@@ -66,14 +112,12 @@ check_lex_data <- function(package) {
 
   check_section(section)
   check_section_polygons(section_polygons)
-  if (!is.matrix(section_distance)) check_stop("section_distance is not a matrix")
-  if (!is.data.frame(station)) check_stop("station is not a data frame")
-  if (!is.data.frame(receiver)) check_stop("receiver is not a data frame")
-  if (!is.data.frame(station_deployment))
-    check_stop("station_deployment is not a data frame")
-  if (!is.data.frame(recapture)) check_stop("recapture is not a data frame")
-  if (!is.data.frame(detection)) check_stop("detection is not a data frame")
-  if (!is.data.frame(depth)) check_stop("depth is not a data frame")
+  check_section_distance(section_distance)
+  check_station(station)
+  check_station_deployment(station_deployment)
+  check_recapture(recapture)
+  check_detection(detection)
+  check_depth(depth)
   check_capture(capture)
 
   TRUE
