@@ -42,7 +42,16 @@ check_station <- function(station) {
                  StationY = 1)
 
   datacheckr::check_data(station, values)
+  stopifnot(!anyDuplicated(station$Station))
   invisible(station)
+}
+
+check_receiver <- function(receiver) {
+  values <- list(Receiver = c(1L, nrow(receiver)))
+
+  datacheckr::check_data(receiver, values)
+  stopifnot(!anyDuplicated(receiver$Receiver))
+  invisible(receiver)
 }
 
 check_station_deployment <- function(station_deployment) {
@@ -105,29 +114,26 @@ check_capture <- function(capture) {
 }
 
 check_all <- function(section, section_polygons, section_distance,
-                      station, station_deployment, recapture, detection, depth,
+                      station, receiver, station_deployment, recapture, detection, depth,
                       capture) {
 
    stopifnot(nrow(!section_polygons@data) == nrow(section))
    stopifnot(nrow(section_distance) == nrow(section))
    stopifnot(ncol(section_distance) == nrow(section))
-#   stopifnot()
-#   station %<>% dplyr::full_join(station_deployment, by = "Station")
-#   if (any(is.na(station$Station)))
-#     stop("unmatched values in column Station of station and station_deployment")
-#
-#   station %<>% dplyr::left_join(section, by = "Section")
-#   if (any(is.na(station$Section)))
-#     stop("unmatched values in column Section of station and section")
-#
-#   capture %<>% dplyr::full_join(recapture, by = "Capture")
-#   if (any(is.na(capture$Capture)))
-#     stop("unmatched values in column Capture of capture and recapture")
-#
-#   capture %<>% dplyr::rename_("Section = Section.x")
-#   capture %<>% dplyr::left_join(section, by = "Section")
-#   if (any(is.na(capture$Section)))
-#     stop("unmatched values in column Section of capture and section")
+
+   stopifnot(all(station$Section %in% section$Section))
+   stopifnot(all(recapture$Section %in% section$Section))
+   stopifnot(all(capture$Section %in% section$Section))
+
+   stopifnot(all(station_deployment$Station %in% station$Station))
+
+   stopifnot(all(station_deployment$Receiver %in% receiver$Receiver))
+   stopifnot(all(detection$Receiver %in% receiver$Receiver))
+   stopifnot(all(depth$Receiver %in% receiver$Receiver))
+
+   stopifnot(all(detection$Capture %in% capture$Capture))
+   stopifnot(all(depth$Capture %in% capture$Capture))
+   stopifnot(all(recapture$Capture %in% capture$Capture))
 
     invisible(section)
 }
@@ -147,13 +153,14 @@ check_lex_data <- function(package) {
   check_section_polygons(section_polygons)
   check_section_distance(section_distance)
   check_station(station)
+  check_receiver(receiver)
   check_station_deployment(station_deployment)
   check_recapture(recapture)
   check_detection(detection)
   check_depth(depth)
   check_capture(capture)
   check_all(section, section_polygons, section_distance,
-                      station, station_deployment, recapture, detection, depth,
+                      station, receiver, station_deployment, recapture, detection, depth,
                       capture)
 
   TRUE
