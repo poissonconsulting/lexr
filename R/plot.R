@@ -87,6 +87,11 @@ plot_station_deployment <- function(station_deployment, station) {
 #' @inheritParams load_lex_data
 #' @param file A string of the pdf file name.
 #' @export
+#' @examples
+#' \dontrun{
+#' # creates qlexdatr.pdf in the working directory
+#' plot_lex_data("qlexdatr")
+#' }
 plot_lex_data <- function(package, file = paste0(package, ".pdf")) {
   load_lex_data(package)
 
@@ -97,5 +102,6 @@ plot_lex_data <- function(package, file = paste0(package, ".pdf")) {
 
   print(plot_section(section, section_polygons))
   print(plot_station(station, section_polygons))
+  print(plot_station(station))
   print(plot_station_deployment(station_deployment, station))
 }

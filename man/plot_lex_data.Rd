@@ -14,4 +14,10 @@ plot_lex_data(package, file = paste0(package, ".pdf"))
 \description{
 Plots lake exploitation package data to a pdf.
 }
+\examples{
+\dontrun{
+# creates qlexdatr.pdf in the working directory
+plot_lex_data("qlexdatr")
+}
+}
 
