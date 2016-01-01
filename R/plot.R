@@ -49,7 +49,10 @@ plot_station <- function(station, section_polygons = NULL) {
   ggplot2::ggplot(data = station, ggplot2::aes_(x = ~StationX / 1000,
                                                 y = ~StationY / 1000)) +
     tidy_section_polygons(section_polygons) +
-    ggplot2::geom_point() +
+    ifelse(is.null(section_polygons),
+           list(ggplot2::geom_text(ggplot2::aes_(label = ~Station),
+                                   nudge_x = 1.5, size = 3, alpha = 0.5)),
+           list(ggplot2::geom_point())) +
     ggplot2::coord_equal() +
     ggplot2::scale_x_continuous(name = "Easting (km)", labels = scales::comma) +
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
