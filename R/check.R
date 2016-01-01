@@ -1,38 +1,17 @@
 check_stop <- function(...) stop(..., call. = FALSE)
 
 check_section <- function(section) {
+  if (!inherits(section, "SpatialPolygonsDataFrame"))
+    check_stop("section must be a spatial polygons data frame")
+
   values <- list(Section = c(1L, nrow(section)),
-                 SectionArea = c(0, Inf),
                  SectionX = 1,
                  SectionY = 1)
 
-  datacheckr::check_data(section, values)
-  stopifnot(!anyDuplicated(section$Section))
+  datacheckr::check_data(section@data, values)
+  stopifnot(!anyDuplicated(section@data$Section))
+  section@data %<>% subset(select = names(values))
   invisible(section)
-}
-
-check_section_polygons <- function(section_polygons) {
-
-  if (!inherits(section_polygons, "SpatialPolygonsDataFrame"))
-    check_stop("section_polygons must be a spatial polygons data frame")
-
-  values <- list(Section = c(1L, nrow(section)))
-
-  datacheckr::check_data(section_polygons@data, values)
-  stopifnot(!anyDuplicated(section_polygons$Section))
-
-  invisible(section_polygons)
-}
-
-check_section_distance <- function(section_distance) {
-  if (!inherits(section_distance, "matrix"))
-    check_stop("section_distance must be a matrix")
-
-  if (!is.integer(section_distance))
-    check_stop("section_distance must be an integer matrix")
-  stopifnot(nrow(section_distance) == ncol(section_distance))
-
-  invisible(section_distance)
 }
 
 check_station <- function(station) {
@@ -43,6 +22,7 @@ check_station <- function(station) {
 
   datacheckr::check_data(station, values)
   stopifnot(!anyDuplicated(station$Station))
+  station %<>% subset(select = names(values))
   invisible(station)
 }
 
@@ -51,16 +31,19 @@ check_receiver <- function(receiver) {
 
   datacheckr::check_data(receiver, values)
   stopifnot(!anyDuplicated(receiver$Receiver))
+  receiver %<>% subset(select = names(values))
   invisible(receiver)
 }
 
-check_station_deployment <- function(station_deployment) {
+check_deployment <- function(deployment) {
   values <- list(Station = c(1L, datacheckr::max_integer()),
                  Receiver = c(1L, datacheckr::max_integer()),
                  ReceiverDateTimeIn = Sys.time(),
                  ReceiverDateTimeOut = Sys.time())
 
-  datacheckr::check_data(station_deployment, values)
+  datacheckr::check_data(deployment, values)
+  deployment %<>% subset(select = names(values))
+  invisible(deployment)
 }
 
 check_recapture <- function(recapture) {
@@ -73,6 +56,8 @@ check_recapture <- function(recapture) {
                  Released = TRUE)
 
   datacheckr::check_data(recapture, values)
+  recapture %<>% subset(select = names(values))
+  invisible(recapture)
 }
 
 check_detection <- function(detection) {
@@ -83,6 +68,8 @@ check_detection <- function(detection) {
                  Detections = c(1L, datacheckr::max_integer()))
 
   datacheckr::check_data(detection, values)
+  detection %<>% subset(select = names(values))
+  invisible(detection)
 }
 
 check_depth <- function(depth) {
@@ -94,6 +81,8 @@ check_depth <- function(depth) {
     Depth = c(0, Inf))
 
   datacheckr::check_data(depth, values)
+  depth %<>% subset(select = names(values))
+  invisible(depth)
 }
 
 check_capture <- function(capture) {
@@ -110,12 +99,15 @@ check_capture <- function(capture) {
 
   datacheckr::check_data(capture, values)
   stopifnot(!anyDuplicated(capture$Capture))
+  capture %<>% subset(select = names(values))
   invisible(capture)
 }
 
-check_all <- function(section, section_polygons, section_distance,
-                      station, receiver, station_deployment, recapture, detection, depth,
-                      capture) {
+check_data <- function(data) {
+  expr <- paste0("check_", data$name, "(", data$name,")")
+}
+
+check_all <- function(data) {
 
    stopifnot(nrow(!section_polygons@data) == nrow(section))
    stopifnot(nrow(section_distance) == nrow(section))
@@ -138,6 +130,8 @@ check_all <- function(section, section_polygons, section_distance,
     invisible(section)
 }
 
+
+
 #' Check Lake Exploitation Data
 #'
 #' Checks lake exploitation data and returns a TRUE if passes all the tests.
@@ -147,21 +141,9 @@ check_all <- function(section, section_polygons, section_distance,
 #' @return A flag indicating whether the package data passes the checks.
 #' @export
 check_lex_data <- function(package) {
-  load_lex_data(package)
+  data <- list_lex_data(package)
 
-  check_section(section)
-  check_section_polygons(section_polygons)
-  check_section_distance(section_distance)
-  check_station(station)
-  check_receiver(receiver)
-  check_station_deployment(station_deployment)
-  check_recapture(recapture)
-  check_detection(detection)
-  check_depth(depth)
-  check_capture(capture)
-  check_all(section, section_polygons, section_distance,
-                      station, receiver, station_deployment, recapture, detection, depth,
-                      capture)
-
-  TRUE
+  data %<>% lapply(check_data)
+  check_all(data)
+  invisible(data)
 }

@@ -7,8 +7,6 @@
 plot_lex_data(package, file = paste0(package, ".pdf"))
 }
 \arguments{
-\item{package}{A string of the data package.}
-
 \item{file}{A string of the pdf file name.}
 }
 \description{

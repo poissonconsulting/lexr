@@ -6,9 +6,6 @@
 \usage{
 check_lex_data(package)
 }
-\arguments{
-\item{package}{A string of the data package.}
-}
 \value{
 A flag indicating whether the package data passes the checks.
 }

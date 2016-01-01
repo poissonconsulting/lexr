@@ -7,8 +7,6 @@
 process_lex_data(package, hourly_interval = 6)
 }
 \arguments{
-\item{package}{A string of the data package.}
-
 \item{hourly_interval}{A count indicating the hourly interval.}
 }
 \value{
