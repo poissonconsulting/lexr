@@ -1,3 +1,8 @@
+capture_output <- function(x) {
+  x %<>% capture.output() %>% paste(collapse = "\n")
+  x
+}
+
 check_stop <- function(...) stop(..., call. = FALSE)
 
 check_section <- function(section) {
@@ -42,6 +47,14 @@ check_deployment <- function(deployment) {
                  ReceiverDateTimeOut = Sys.time())
 
   datacheckr::check_data(deployment, values)
+  deployment %<>% dplyr::arrange_(~ReceiverDateTimeIn)
+  deployment %<>% dplyr::mutate_(.dots = list(
+    "Duration" = ~as.integer(difftime(ReceiverDateTimeOut, ReceiverDateTimeIn, units = "secs"))))
+  if (any(deployment$Duration <= 0)) {
+    deployment %<>% dplyr::filter_(~Duration <= 0)
+    check_stop("receiver retrieved before deployed!\n", capture_output(deployment))
+  }
+  deployment
   deployment %<>% subset(select = names(values))
   invisible(deployment)
 }
@@ -104,8 +117,9 @@ check_capture <- function(capture) {
 }
 
 check_data <- function(data) {
-  expr <- paste0("check_", names(data), "(data)")
-  eval(expr)
+  name <- names(data)
+  expr <- paste0("data$", name, " <- check_", name, "(data$", name, ")")
+  eval(parse(text = expr))
   invisible(data)
 }
 
