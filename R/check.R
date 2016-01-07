@@ -15,7 +15,7 @@ check_section <- function(section) {
 }
 
 check_station <- function(station) {
-  values <- list(Station = c(1L, nrow(section)),
+  values <- list(Station = c(1L, nrow(station)),
                  Section = c(1L, datacheckr::max_integer()),
                  StationX = 1,
                  StationY = 1)
@@ -106,7 +106,7 @@ check_capture <- function(capture) {
 check_data <- function(data) {
   expr <- paste0("check_", names(data), "(data)")
   eval(expr)
-  data
+  invisible(data)
 }
 
 check_all <- function(data) {
@@ -124,7 +124,7 @@ check_all <- function(data) {
    stopifnot(all(data$detection$Capture %in% data$capture$Capture))
    stopifnot(all(data$depth$Capture %in% data$capture$Capture))
    stopifnot(all(data$recapture$Capture %in% data$capture$Capture))
-   data
+   invisible(data)
 }
 
 #' Check Lake Exploitation Data
@@ -132,7 +132,7 @@ check_all <- function(data) {
 #' Checks loaded lake exploitation data and returns a TRUE if passes all the tests.
 #' Otherwise stops with an informative error.
 #'
-#' @inheritParams load_lex_data
+#' @param data The lex_data object to check.
 #' @return A flag indicating whether the package data passes the checks.
 #' @export
 check_lex_data <- function(data) {

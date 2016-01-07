@@ -61,7 +61,7 @@ plot_detection <- function(detection) {
 }
 
 #' @export
-plot.lex_data <- function(x) {
+plot.lex_data <- function(x, ...) {
   if (!is.null(x$section)) {
     plot_section(x$section) %>% print()
     if (!is.null(x$station))

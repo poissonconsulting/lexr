@@ -6,6 +6,9 @@
 \usage{
 check_lex_data(data)
 }
+\arguments{
+\item{data}{The lex_data object to check.}
+}
 \value{
 A flag indicating whether the package data passes the checks.
 }

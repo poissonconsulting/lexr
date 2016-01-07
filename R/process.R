@@ -22,21 +22,21 @@
 #
 #   as.data.frame(coverage)
 # }
-
-#' Process Data
-#'
-#' @inheritParams load_lex_data
-#' @param hourly_interval A count indicating the hourly interval.
-#'
-#' @return A list of the data frames and transition matrix.
-#' @export
-#' @examples
-#' \dontrun{
-#' process_lex_data("qlexdatr")
-#' }
-process_lex_data <-  function(package, hourly_interval = 6) {
-  check_lex_data(package)
-  load_lex_data(package)
-  section_transition <- section_distance < 2
-  list(section = section, section_transition = section_transition)
-}
+#
+# #' Process Data
+# #'
+# #' @inheritParams load_lex_data
+# #' @param hourly_interval A count indicating the hourly interval.
+# #'
+# #' @return A list of the data frames and transition matrix.
+# #' @export
+# #' @examples
+# #' \dontrun{
+# #' process_lex_data("qlexdatr")
+# #' }
+# process_lex_data <-  function(package, hourly_interval = 6) {
+#   check_lex_data(package)
+#   load_lex_data(package)
+#   section_transition <- section_distance < 2
+#   list(section = section, section_transition = section_transition)
+# }
