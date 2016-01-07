@@ -9,7 +9,6 @@ To install the `lexr` package first install
 Then execute the following code at the R terminal:
 ``` r
 # install.packages("devtools")
-devtools::install_github("slowkow/ggrepel")
 devtools::install_github("poissonconsulting/qlexdatr")
 devtools::install_github("poissonconsulting/lexr")
 ```
