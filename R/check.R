@@ -104,46 +104,39 @@ check_capture <- function(capture) {
 }
 
 check_data <- function(data) {
-  expr <- paste0("check_", data$name, "(", data$name,")")
+  expr <- paste0("check_", names(data), "(data)")
+  eval(expr)
+  data
 }
 
 check_all <- function(data) {
 
-   stopifnot(nrow(!section_polygons@data) == nrow(section))
-   stopifnot(nrow(section_distance) == nrow(section))
-   stopifnot(ncol(section_distance) == nrow(section))
+   stopifnot(all(data$station$Section %in% data$section$Section))
+   stopifnot(all(data$recapture$Section %in% data$section$Section))
+   stopifnot(all(data$capture$Section %in% data$section$Section))
 
-   stopifnot(all(station$Section %in% section$Section))
-   stopifnot(all(recapture$Section %in% section$Section))
-   stopifnot(all(capture$Section %in% section$Section))
+   stopifnot(all(data$deployment$Station %in% data$station$Station))
 
-   stopifnot(all(station_deployment$Station %in% station$Station))
+   stopifnot(all(data$deployment$Receiver %in% data$receiver$Receiver))
+   stopifnot(all(data$detection$Receiver %in% data$receiver$Receiver))
+   stopifnot(all(data$depth$Receiver %in% data$receiver$Receiver))
 
-   stopifnot(all(station_deployment$Receiver %in% receiver$Receiver))
-   stopifnot(all(detection$Receiver %in% receiver$Receiver))
-   stopifnot(all(depth$Receiver %in% receiver$Receiver))
-
-   stopifnot(all(detection$Capture %in% capture$Capture))
-   stopifnot(all(depth$Capture %in% capture$Capture))
-   stopifnot(all(recapture$Capture %in% capture$Capture))
-
-    invisible(section)
+   stopifnot(all(data$detection$Capture %in% data$capture$Capture))
+   stopifnot(all(data$depth$Capture %in% data$capture$Capture))
+   stopifnot(all(data$recapture$Capture %in% data$capture$Capture))
+   data
 }
-
-
 
 #' Check Lake Exploitation Data
 #'
-#' Checks lake exploitation data and returns a TRUE if passes all the tests.
+#' Checks loaded lake exploitation data and returns a TRUE if passes all the tests.
 #' Otherwise stops with an informative error.
 #'
 #' @inheritParams load_lex_data
 #' @return A flag indicating whether the package data passes the checks.
 #' @export
-check_lex_data <- function(package) {
-  data <- list_lex_data(package)
-
-  data %<>% lapply(check_data)
+check_lex_data <- function(data) {
+  purrr::lmap(data, check_data)
   check_all(data)
   invisible(data)
 }

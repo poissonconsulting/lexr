@@ -4,13 +4,13 @@
 \alias{check_lex_data}
 \title{Check Lake Exploitation Data}
 \usage{
-check_lex_data(package)
+check_lex_data(data)
 }
 \value{
 A flag indicating whether the package data passes the checks.
 }
 \description{
-Checks lake exploitation data and returns a TRUE if passes all the tests.
+Checks loaded lake exploitation data and returns a TRUE if passes all the tests.
 Otherwise stops with an informative error.
 }
 

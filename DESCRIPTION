@@ -7,19 +7,21 @@ Authors@R: c(
     person("Bernhard", "Konrad", role = "aut"))
 Description: An R package to plot and analyse lake exploitation data.
 Depends:
-    R (>= 3.2.3)
+    R (>= 3.2.0)
 Imports:
     assertthat,
     broom,
     datacheckr (>= 0.0.1),
     dplyr,
     ggplot2 (>= 2.0.0),
+    ggrepel,
     lubridate,
+    purrr,
     magrittr,
+    qlexdatr,
     scales
 Suggests:
     klesdatr,
-    qlexdatr
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 5.0.1
