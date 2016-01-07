@@ -52,9 +52,21 @@ check_deployment <- function(deployment) {
     "Duration" = ~as.integer(difftime(ReceiverDateTimeOut, ReceiverDateTimeIn, units = "secs"))))
   if (any(deployment$Duration <= 0)) {
     deployment %<>% dplyr::filter_(~Duration <= 0)
-    check_stop("receiver retrieved before deployed!\n", capture_output(deployment))
+    check_stop("receiver retrieved before deployed\n", capture_output(deployment))
   }
-  deployment
+  deployment_diff <- function (x) {
+    x %<>% dplyr::arrange_(~ReceiverDateTimeIn)
+    x$Difference <- c(diff(as.integer(x$ReceiverDateTimeIn)), NA)
+    x
+  }
+  deployment %<>% plyr::ddply("Station", deployment_diff)
+  overlap <- !is.na(deployment$Difference) & deployment$Difference < deployment$Duration
+  if (FALSE) { #(any(overlap)) {
+    overlap <- which(overlap)
+    overlap <- sort(unique(c(overlap, overlap + 1)))
+    deployment %<>% dplyr::slice_(~overlap)
+    check_stop("multiple receivers at the same station\n", capture_output(deployment))
+  }
   deployment %<>% subset(select = names(values))
   invisible(deployment)
 }
