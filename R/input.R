@@ -6,24 +6,23 @@
 #' @param package A string of the data package.
 #' @export
 input_lex_data <- function(package = "qlexdatr") {
-  if (!assertthat::is.string(package)) error("package must be a string")
+  check_string(package)
 
-  section <- station <- receiver <- deployment <- recapture <- detection <- depth <- capture <- NULL
+  section <- station <- receiver <- deployment <- capture <- recapture <- detection <- depth <- NULL
 
-  data("section", "station", "receiver", "deployment",
-       "recapture", "detection", "depth", "capture",
+  data("section", "station", "receiver", "deployment", "capture",
+       "recapture", "detection", "depth",
        package = package, verbose = FALSE, envir = environment())
 
   data <- list(section = section,
        station = station,
        receiver = receiver,
        deployment = deployment,
+       capture = capture,
        recapture = recapture,
        detection = detection,
-       depth = depth,
-       capture = capture)
+       depth = depth)
 
   class(data) <- c("lex_data")
-  check_data(data)
   data
 }

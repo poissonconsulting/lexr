@@ -1,32 +1,23 @@
-capture_output <- function(x) {
-  x %<>% capture.output() %>% paste(collapse = "\n")
-  x
-}
-
-error <- function(...) stop(..., call. = FALSE)
-
 check_section <- function(section) {
   if (!inherits(section, "SpatialPolygonsDataFrame"))
     error("section must be a spatial polygons data frame")
 
-  values <- list(Section = c(1L, nrow(section)),
-                 SectionX = 1,
-                 SectionY = 1)
+  values <- list(Section = c(1L, nrow(section@data)),
+         SectionX = 1,
+         SectionY = 1)
 
-  datacheckr::check_data(section@data, values)
-  stopifnot(!anyDuplicated(section@data$Section))
+  datacheckr::check_data2(section@data, values, key = "Section")
   section@data %<>% subset(select = names(values))
   invisible(section)
 }
 
 check_station <- function(station) {
   values <- list(Station = c(1L, nrow(station)),
-                 Section = c(1L, datacheckr::max_integer()),
-                 StationX = 1,
-                 StationY = 1)
+         Section = 1L,
+         StationX = 1,
+         StationY = 1)
 
-  datacheckr::check_data(station, values)
-  stopifnot(!anyDuplicated(station$Station))
+  datacheckr::check_data2(station, values, key = "Station")
   station %<>% subset(select = names(values))
   invisible(station)
 }
@@ -34,53 +25,50 @@ check_station <- function(station) {
 check_receiver <- function(receiver) {
   values <- list(Receiver = c(1L, nrow(receiver)))
 
-  datacheckr::check_data(receiver, values)
-  stopifnot(!anyDuplicated(receiver$Receiver))
+  datacheckr::check_data2(receiver, values, key = "Receiver")
   receiver %<>% subset(select = names(values))
   invisible(receiver)
 }
 
 check_deployment <- function(deployment) {
-  values <- list(Station = c(1L, datacheckr::max_integer()),
-                 Receiver = c(1L, datacheckr::max_integer()),
-                 ReceiverDateTimeIn = Sys.time(),
-                 ReceiverDateTimeOut = Sys.time())
 
-  datacheckr::check_data(deployment, values)
-  deployment %<>% dplyr::arrange_(~ReceiverDateTimeIn)
-  deployment %<>% dplyr::mutate_(.dots = list(
-    "Duration" = ~as.integer(difftime(ReceiverDateTimeOut, ReceiverDateTimeIn, units = "secs"))))
-  if (any(deployment$Duration <= 0)) {
-    deployment %<>% dplyr::filter_(~Duration <= 0)
-    error("receiver retrieved before deployed\n", capture_output(deployment))
-  }
-  deployment_diff <- function (x) {
-    x %<>% dplyr::arrange_(~ReceiverDateTimeIn)
-    x$Difference <- c(diff(as.integer(x$ReceiverDateTimeIn)), NA)
-    x
-  }
-  deployment %<>% plyr::ddply("Station", deployment_diff)
-  overlap <- !is.na(deployment$Difference) & deployment$Difference < deployment$Duration
-  if (FALSE) { #(any(overlap)) {
-    overlap <- which(overlap)
-    overlap <- sort(unique(c(overlap, overlap + 1)))
-    deployment %<>% dplyr::slice_(~overlap)
-    error("multiple receivers at the same station\n", capture_output(deployment))
-  }
+  values <-  list(Station = 1L,
+         Receiver = 1L,
+         ReceiverDateTimeIn = Sys.time(),
+         ReceiverDateTimeOut = Sys.time())
+
+  datacheckr::check_data2(deployment, values, key = c("Station", "Receiver", "ReceiverDateTimeIn"))
   deployment %<>% subset(select = names(values))
   invisible(deployment)
 }
 
+check_capture <- function(capture) {
+  values <- list(Capture = c(1L, nrow(capture)),
+         CaptureDateTime = Sys.time(),
+         Section = 1L,
+         Species = factor(""),
+         Length = c(1L, 1000L),
+         Weight = c(1, 10, NA),
+         Reward1 = c(1L, 10L, 100L),
+         Reward2 = c(1L, 10L, 100L),
+         TagExpireDateTime = Sys.time(),
+         TagDepthRange = c(1, NA))
+
+  datacheckr::check_data2(capture, values, key = "Capture")
+  capture %<>% subset(select = names(values))
+  invisible(capture)
+}
+
 check_recapture <- function(recapture) {
   values <- list(RecaptureDateTime = Sys.time(),
-                 Capture = c(1L, datacheckr::max_integer()),
-                 Section = c(1L, datacheckr::max_integer()),
-                 TBarTag1 = TRUE,
-                 TBarTag2 = TRUE,
-                 TagsRemoved = TRUE,
-                 Released = TRUE)
+         Capture = 1L,
+         Section = 1L,
+         TBarTag1 = TRUE,
+         TBarTag2 = TRUE,
+         TagsRemoved = TRUE,
+         Released = TRUE)
 
-  datacheckr::check_data(recapture, values)
+  datacheckr::check_data2(recapture, values)
   recapture %<>% subset(select = names(values))
   invisible(recapture)
 }
@@ -88,11 +76,11 @@ check_recapture <- function(recapture) {
 check_detection <- function(detection) {
 
   values <- list(DetectionDateTime = Sys.time(),
-                 Capture = c(1L, datacheckr::max_integer()),
-                 Receiver = c(1L, datacheckr::max_integer()),
-                 Detections = c(1L, datacheckr::max_integer()))
+         Capture = 1L,
+         Receiver = 1L,
+         Detections = 1L)
 
-  datacheckr::check_data(detection, values)
+  datacheckr::check_data2(detection, values, key = c("DetectionDateTime", "Capture", "Receiver"))
   detection %<>% subset(select = names(values))
   invisible(detection)
 }
@@ -101,56 +89,35 @@ check_depth <- function(depth) {
 
   values <- list(
     DepthDateTime = Sys.time(),
-    Capture = c(1L, datacheckr::max_integer()),
-    Receiver = c(1L, datacheckr::max_integer()),
-    Depth = c(0, Inf))
+         Capture = 1L,
+         Receiver = 1L,
+         Depth = c(0, 340))
 
-  datacheckr::check_data(depth, values)
+  datacheckr::check_data2(depth, values, key = c("DepthDateTime", "Capture", "Receiver"))
   depth %<>% subset(select = names(values))
   invisible(depth)
 }
 
-check_capture <- function(capture) {
-  values <- list(
-    Capture = c(1L, nrow(capture)),
-    CaptureDateTime = Sys.time(),
-    Section = c(1L, datacheckr::max_integer()),
-    Species = factor(""),
-    Length = c(1L, 1000L),
-    Weight = c(0, Inf, NA),
-    Reward1 = c(1L, 10L, 100L),
-    Reward2 = c(1L, 10L, 100L),
-    TagExpireDateTime = Sys.time())
-
-  datacheckr::check_data(capture, values)
-  stopifnot(!anyDuplicated(capture$Capture))
-  capture %<>% subset(select = names(values))
-  invisible(capture)
-}
-
-check_data <- function(data) {
+check_data_name <- function(data) {
   name <- names(data)
   expr <- paste0("data$", name, " <- check_", name, "(data$", name, ")")
   eval(parse(text = expr))
   invisible(data)
 }
 
-check_all <- function(data) {
+check_joins <- function(data) {
 
-   stopifnot(all(data$station$Section %in% data$section$Section))
-   stopifnot(all(data$recapture$Section %in% data$section$Section))
-   stopifnot(all(data$capture$Section %in% data$section$Section))
-
-   stopifnot(all(data$deployment$Station %in% data$station$Station))
-
-   stopifnot(all(data$deployment$Receiver %in% data$receiver$Receiver))
-   stopifnot(all(data$detection$Receiver %in% data$receiver$Receiver))
-   stopifnot(all(data$depth$Receiver %in% data$receiver$Receiver))
-
-   stopifnot(all(data$detection$Capture %in% data$capture$Capture))
-   stopifnot(all(data$depth$Capture %in% data$capture$Capture))
-   stopifnot(all(data$recapture$Capture %in% data$capture$Capture))
-   invisible(data)
+  datacheckr::check_join(data$station, data$section@data, "Section")
+  datacheckr::check_join(data$deployment,  data$station, "Station")
+  datacheckr::check_join(data$deployment,  data$receiver, "Receiver")
+  datacheckr::check_join(data$capture,  data$section@data, "Section")
+  datacheckr::check_join(data$recapture,  data$capture, "Capture", extra = TRUE)
+  datacheckr::check_join(data$recapture,  data$section@data, "Section")
+  datacheckr::check_join(data$detection,  data$capture, "Capture")
+  datacheckr::check_join(data$detection,  data$receiver, "Receiver")
+  datacheckr::check_join(data$depth,  data$capture, "Capture")
+  datacheckr::check_join(data$depth,  data$receiver, "Receiver")
+  invisible(data)
 }
 
 #' Check Lake Exploitation Data
@@ -162,7 +129,10 @@ check_all <- function(data) {
 #' @return A flag indicating whether the package data passes the checks.
 #' @export
 check_lex_data <- function(data) {
-  purrr::lmap(data, check_data)
-  check_all(data)
+  if (!inherits(data, "lex_data")) error("data must be a lex_data object")
+  if (!identical(names(data), data_names())) error("data must have correct names")
+  data %<>% purrr::lmap(check_data_name)
+  check_joins(data)
+  class(data) <- "lex_data"
   invisible(data)
 }
