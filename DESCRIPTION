@@ -1,17 +1,17 @@
 Package: lexr
 Title: Lake Exploitation Study Data Plotting and Analysis
-Version: 0.0.0.9002
+Version: 0.0.0.9003
 Authors@R: c(
     person("Joe", "Thorley", email = "joe@poissonconsulting.ca", role = c("aut", "cre")),
     person("Gary", "Pavan", role = "aut"),
     person("Bernhard", "Konrad", role = "aut"))
 Description: An R package to plot and analyse lake exploitation data.
 Depends:
-    R (>= 3.2.0)
+    R (>= 3.1.0)
 Imports:
     assertthat,
     broom,
-    datacheckr (>= 0.0.1),
+    datacheckr (>= 0.0.2.9005),
     dplyr,
     ggplot2 (>= 2.0.0),
     lubridate,
