@@ -36,8 +36,11 @@ capture_output <- function(x) {
   x
 }
 
-data_names <- function() c("section", "station", "receiver", "deployment", "capture",
+lex_data_names <- function() c("section", "station", "receiver", "deployment", "capture",
        "recapture", "detection", "depth")
+
+detect_data_names <- function() c("section", "distance", "interval", "coverage", "capture",
+       "recapture", "detection")
 
 fun_data_name <- function(data, fun) {
   name <- names(data)

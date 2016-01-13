@@ -1,4 +1,4 @@
-check_section <- function(section) {
+check_lex_section <- function(section) {
   if (!inherits(section, "SpatialPolygonsDataFrame"))
     error("section must be a spatial polygons data frame")
 
@@ -11,7 +11,7 @@ check_section <- function(section) {
   invisible(section)
 }
 
-check_station <- function(station) {
+check_lex_station <- function(station) {
   values <- list(Station = c(1L, nrow(station)),
          Section = 1L,
          StationX = 1,
@@ -22,7 +22,7 @@ check_station <- function(station) {
   invisible(station)
 }
 
-check_receiver <- function(receiver) {
+check_lex_receiver <- function(receiver) {
   values <- list(Receiver = c(1L, nrow(receiver)))
 
   datacheckr::check_data2(receiver, values, key = "Receiver")
@@ -30,7 +30,7 @@ check_receiver <- function(receiver) {
   invisible(receiver)
 }
 
-check_deployment <- function(deployment) {
+check_lex_deployment <- function(deployment) {
 
   values <-  list(Station = 1L,
          Receiver = 1L,
@@ -42,7 +42,7 @@ check_deployment <- function(deployment) {
   invisible(deployment)
 }
 
-check_capture <- function(capture) {
+check_lex_capture <- function(capture) {
   values <- list(Capture = c(1L, nrow(capture)),
          CaptureDateTime = Sys.time(),
          Section = 1L,
@@ -59,7 +59,7 @@ check_capture <- function(capture) {
   invisible(capture)
 }
 
-check_recapture <- function(recapture) {
+check_lex_recapture <- function(recapture) {
   values <- list(RecaptureDateTime = Sys.time(),
          Capture = 1L,
          Section = c(1L,NA),
@@ -73,7 +73,7 @@ check_recapture <- function(recapture) {
   invisible(recapture)
 }
 
-check_detection <- function(detection) {
+check_lex_detection <- function(detection) {
 
   values <- list(DetectionDateTime = Sys.time(),
          Capture = 1L,
@@ -85,7 +85,7 @@ check_detection <- function(detection) {
   invisible(detection)
 }
 
-check_depth <- function(depth) {
+check_lex_depth <- function(depth) {
 
   values <- list(
     DepthDateTime = Sys.time(),
@@ -98,7 +98,7 @@ check_depth <- function(depth) {
   invisible(depth)
 }
 
-check_joins <- function(data) {
+check_lex_joins <- function(data) {
 
   datacheckr::check_join(data$station, data$section@data, "Section")
   datacheckr::check_join(data$deployment,  data$station, "Station")
@@ -123,9 +123,9 @@ check_joins <- function(data) {
 #' @export
 check_lex_data <- function(data) {
   if (!inherits(data, "lex_data")) error("data must be a lex_data object")
-  if (!identical(names(data), data_names())) error("data must have correct names")
-  data %<>% purrr::lmap(fun_data_name, fun = "check")
-  check_joins(data)
+  if (!identical(names(data), lex_data_names())) error("data must have correct names")
+  data %<>% purrr::lmap(fun_data_name, fun = "check_lex")
+  check_lex_joins(data)
   class(data) <- "lex_data"
   invisible(data)
 }
