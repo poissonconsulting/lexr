@@ -37,6 +37,8 @@ plot_station <- function(station, section = NULL) {
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
 }
 
+plot_receiver <- function(receiver) NULL
+
 plot_deployment <- function(deployment) {
   tz <- lubridate::tz(deployment$ReceiverDateTimeIn[1])
   ggplot2::ggplot(data = deployment, ggplot2::aes_(y = ~Station)) +
@@ -45,6 +47,25 @@ plot_deployment <- function(deployment) {
       alpha = 1/2, size = 3) +
     ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz)) +
     ggplot2::scale_y_continuous()
+}
+
+plot_capture <- function(capture) {
+  capture %<>% dplyr::mutate_(.dots = list("Year" = ~lubridate::year(CaptureDateTime)))
+
+  ggplot2::ggplot(data = capture, ggplot2::aes_(x = ~Length)) +
+    ggplot2::facet_grid(Species~Year) +
+    ggplot2::geom_histogram(binwidth = 50, color = "white") +
+    ggplot2::scale_x_continuous(name = "Fork Length (mm)") +
+    ggplot2::scale_y_continuous(name = "Captures")
+}
+
+plot_recapture <- function(recapture) {
+  tz <- lubridate::tz(recapture$RecaptureDateTime[1])
+  recapture %<>% dplyr::mutate_(.dots = list("Section" = ~factor(Section)))
+
+  ggplot2::ggplot(data = recapture, ggplot2::aes_(x = ~RecaptureDateTime, y = ~Section)) +
+    ggplot2::geom_point(ggplot2::aes_(shape = ~Released), alpha = 1/2, size = 4) +
+    ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz))
 }
 
 plot_detection <- function(detection) {
@@ -60,6 +81,14 @@ plot_detection <- function(detection) {
     ggplot2::scale_y_continuous(name = "Total Daily Detections", labels = scales::comma)
 }
 
+plot_depth <- function(depth) {
+  tz <- lubridate::tz(depth$DepthDateTime[1])
+  ggplot2::ggplot(data = depth, ggplot2::aes_(x = ~DepthDateTime, y = ~Depth * -1)) +
+    ggplot2::geom_point(alpha = 1/3) +
+    ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz)) +
+    ggplot2::scale_y_continuous(name = "Depth (m)")
+}
+
 plot_data_name <- function(data) {
   name <- names(data)
   expr <- paste0("data$", name, " <- plot_", name, "(data$", name, ")")
@@ -69,10 +98,7 @@ plot_data_name <- function(data) {
 
 #' @export
 plot.lex_data <- function(x, ...) {
- x %<>% check_lex_data()
-  x <- x[c("section", "station", "deployment")]
-
   x %<>% purrr::lmap(fun_data_name, fun = "plot")
   lapply(x, print)
-  invisible (NULL)
+  invisible(NULL)
 }
