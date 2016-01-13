@@ -9,7 +9,6 @@ Description: An R package to plot and analyse lake exploitation data.
 Depends:
     R (>= 3.1.0)
 Imports:
-    assertthat,
     broom,
     datacheckr (>= 0.0.2.9005),
     dplyr,
