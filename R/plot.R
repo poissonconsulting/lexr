@@ -17,9 +17,9 @@ plot_section <- function(section) {
   ggplot2::ggplot(data = section@data, ggplot2::aes_(x = ~SectionX / 1000,
                                                      y = ~SectionY / 1000)) +
     tidy_section(section) +
-    ggplot2::geom_point() +
-    ggplot2::geom_text(ggplot2::aes_(x = ~SectionX / 1000, label = ~Section),
-                       size = 3, alpha = 0.5, nudge_x = 1.5) +
+    ggplot2::geom_point(alpha = 1/3) +
+    ggrepel::geom_text_repel(ggplot2::aes_(x = ~SectionX / 1000, label = ~Section),
+                       size = 4) +
     ggplot2::coord_equal() +
     ggplot2::scale_x_continuous(name = "Easting (km)", labels = scales::comma) +
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
@@ -29,9 +29,8 @@ plot_station <- function(station, section = NULL) {
   ggplot2::ggplot(data = station, ggplot2::aes_(x = ~StationX / 1000,
                                                 y = ~StationY / 1000)) +
     tidy_section(section) +
-    ggplot2::geom_point() +
-    ggplot2::geom_text(ggplot2::aes_(label = ~Station),
-                       size = 3, alpha = 0.5, nudge_x = 1.5) +
+    ggplot2::geom_point(alpha = 1/3) +
+    ggrepel::geom_text_repel(ggplot2::aes_(label = ~Station), size = 4) +
     ggplot2::coord_equal() +
     ggplot2::scale_x_continuous(name = "Easting (km)", labels = scales::comma) +
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)

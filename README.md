@@ -89,7 +89,7 @@ print(lex_data)
 #> ..     ...      ...                 ...                 ...
 #> 
 #> $capture
-#> Source: local data frame [225 x 10]
+#> Source: local data frame [227 x 10]
 #> 
 #>    Capture     CaptureDateTime Section    Species Length Weight Reward1
 #>      (int)              (time)   (int)     (fctr)  (int)  (dbl)   (int)
@@ -112,29 +112,29 @@ print(lex_data)
 #> 
 #>      RecaptureDateTime Capture Section TBarTag1 TBarTag2 TagsRemoved
 #>                 (time)   (int)   (int)    (lgl)    (lgl)       (lgl)
-#> 1  2013-07-02 12:00:00     104      13     TRUE     TRUE       FALSE
-#> 2  2014-05-08 12:00:00     105      13     TRUE     TRUE       FALSE
+#> 1  2013-07-02 12:00:00     105      13     TRUE     TRUE       FALSE
+#> 2  2014-05-08 12:00:00     106      13     TRUE     TRUE       FALSE
 #> 3  2014-06-08 12:00:00      28      13     TRUE     TRUE       FALSE
-#> 4  2014-06-17 12:00:00     142      14     TRUE     TRUE        TRUE
-#> 5  2014-06-20 12:00:00     103      13     TRUE     TRUE       FALSE
-#> 6  2014-06-22 12:00:00     107      15     TRUE     TRUE       FALSE
-#> 7  2014-07-19 12:00:00     148      11     TRUE     TRUE       FALSE
-#> 8  2014-07-22 12:00:00     144      13     TRUE     TRUE        TRUE
-#> 9  2014-07-26 12:00:00     163      13     TRUE     TRUE       FALSE
-#> 10 2014-08-02 12:00:00     139      13     TRUE     TRUE       FALSE
-#> 11 2014-08-14 12:00:00     135      23     TRUE     TRUE       FALSE
+#> 4  2014-06-17 12:00:00     143      14     TRUE     TRUE        TRUE
+#> 5  2014-06-20 12:00:00     104      13     TRUE     TRUE       FALSE
+#> 6  2014-06-22 12:00:00     108      15     TRUE     TRUE       FALSE
+#> 7  2014-07-19 12:00:00     149      11     TRUE     TRUE       FALSE
+#> 8  2014-07-22 12:00:00     145      13     TRUE     TRUE        TRUE
+#> 9  2014-07-26 12:00:00     164      13     TRUE     TRUE       FALSE
+#> 10 2014-08-02 12:00:00     140      13     TRUE     TRUE       FALSE
+#> 11 2014-08-14 12:00:00     136      23     TRUE     TRUE       FALSE
 #> 12 2014-10-15 12:00:00      23      13     TRUE     TRUE        TRUE
-#> 13 2015-05-30 12:00:00     143      13     TRUE     TRUE        TRUE
-#> 14 2015-05-30 12:00:00     136      24     TRUE     TRUE        TRUE
-#> 15 2015-06-07 12:00:00     166      13     TRUE     TRUE       FALSE
-#> 16 2015-06-07 12:00:00     111      13     TRUE     TRUE        TRUE
-#> 17 2015-07-18 12:00:00     175      11     TRUE     TRUE       FALSE
-#> 18 2015-08-02 12:00:00     180      11     TRUE     TRUE        TRUE
+#> 13 2015-05-30 12:00:00     144      13     TRUE     TRUE        TRUE
+#> 14 2015-05-30 12:00:00     137      24     TRUE     TRUE        TRUE
+#> 15 2015-06-07 12:00:00     167      13     TRUE     TRUE       FALSE
+#> 16 2015-06-07 12:00:00     112      13     TRUE     TRUE        TRUE
+#> 17 2015-07-18 12:00:00     176      11     TRUE     TRUE       FALSE
+#> 18 2015-08-02 12:00:00     181      11     TRUE     TRUE        TRUE
 #> 19 2015-11-02 12:00:00       6      13    FALSE     TRUE        TRUE
 #> Variables not shown: Released (lgl)
 #> 
 #> $detection
-#> Source: local data frame [387,284 x 4]
+#> Source: local data frame [388,536 x 4]
 #> 
 #>      DetectionDateTime Capture Receiver Detections
 #>                 (time)   (int)    (int)      (int)
@@ -155,16 +155,16 @@ print(lex_data)
 #> 
 #>          DepthDateTime Capture Receiver Depth
 #>                 (time)   (int)    (int) (dbl)
-#> 1  2015-05-28 03:26:24     179        9     6
-#> 2  2015-05-28 03:38:04     179        9     8
-#> 3  2015-05-28 03:42:56     179        9     8
-#> 4  2015-05-28 03:45:38     179        9     7
-#> 5  2015-05-28 03:47:55     179        9     8
-#> 6  2015-05-28 03:51:18     179        9     9
-#> 7  2015-05-28 03:56:20     179        9     8
-#> 8  2015-05-28 05:32:40     179        9     6
-#> 9  2015-05-28 05:35:31     179        9     6
-#> 10 2015-05-28 05:37:29     179        9     8
+#> 1  2015-05-28 03:26:24     180        9     6
+#> 2  2015-05-28 03:38:04     180        9     8
+#> 3  2015-05-28 03:42:56     180        9     8
+#> 4  2015-05-28 03:45:38     180        9     7
+#> 5  2015-05-28 03:47:55     180        9     8
+#> 6  2015-05-28 03:51:18     180        9     9
+#> 7  2015-05-28 03:56:20     180        9     8
+#> 8  2015-05-28 05:32:40     180        9     6
+#> 9  2015-05-28 05:35:31     180        9     6
+#> 10 2015-05-28 05:37:29     180        9     8
 #> ..                 ...     ...      ...   ...
 #> 
 #> attr(,"class")

@@ -13,6 +13,7 @@ Imports:
     datacheckr (>= 0.0.2.9005),
     dplyr,
     ggplot2 (>= 2.0.0),
+    ggrepel (>= 0.4),
     lubridate,
     purrr,
     magrittr,
