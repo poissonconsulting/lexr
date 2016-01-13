@@ -3,3 +3,5 @@
 
 ^klesdatr.pdf$
 ^qlexdatr.pdf$
+^README\.Rmd$
+^README-.*\.png$

@@ -38,3 +38,10 @@ capture_output <- function(x) {
 
 data_names <- function() c("section", "station", "receiver", "deployment", "capture",
        "recapture", "detection", "depth")
+
+fun_data_name <- function(data, fun) {
+  name <- names(data)
+  expr <- paste0("data$", name, " <- ", fun, "_", name, "(data$", name, ")")
+  eval(parse(text = expr))
+  invisible(data)
+}

@@ -25,7 +25,7 @@ plot_section <- function(section) {
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
 }
 
-plot_station <- function(station, section) {
+plot_station <- function(station, section = NULL) {
   ggplot2::ggplot(data = station, ggplot2::aes_(x = ~StationX / 1000,
                                                 y = ~StationY / 1000)) +
     tidy_section(section) +
@@ -60,16 +60,19 @@ plot_detection <- function(detection) {
     ggplot2::scale_y_continuous(name = "Total Daily Detections", labels = scales::comma)
 }
 
+plot_data_name <- function(data) {
+  name <- names(data)
+  expr <- paste0("data$", name, " <- plot_", name, "(data$", name, ")")
+  eval(parse(text = expr))
+  invisible(data)
+}
+
 #' @export
 plot.lex_data <- function(x, ...) {
-  if (!is.null(x$section)) {
-    plot_section(x$section) %>% print()
-    if (!is.null(x$station))
-      plot_station(x$station, x$section) %>% print()
-  }
-  if (!is.null(x$deployment))
-    plot_deployment(x$deployment) %>% print()
-  if (!is.null(x$detection))
-    plot_detection(x$detection) %>% print()
-  invisible(NULL)
+ x %<>% check_lex_data()
+  x <- x[c("section", "station", "deployment")]
+
+  x %<>% purrr::lmap(fun_data_name, fun = "plot")
+  lapply(x, print)
+  invisible (NULL)
 }

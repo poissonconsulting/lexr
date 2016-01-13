@@ -98,13 +98,6 @@ check_depth <- function(depth) {
   invisible(depth)
 }
 
-check_data_name <- function(data) {
-  name <- names(data)
-  expr <- paste0("data$", name, " <- check_", name, "(data$", name, ")")
-  eval(parse(text = expr))
-  invisible(data)
-}
-
 check_joins <- function(data) {
 
   datacheckr::check_join(data$station, data$section@data, "Section")
@@ -131,7 +124,7 @@ check_joins <- function(data) {
 check_lex_data <- function(data) {
   if (!inherits(data, "lex_data")) error("data must be a lex_data object")
   if (!identical(names(data), data_names())) error("data must have correct names")
-  data %<>% purrr::lmap(check_data_name)
+  data %<>% purrr::lmap(fun_data_name, fun = "check")
   check_joins(data)
   class(data) <- "lex_data"
   invisible(data)
