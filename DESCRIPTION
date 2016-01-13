@@ -14,7 +14,6 @@ Imports:
     dplyr,
     ggplot2 (>= 2.0.0),
     lubridate,
-    plyr,
     purrr,
     magrittr,
     scales
