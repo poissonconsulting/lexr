@@ -6,7 +6,7 @@
 #' @param package A string of the data package.
 #' @export
 input_lex_data <- function(package = "qlexdatr") {
-  if (!assertthat::is.string(package)) check_stop("package must be a string")
+  if (!assertthat::is.string(package)) error("package must be a string")
 
   section <- station <- receiver <- deployment <- recapture <- detection <- depth <- capture <- NULL
 

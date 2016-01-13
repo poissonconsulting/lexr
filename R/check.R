@@ -3,11 +3,11 @@ capture_output <- function(x) {
   x
 }
 
-check_stop <- function(...) stop(..., call. = FALSE)
+error <- function(...) stop(..., call. = FALSE)
 
 check_section <- function(section) {
   if (!inherits(section, "SpatialPolygonsDataFrame"))
-    check_stop("section must be a spatial polygons data frame")
+    error("section must be a spatial polygons data frame")
 
   values <- list(Section = c(1L, nrow(section)),
                  SectionX = 1,
@@ -52,7 +52,7 @@ check_deployment <- function(deployment) {
     "Duration" = ~as.integer(difftime(ReceiverDateTimeOut, ReceiverDateTimeIn, units = "secs"))))
   if (any(deployment$Duration <= 0)) {
     deployment %<>% dplyr::filter_(~Duration <= 0)
-    check_stop("receiver retrieved before deployed\n", capture_output(deployment))
+    error("receiver retrieved before deployed\n", capture_output(deployment))
   }
   deployment_diff <- function (x) {
     x %<>% dplyr::arrange_(~ReceiverDateTimeIn)
@@ -65,7 +65,7 @@ check_deployment <- function(deployment) {
     overlap <- which(overlap)
     overlap <- sort(unique(c(overlap, overlap + 1)))
     deployment %<>% dplyr::slice_(~overlap)
-    check_stop("multiple receivers at the same station\n", capture_output(deployment))
+    error("multiple receivers at the same station\n", capture_output(deployment))
   }
   deployment %<>% subset(select = names(values))
   invisible(deployment)
