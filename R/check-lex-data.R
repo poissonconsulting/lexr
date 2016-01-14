@@ -6,8 +6,7 @@ check_lex_section <- function(section) {
          SectionX = 1,
          SectionY = 1)
 
-  datacheckr::check_data2(section@data, values, key = "Section")
-  section@data %<>% subset(select = names(values))
+  datacheckr::check_data3(section@data, values, key = "Section", select = TRUE)
   invisible(section)
 }
 
@@ -17,17 +16,13 @@ check_lex_station <- function(station) {
          StationX = 1,
          StationY = 1)
 
-  datacheckr::check_data2(station, values, key = "Station")
-  station %<>% subset(select = names(values))
-  invisible(station)
+  datacheckr::check_data3(station, values, key = "Station", select = TRUE)
 }
 
 check_lex_receiver <- function(receiver) {
   values <- list(Receiver = c(1L, nrow(receiver)))
 
-  datacheckr::check_data2(receiver, values, key = "Receiver")
-  receiver %<>% subset(select = names(values))
-  invisible(receiver)
+  datacheckr::check_data3(receiver, values, key = "Receiver", select = TRUE)
 }
 
 check_lex_deployment <- function(deployment) {
@@ -37,9 +32,8 @@ check_lex_deployment <- function(deployment) {
          ReceiverDateTimeIn = Sys.time(),
          ReceiverDateTimeOut = Sys.time())
 
-  datacheckr::check_data2(deployment, values, key = c("Station", "Receiver", "ReceiverDateTimeIn"))
-  deployment %<>% subset(select = names(values))
-  invisible(deployment)
+  datacheckr::check_data3(deployment, values,
+                          key = c("Station", "Receiver", "ReceiverDateTimeIn"), select = TRUE)
 }
 
 check_lex_capture <- function(capture) {
@@ -54,9 +48,7 @@ check_lex_capture <- function(capture) {
          TagExpireDateTime = Sys.time(),
          TagDepthRange = c(1, NA))
 
-  datacheckr::check_data2(capture, values, key = "Capture")
-  capture %<>% subset(select = names(values))
-  invisible(capture)
+  datacheckr::check_data3(capture, values, key = "Capture", select = TRUE)
 }
 
 check_lex_recapture <- function(recapture) {
@@ -68,9 +60,7 @@ check_lex_recapture <- function(recapture) {
          TagsRemoved = TRUE,
          Released = TRUE)
 
-  datacheckr::check_data2(recapture, values)
-  recapture %<>% subset(select = names(values))
-  invisible(recapture)
+  datacheckr::check_data3(recapture, values, select = TRUE)
 }
 
 check_lex_detection <- function(detection) {
@@ -80,9 +70,8 @@ check_lex_detection <- function(detection) {
          Receiver = 1L,
          Detections = 1L)
 
-  datacheckr::check_data2(detection, values, key = c("DetectionDateTime", "Capture", "Receiver"))
-  detection %<>% subset(select = names(values))
-  invisible(detection)
+  datacheckr::check_data3(detection, values, key = c("DetectionDateTime", "Capture", "Receiver"),
+                          select = TRUE)
 }
 
 check_lex_depth <- function(depth) {
@@ -93,9 +82,8 @@ check_lex_depth <- function(depth) {
          Receiver = 1L,
          Depth = c(0, 340))
 
-  datacheckr::check_data2(depth, values, key = c("DepthDateTime", "Capture", "Receiver"))
-  depth %<>% subset(select = names(values))
-  invisible(depth)
+  datacheckr::check_data3(depth, values, key = c("DepthDateTime", "Capture", "Receiver"),
+                          select = TRUE)
 }
 
 check_lex_joins <- function(data) {
