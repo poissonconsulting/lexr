@@ -36,8 +36,6 @@ plot_station <- function(station, section = NULL) {
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
 }
 
-plot_receiver <- function(receiver) NULL
-
 plot_deployment <- function(deployment) {
   tz <- lubridate::tz(deployment$ReceiverDateTimeIn[1])
   ggplot2::ggplot(data = deployment, ggplot2::aes_(y = ~Station)) +
@@ -45,7 +43,7 @@ plot_deployment <- function(deployment) {
       x = ~ReceiverDateTimeIn, xend = ~ReceiverDateTimeOut, yend = ~Station),
       alpha = 1/2, size = 3) +
     ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz)) +
-    ggplot2::scale_y_continuous()
+    ggplot2::scale_y_discrete()
 }
 
 plot_capture <- function(capture) {

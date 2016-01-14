@@ -5,7 +5,7 @@ test_that("qlexdatr passes checks", {
   expect_is(check_lex_data(data), "lex_data")
 
   data$station$Station <- as.numeric(data$station$Station)
-  expect_error(check_lex_data(data), "column Station in station must be of class 'integer'")
+  expect_error(check_lex_data(data), "column Station in station must be of class 'factor'")
 })
 
 test_that("check deployment", {

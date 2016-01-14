@@ -2,7 +2,7 @@ check_lex_section <- function(section) {
   if (!inherits(section, "SpatialPolygonsDataFrame"))
     error("section must be a spatial polygons data frame")
 
-  values <- list(Section = c(1L, nrow(section@data)),
+  values <- list(Section = factor(1),
          SectionX = 1,
          SectionY = 1)
 
@@ -11,24 +11,18 @@ check_lex_section <- function(section) {
 }
 
 check_lex_station <- function(station) {
-  values <- list(Station = c(1L, nrow(station)),
-         Section = 1L,
+  values <- list(Station = factor(1),
+         Section = factor(1),
          StationX = 1,
          StationY = 1)
 
   datacheckr::check_data3(station, values, key = "Station", select = TRUE)
 }
 
-check_lex_receiver <- function(receiver) {
-  values <- list(Receiver = c(1L, nrow(receiver)))
-
-  datacheckr::check_data3(receiver, values, key = "Receiver", select = TRUE)
-}
-
 check_lex_deployment <- function(deployment) {
 
-  values <-  list(Station = 1L,
-         Receiver = 1L,
+  values <-  list(Station = factor(1),
+         Receiver = factor(1),
          ReceiverDateTimeIn = Sys.time(),
          ReceiverDateTimeOut = Sys.time())
 
@@ -37,10 +31,10 @@ check_lex_deployment <- function(deployment) {
 }
 
 check_lex_capture <- function(capture) {
-  values <- list(Capture = c(1L, nrow(capture)),
+  values <- list(Capture = factor(1),
          CaptureDateTime = Sys.time(),
-         Section = 1L,
-         Species = factor(""),
+         Section = factor(1),
+         Species = factor(1),
          Length = c(200L, 1000L),
          Weight = c(0.5, 10, NA),
          Reward1 = c(1L, 10L, 100L),
@@ -53,8 +47,8 @@ check_lex_capture <- function(capture) {
 
 check_lex_recapture <- function(recapture) {
   values <- list(RecaptureDateTime = Sys.time(),
-         Capture = 1L,
-         Section = c(1L,NA),
+         Capture = factor(1),
+         Section = factor(1),
          TBarTag1 = TRUE,
          TBarTag2 = TRUE,
          TagsRemoved = TRUE,
@@ -66,9 +60,9 @@ check_lex_recapture <- function(recapture) {
 check_lex_detection <- function(detection) {
 
   values <- list(DetectionDateTime = Sys.time(),
-         Capture = 1L,
-         Receiver = 1L,
-         Detections = 1L)
+         Capture = factor(1),
+         Receiver = factor(1),
+         Detections = c(1L, datacheckr::max_integer()))
 
   datacheckr::check_data3(detection, values, key = c("DetectionDateTime", "Capture", "Receiver"),
                           select = TRUE)
@@ -78,8 +72,8 @@ check_lex_depth <- function(depth) {
 
   values <- list(
     DepthDateTime = Sys.time(),
-         Capture = 1L,
-         Receiver = 1L,
+         Capture = factor(1),
+         Receiver = factor(1),
          Depth = c(0, 340))
 
   datacheckr::check_data3(depth, values, key = c("DepthDateTime", "Capture", "Receiver"),
@@ -90,14 +84,14 @@ check_lex_joins <- function(data) {
 
   datacheckr::check_join(data$station, data$section@data, "Section")
   datacheckr::check_join(data$deployment,  data$station, "Station")
-  datacheckr::check_join(data$deployment,  data$receiver, "Receiver")
   datacheckr::check_join(data$capture,  data$section@data, "Section")
   datacheckr::check_join(data$recapture,  data$capture, "Capture", extra = TRUE)
   datacheckr::check_join(data$recapture,  data$section@data, "Section")
   datacheckr::check_join(data$detection,  data$capture, "Capture")
-  datacheckr::check_join(data$detection,  data$receiver, "Receiver")
   datacheckr::check_join(data$depth,  data$capture, "Capture")
-  datacheckr::check_join(data$depth,  data$receiver, "Receiver")
+
+  stopifnot(all(data$detection$Receiver %in% data$deployment$Receiver))
+  stopifnot(all(data$depth$Receiver %in% data$deployment$Receiver))
   invisible(data)
 }
 

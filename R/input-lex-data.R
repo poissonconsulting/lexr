@@ -8,15 +8,14 @@
 input_lex_data <- function(package = "qlexdatr") {
   check_string(package)
 
-  section <- station <- receiver <- deployment <- capture <- recapture <- detection <- depth <- NULL
+  section <- station <- deployment <- capture <- recapture <- detection <- depth <- NULL
 
-  data("section", "station", "receiver", "deployment", "capture",
+  data("section", "station", "deployment", "capture",
        "recapture", "detection", "depth",
        package = package, verbose = FALSE, envir = environment())
 
   data <- list(section = section,
        station = station,
-       receiver = receiver,
        deployment = deployment,
        capture = capture,
        recapture = recapture,
