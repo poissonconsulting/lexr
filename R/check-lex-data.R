@@ -4,6 +4,7 @@ check_lex_section <- function(section) {
 
   values <- list(Section = factor(1),
                  Habitat = factor(1),
+                 Bounded = TRUE,
                  SectionX = 1,
                  SectionY = 1)
 
