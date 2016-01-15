@@ -21,21 +21,21 @@ lex_data %<>% check_lex_data()
 
 print(lex_data)
 #> $section
-#> Source: local data frame [30 x 3]
+#> Source: local data frame [32 x 4]
 #> 
-#>    Section SectionX SectionY
-#>     (fctr)    (dbl)    (dbl)
-#> 1      S01  1261438 872984.8
-#> 2      S09  1300511 853963.2
-#> 3      S10  1301137 851791.7
-#> 4      S11  1301451 849862.5
-#> 5      S12  1302051 848480.9
-#> 6      S13  1302477 847060.1
-#> 7      S14  1303116 845317.4
-#> 8      S15  1305063 842552.3
-#> 9      S16  1309357 841285.2
-#> 10     S18  1312795 838945.4
-#> ..     ...      ...      ...
+#>    Section Habitat SectionX SectionY
+#>     (fctr)  (fctr)    (dbl)    (dbl)
+#> 1      S01   Lotic  1298327 854668.9
+#> 2      S09   Lotic  1300511 853963.2
+#> 3      S10  Lentic  1301137 851791.7
+#> 4      S11  Lentic  1301451 849862.5
+#> 5      S12  Lentic  1302051 848480.9
+#> 6      S13  Lentic  1302477 847060.1
+#> 7      S14  Lentic  1303116 845317.4
+#> 8      S15  Lentic  1305063 842552.3
+#> 9      S16  Lentic  1309357 841285.2
+#> 10     S39   Lotic  1310751 836116.0
+#> ..     ...     ...      ...      ...
 #> 
 #> $station
 #> Source: local data frame [46 x 4]
@@ -49,9 +49,9 @@ print(lex_data)
 #> 5           Raft Creek North     S15  1304628 843825.2
 #> 6            Hazeltine North     S15  1305481 842644.5
 #> 7            Hazeltine Point     S15  1305749 840969.4
-#> 8             Cariboo Island     S17  1313248 842218.0
-#> 9         Horsefly Bay North     S17  1313357 839963.1
-#> 10    Narrows Cariboo Island     S17  1313464 841227.9
+#> 8                 Otter Hole     S38  1310565 837332.4
+#> 9       Horsefly River Delta     S38  1312071 837971.7
+#> 10            Cariboo Island     S17  1313248 842218.0
 #> ..                       ...     ...      ...      ...
 #> 
 #> $deployment

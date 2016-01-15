@@ -20,7 +20,7 @@ Imports:
     scales
 Suggests:
     klesdatr,
-    qlexdatr (>= 0.0.0.9002),
+    qlexdatr (>= 0.0.0.9003),
     testthat
 License: MIT + file LICENSE
 LazyData: true

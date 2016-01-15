@@ -3,8 +3,9 @@ check_lex_section <- function(section) {
     error("section must be a spatial polygons data frame")
 
   values <- list(Section = factor(1),
-         SectionX = 1,
-         SectionY = 1)
+                 Habitat = factor(1),
+                 SectionX = 1,
+                 SectionY = 1)
 
   datacheckr::check_data3(section@data, values, key = "Section", select = TRUE)
   invisible(section)
@@ -12,9 +13,9 @@ check_lex_section <- function(section) {
 
 check_lex_station <- function(station) {
   values <- list(Station = factor(1),
-         Section = factor(1),
-         StationX = 1,
-         StationY = 1)
+                 Section = factor(1),
+                 StationX = 1,
+                 StationY = 1)
 
   datacheckr::check_data3(station, values, key = "Station", select = TRUE)
 }
@@ -22,9 +23,9 @@ check_lex_station <- function(station) {
 check_lex_deployment <- function(deployment) {
 
   values <-  list(Station = factor(1),
-         Receiver = factor(1),
-         ReceiverDateTimeIn = Sys.time(),
-         ReceiverDateTimeOut = Sys.time())
+                  Receiver = factor(1),
+                  ReceiverDateTimeIn = Sys.time(),
+                  ReceiverDateTimeOut = Sys.time())
 
   datacheckr::check_data3(deployment, values,
                           key = c("Station", "Receiver", "ReceiverDateTimeIn"), select = TRUE)
@@ -32,27 +33,27 @@ check_lex_deployment <- function(deployment) {
 
 check_lex_capture <- function(capture) {
   values <- list(Capture = factor(1),
-         CaptureDateTime = Sys.time(),
-         Section = factor(1),
-         Species = factor(1),
-         Length = c(200L, 1000L),
-         Weight = c(0.5, 10, NA),
-         Reward1 = c(1L, 10L, 100L),
-         Reward2 = c(1L, 10L, 100L),
-         TagExpireDateTime = Sys.time(),
-         TagDepthRange = c(1, NA))
+                 CaptureDateTime = Sys.time(),
+                 Section = factor(1),
+                 Species = factor(1),
+                 Length = c(200L, 1000L),
+                 Weight = c(0.5, 10, NA),
+                 Reward1 = c(1L, 10L, 100L),
+                 Reward2 = c(1L, 10L, 100L),
+                 TagExpireDateTime = Sys.time(),
+                 TagDepthRange = c(1, NA))
 
   datacheckr::check_data3(capture, values, key = "Capture", select = TRUE)
 }
 
 check_lex_recapture <- function(recapture) {
   values <- list(RecaptureDateTime = Sys.time(),
-         Capture = factor(1),
-         Section = factor(1),
-         TBarTag1 = TRUE,
-         TBarTag2 = TRUE,
-         TagsRemoved = TRUE,
-         Released = TRUE)
+                 Capture = factor(1),
+                 Section = factor(1),
+                 TBarTag1 = TRUE,
+                 TBarTag2 = TRUE,
+                 TagsRemoved = TRUE,
+                 Released = TRUE)
 
   datacheckr::check_data3(recapture, values, select = TRUE)
 }
@@ -60,9 +61,9 @@ check_lex_recapture <- function(recapture) {
 check_lex_detection <- function(detection) {
 
   values <- list(DetectionDateTime = Sys.time(),
-         Capture = factor(1),
-         Receiver = factor(1),
-         Detections = c(1L, datacheckr::max_integer()))
+                 Capture = factor(1),
+                 Receiver = factor(1),
+                 Detections = c(1L, datacheckr::max_integer()))
 
   datacheckr::check_data3(detection, values, key = c("DetectionDateTime", "Capture", "Receiver"),
                           select = TRUE)
@@ -72,9 +73,9 @@ check_lex_depth <- function(depth) {
 
   values <- list(
     DepthDateTime = Sys.time(),
-         Capture = factor(1),
-         Receiver = factor(1),
-         Depth = c(0, 340))
+    Capture = factor(1),
+    Receiver = factor(1),
+    Depth = c(0, 340))
 
   datacheckr::check_data3(depth, values, key = c("DepthDateTime", "Capture", "Receiver"),
                           select = TRUE)
