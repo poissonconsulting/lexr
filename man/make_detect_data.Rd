@@ -4,7 +4,7 @@
 \alias{make_detect_data}
 \title{Make Detect Data}
 \usage{
-make_detect_data(data, capture = lex_data$capture, hourly_interval = 6)
+make_detect_data(data, capture = data$capture, hourly_interval = 6)
 }
 \arguments{
 \item{data}{The lex_data object to check.}

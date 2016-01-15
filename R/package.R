@@ -3,16 +3,17 @@
 #' @docType package
 #' @name lexr
 #' @importFrom magrittr %<>% %>%
+#' @importFrom dplyr %.%
+#' @importFrom sp %over%
 #' @examples
-#' library(dplyr)
-#' library(magrittr)
 #' library(qlexdatr)
 #' library(lexr)
 
-#' lex_data <- input_lex_data("qlexdatr")
-#' lex_data %<>% check_lex_data()
+#' data <- input_lex_data("qlexdatr")
+#' check_lex_data(data)
 
-#' print(lex_data)
+#' print(make_detect_data(data))
+#' # print(data)
 
-#' plot(lex_data)
+#' # plot(data)
 NULL

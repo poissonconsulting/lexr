@@ -67,6 +67,21 @@
 #   as.data.frame(coverage)
 # }
 
+filter_captures <- function(data, capture) {
+  capture %<>% check_lex_capture()
+  capture$Capture %<>% droplevels()
+  levels(data$recapture$Capture) <- levels(capture$Capture)
+  levels(data$detection$Capture) <- levels(capture$Capture)
+  levels(data$depth$Capture) <- levels(capture$Capture)
+
+  data$recapture %<>% dplyr::filter_(~!is.na(Capture))
+  data$detection %<>% dplyr::filter_(~!is.na(Capture))
+  data$depth %<>% dplyr::filter_(~!is.na(Capture))
+  data$capture <- capture
+  data %<>% check_lex_data()
+  data
+}
+
 #' Make Detect Data
 #'
 #' Makes detect_data object from a lex_data object.
@@ -76,13 +91,8 @@
 #'
 #' @return A detect_data object.
 #' @export
-make_detect_data <-  function(data, capture = lex_data$capture, hourly_interval = 6) {
-  lex_data %<>% check_lex_data()
-  capture %<>% check_lex_capture()
-  lex_data$recapture %<>% dplyr::inner_join(dplyr::select(capture,~-Section), by = "Capture")
-  lex_data$detection %<>% dplyr::inner_join(dplyr::select(capture,~-Section), by = "Capture")
-  lex_data$depth %<>% dplyr::inner_join(dplyr::select(capture,~-Section), by = "Capture")
-  lex_data$capture <- capture
-  lex_data %<>% check_lex_data()
-  lex_data
+make_detect_data <-  function(data, capture = data$capture, hourly_interval = 6) {
+  data %<>% check_lex_data()
+  data %<>% filter_captures(capture)
+  return(data)
 }
