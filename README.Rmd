@@ -14,26 +14,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r}
-library(dplyr)
-library(magrittr)
-library(qlexdatr)
-library(lexr)
-
-lex_data <- input_lex_data("qlexdatr")
-lex_data %<>% check_lex_data()
-
-print(lex_data)
-
-plot(lex_data)
-
-```
 
 ## Installation
 
-Then execute the following code at the R terminal:
+Execute the following code at the R terminal:
 ``` r
 # install.packages("devtools")
-devtools::install_github("poissonconsulting/qlexdatr")
 devtools::install_github("poissonconsulting/lexr")
 ```
+
+## More Information
+
+See `?lexr`
