@@ -1,22 +1,4 @@
-# # section_polygons@data$SectionArea <- gArea(section_polygons, byid = TRUE) / 10^6
-#
-#
-# neighbours <- poly2nb(section_polygons, row.names = section_polygons@data$Section)
-# plot(section_polygons)
-# plot(neighbours, coordinates(section_polygons), col = "red", add = TRUE)
-# plot(neighbours, coordinates(section_polygons), col = "red")
-#
-# section_adjacency <- matrix(FALSE, nrow = nrow(section_polygons@data), ncol = nrow(section_polygons@data))
-# for (i in 1:nrow(section_polygons@data)) {
-#   section_adjacency[i,neighbours[[i]]] <- TRUE
-# }
-# diag(section_adjacency) <- TRUE
-# stopifnot(isSymmetric(section_adjacency))
-# section_distance <- spa::uDist(section_adjacency, nrow(section_adjacency))
-# dim <- dim(section_distance)
-# section_distance <- as.integer(section_distance)
-# dim(section_distance) <- dim
-# use_data(section_distance, overwrite = TRUE)
+
 
 
 
@@ -78,9 +60,40 @@ filter_captures <- function(data, capture) {
   data$detection %<>% dplyr::filter_(~!is.na(Capture))
   data$depth %<>% dplyr::filter_(~!is.na(Capture))
   data$capture <- capture
-  data %<>% check_lex_data()
   data
 }
+
+make_interval <- function(data, start_date, end_date, hourly_interval) {
+  check_date(start_date)
+  check_date(end_date)
+  check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
+  data
+}
+
+make_distance <- function(data) {
+  neighbours <- spdep::poly2nb(data$section, row.names = data$section@data$Section)
+  adjacency <- matrix(FALSE, nrow = nrow(data$section@data), ncol = nrow(data$section@data))
+  for (i in 1:nrow(data$section@data))
+    adjacency[i,neighbours[[i]]] <- TRUE
+
+  diag(adjacency) <- TRUE
+  stopifnot(isSymmetric(adjacency))
+  distance <- spa::uDist(adjacency, nrow(adjacency))
+  dim <- dim(distance)
+  distance <- as.integer(distance)
+  dim(distance) <- dim
+  rownames(distance) <- levels(data$section@data$Section)
+  colnames(distance) <- levels(data$section@data$Section)
+  data$distance <- distance
+  data
+}
+
+make_section <- function(data) {
+  data$section@data$Area <- rgeos::gArea(data$section, byid = TRUE) / 10 ^ 6
+  data$section <- data$section@data
+  data
+}
+#
 
 #' Make Detect Data
 #'
@@ -91,8 +104,19 @@ filter_captures <- function(data, capture) {
 #'
 #' @return A detect_data object.
 #' @export
-make_detect_data <-  function(data, capture = data$capture, hourly_interval = 6) {
+make_detect_data <-  function(
+  data, capture = data$capture,
+  start_date = min(as.Date(capture$CaptureDateTime)),
+  end_date = min(Sys.Date(), max(as.Date(capture$TagExpireDateTime))),
+  hourly_interval = 6L) {
+
   data %<>% check_lex_data()
   data %<>% filter_captures(capture)
+  data$depth <- NULL
+  data %<>% make_interval(start_date = start_date, end_date = end_date,
+                          hourly_interval = hourly_interval)
+  data %<>% make_distance()
+  data %<>% make_section()
+  class(data) <- "detect_data"
   return(data)
 }

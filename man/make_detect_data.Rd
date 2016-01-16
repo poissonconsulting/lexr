@@ -4,7 +4,10 @@
 \alias{make_detect_data}
 \title{Make Detect Data}
 \usage{
-make_detect_data(data, capture = data$capture, hourly_interval = 6)
+make_detect_data(data, capture = data$capture,
+  start_date = min(as.Date(capture$CaptureDateTime)),
+  end_date = min(Sys.Date(), max(as.Date(capture$TagExpireDateTime))),
+  hourly_interval = 6L)
 }
 \arguments{
 \item{data}{The lex_data object to check.}

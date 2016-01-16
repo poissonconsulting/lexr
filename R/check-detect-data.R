@@ -1,20 +1,16 @@
 check_detect_section <- function(section) {
-  values <- list(Section = c(1L, nrow(data)),
-                 Area = c(0, 100))
-
-  datacheckr::check_data2(section, values, key = "Section")
-  section %<>% subset(select = names(values))
-  invisible(section)
+  datacheckr::check_data2(
+    section, list(Section = factor(1),
+                  Habitat = factor(1),
+                  Area = c(0, 100),
+                  Bounded = TRUE),
+    key = "Section", select = TRUE)
 }
 
 check_detect_distance <- function(distance) {
-  values <- list(Section = 1L,
-                 Section2 = 1L,
-                 Distance = c(0, 100L))
-
-  datacheckr::check_data2(distance, values, key = c("Section", "Section2"))
-  distance %<>% subset(select = names(values))
-  invisible(distance)
+  stopifnot(is.matrix(distance))
+  stopifnot(is.integer(distance))
+  distance
 }
 
 check_detect_interval <- function(interval) {
@@ -63,12 +59,12 @@ check_detect_recapture <- function(recapture) {
 
 check_detect_capture <- function(capture) {
   values <- list(Capture = c(1L, 1000L),
-         Interval = 1L,
-         Section = 1L,
-         Length = c(200L, 1000L),
-         Reward1 = c(1L, 10L, 100L),
-         Reward2 = c(1L, 10L, 100L),
-         TagExpireInterval = 1L)
+                 Interval = 1L,
+                 Section = 1L,
+                 Length = c(200L, 1000L),
+                 Reward1 = c(1L, 10L, 100L),
+                 Reward2 = c(1L, 10L, 100L),
+                 TagExpireInterval = 1L)
 
   datacheckr::check_data2(capture, values, key = "Capture")
   capture %<>% subset(select = names(values))
@@ -85,9 +81,6 @@ check_detect_detection <- function(detection) {
   detection %<>% subset(select = names(values))
   invisible(detection)
 }
-
-c("section", "distance", "interval", "coverage", "capture",
-  "recapture", "detection")
 
 check_detect_joins <- function(data) {
 
