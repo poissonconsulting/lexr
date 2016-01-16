@@ -67,6 +67,20 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
   check_date(start_date)
   check_date(end_date)
   check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
+
+#   start_date %<>% as.POSIXct(tz = "UTC")
+#   end_date %<>% as.POSIXct(tz = "UTC")
+#
+#   lubridate::hour(start_date) <-
+#   lubridate::minute(start_date) <-
+#   lubridate::second(start_date) <-
+#
+#   interval <- dplyr::data_frame(DateTime = seq(
+#     start_date, end_date, by = "6 hours"))
+#   interval$Interval <- 1:nrow(interval)
+#   interval %<>% dplyr::mutate_(.dots = list(Date = as.Date(DateTime),
+#                                             Hour = lubridate::hour(DateTime)))
+#   data$interval <- interval
   data
 }
 
