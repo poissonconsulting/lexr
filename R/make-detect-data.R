@@ -24,30 +24,30 @@
 #   }
 
 
-# calculate_coverage <- function(section, section_polygons, station, station_deployment,
-#                                hourly_interval = 6) {
-#
-#   station_deployment %<>% dplyr::full_join(station, by = "Station")
-#   if (any(is.na(station_deployment$Receiver)))
-#     check_stop("st")
-#
-#
-#   coverage <- dplyr::inner_join(section, receiver, by = "Section")
-#   coverage %<>% dplyr::inner_join(deployment, by = "Receiver")
-#   coverage %<>% dplyr::group_by(Section, DeploymentDate) %>% dplyr::summarise(Receivers = n())
-#   coverage %<>% dplyr::inner_join(section, by = "Section")
-#   coverage %<>% dplyr::mutate(Coverage = Receivers * pi * 0.5^2 / Area)
-#   coverage$Coverage[coverage$Coverage > 1] <- 1
-#   coverage %<>% dplyr::select(Section, DeploymentDate, Coverage)
-#
-#   all <- expand.grid(DeploymentDate = seq(from = min(coverage$DeploymentDate), to = max(coverage$DeploymentDate), by = "day"),
-#                      Section = section$Section)
-#
-#   coverage %<>% dplyr::right_join(all, by = c("Section", "DeploymentDate"))
-#   coverage$Coverage[is.na(coverage$Coverage)] <- 0
-#
-#   as.data.frame(coverage)
-# }
+make_coverage <- function(section, section_polygons, station, station_deployment,
+                               hourly_interval = 6) {
+
+  station_deployment %<>% dplyr::full_join(station, by = "Station")
+  if (any(is.na(station_deployment$Receiver)))
+    check_stop("st")
+
+
+  coverage <- dplyr::inner_join(section, receiver, by = "Section")
+  coverage %<>% dplyr::inner_join(deployment, by = "Receiver")
+  coverage %<>% dplyr::group_by(Section, DeploymentDate) %>% dplyr::summarise(Receivers = n())
+  coverage %<>% dplyr::inner_join(section, by = "Section")
+  coverage %<>% dplyr::mutate(Coverage = Receivers * pi * 0.5^2 / Area)
+  coverage$Coverage[coverage$Coverage > 1] <- 1
+  coverage %<>% dplyr::select(Section, DeploymentDate, Coverage)
+
+  all <- expand.grid(DeploymentDate = seq(from = min(coverage$DeploymentDate), to = max(coverage$DeploymentDate), by = "day"),
+                     Section = section$Section)
+
+  coverage %<>% dplyr::right_join(all, by = c("Section", "DeploymentDate"))
+  coverage$Coverage[is.na(coverage$Coverage)] <- 0
+
+  as.data.frame(coverage)
+}
 
 filter_captures <- function(data, capture) {
   capture %<>% check_lex_capture()
@@ -85,6 +85,7 @@ set_intervals <- function(data, interval) {
 }
 
 make_interval <- function(data, start_date, end_date, hourly_interval) {
+  message("making interval...")
   check_date(start_date)
   check_date(end_date)
   check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
@@ -105,6 +106,7 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
 }
 
 make_distance <- function(data) {
+  message("making distance...")
   neighbours <- spdep::poly2nb(data$section, row.names = data$section@data$Section)
   adjacency <- matrix(FALSE, nrow = nrow(data$section@data), ncol = nrow(data$section@data))
   for (i in 1:nrow(data$section@data))
@@ -125,7 +127,28 @@ make_distance <- function(data) {
   data
 }
 
+sum_detections <- function(data) {
+  Detections <- sum(data$Detections)
+  Receivers <- length(unique(data$Receiver))
+  dplyr::data_frame(Receivers = Receivers, Detections = Detections)
+}
+
+make_detection <- function(data) {
+  message("making detection...")
+  detection <- data$detection
+  detection %<>% dplyr::inner_join(data$deployment, by = "Receiver")
+  detection %<>% dplyr::filter_(~IntervalDetection >= IntervalReceiverIn,
+                        ~IntervalDetection <= IntervalReceiverOut)
+  detection %<>% dplyr::inner_join(data$station, by = "Station")
+  detection %<>% plyr::ddply(c("IntervalDetection", "Section", "Capture"), sum_detections)
+  data$detection <- dplyr::as.tbl(detection)
+  data$deployment <- NULL
+  data$station <- NULL
+  data
+}
+
 make_section <- function(data) {
+  message("making section...")
   data$polygon <- dplyr::as.tbl(broom::tidy(data$section))
   data$polygon %<>% dplyr::rename_(.dots = list(Easting = "lat",
                                                 Northing = "long",
@@ -158,6 +181,7 @@ make_detect_data <-  function(
   data$depth <- NULL
   data %<>% make_interval(start_date = start_date, end_date = end_date,
                           hourly_interval = hourly_interval)
+  data %<>% make_detection()
   data %<>% make_distance()
   data %<>% make_section()
   class(data) <- "detect_data"
