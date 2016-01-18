@@ -63,24 +63,44 @@ filter_captures <- function(data, capture) {
   data
 }
 
+set_interval <- function(col, interval) {
+  lubridate::minute(col) <- 0
+  lubridate::second(col) <- 0
+
+  hourly_interval <- interval$Hour[2] - interval$Hour[1]
+  lubridate::hour(col) <- lubridate::hour(col) %/% hourly_interval * hourly_interval
+  data <- dplyr::data_frame(DateTime = col)
+  data %<>% dplyr::inner_join(interval, by = "DateTime")
+  data$Interval
+}
+
+set_intervals <- function(data, interval) {
+  colnames <- colnames(data)
+  colnames <- colnames[grepl("^DateTime.+", colnames)]
+  if (length(colnames)) {
+    data[colnames] %<>% lapply(set_interval, interval = interval)
+    colnames(data) %<>% sub("^(DateTime)(.+)$", "Interval\\2" , .)
+  }
+  data
+}
+
 make_interval <- function(data, start_date, end_date, hourly_interval) {
   check_date(start_date)
   check_date(end_date)
   check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
 
-#   start_date %<>% as.POSIXct(tz = "UTC")
-#   end_date %<>% as.POSIXct(tz = "UTC")
-#
-#   lubridate::hour(start_date) <-
-#   lubridate::minute(start_date) <-
-#   lubridate::second(start_date) <-
-#
-#   interval <- dplyr::data_frame(DateTime = seq(
-#     start_date, end_date, by = "6 hours"))
-#   interval$Interval <- 1:nrow(interval)
-#   interval %<>% dplyr::mutate_(.dots = list(Date = as.Date(DateTime),
-#                                             Hour = lubridate::hour(DateTime)))
-#   data$interval <- interval
+  tz <- lubridate::tz(data$capture$DateTimeCapture[1])
+
+  start_date %<>% paste("00:00:00") %>% as.POSIXct(tz = tz)
+  end_date %<>% paste("23:59:59") %>% as.POSIXct(tz = tz)
+
+  interval <- dplyr::data_frame(DateTime = seq(start_date, end_date, by = "6 hours"))
+  interval %<>% dplyr::mutate_(.dots = list(Interval = ~1:nrow(.),
+                                            Date = ~as.Date(DateTime),
+                                            Hour = ~lubridate::hour(DateTime)))
+  interval %<>% dplyr::select_(~Interval, ~Date, ~Hour, ~DateTime)
+  data$interval <- interval
+  data %<>% lapply(set_intervals, interval = .$interval)
   data
 }
 
@@ -96,13 +116,22 @@ make_distance <- function(data) {
   dim <- dim(distance)
   distance <- as.integer(distance)
   dim(distance) <- dim
-  rownames(distance) <- levels(data$section@data$Section)
-  colnames(distance) <- levels(data$section@data$Section)
-  data$distance <- distance
+  section_names <- levels(data$section@data$Section)
+  colnames(distance) <- section_names
+  distance %<>% as.data.frame()
+  distance$SectionFrom <- section_names
+  distance %<>% tidyr::gather_("SectionTo", "Distance", section_names)
+  data$distance <- dplyr::as.tbl(distance)
   data
 }
 
 make_section <- function(data) {
+  data$polygon <- dplyr::as.tbl(broom::tidy(data$section))
+  data$polygon %<>% dplyr::rename_(.dots = list(Easting = "lat",
+                                                Northing = "long",
+                                                Hole = "hole",
+                                                Group = "id"))
+  data$polygon %<>% dplyr::select_(~Easting, ~Northing, ~Hole, ~Group)
   data$section@data$Area <- rgeos::gArea(data$section, byid = TRUE) / 10 ^ 6
   data$section <- data$section@data
   data
