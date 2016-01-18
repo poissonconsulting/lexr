@@ -5,8 +5,8 @@ check_lex_section <- function(section) {
   values <- list(Section = factor(1),
                  Habitat = factor(1),
                  Bounded = TRUE,
-                 SectionX = 1,
-                 SectionY = 1)
+                 EastingSection = 1,
+                 NorthingSection = 1)
 
   datacheckr::check_data3(section@data, values, key = "Section", select = TRUE)
   invisible(section)
@@ -15,8 +15,8 @@ check_lex_section <- function(section) {
 check_lex_station <- function(station) {
   values <- list(Station = factor(1),
                  Section = factor(1),
-                 StationX = 1,
-                 StationY = 1)
+                 EastingStation = 1,
+                 NorthingStation = 1)
 
   datacheckr::check_data3(station, values, key = "Station", select = TRUE)
 }
@@ -25,32 +25,32 @@ check_lex_deployment <- function(deployment) {
 
   values <-  list(Station = factor(1),
                   Receiver = factor(1),
-                  ReceiverDateTimeIn = Sys.time(),
-                  ReceiverDateTimeOut = Sys.time())
+                  DateTimeReceiverIn = Sys.time(),
+                  DateTimeReceiverOut = Sys.time())
 
   datacheckr::check_data3(deployment, values,
-                          key = c("Station", "Receiver", "ReceiverDateTimeIn"), select = TRUE)
+                          key = c("Station", "Receiver", "DateTimeReceiverIn"), select = TRUE)
 }
 
 check_lex_capture <- function(capture) {
   values <- list(Capture = factor(1),
-                 CaptureDateTime = Sys.time(),
-                 Section = factor(1),
+                 DateTimeCapture = Sys.time(),
+                 SectionCapture = factor(1),
                  Species = factor(1),
                  Length = c(200L, 1000L),
                  Weight = c(0.5, 10, NA),
                  Reward1 = c(1L, 10L, 100L),
                  Reward2 = c(1L, 10L, 100L),
-                 TagExpireDateTime = Sys.time(),
-                 TagDepthRange = c(1, NA))
+                 DateTimeTagExpire = Sys.time(),
+                 DepthRangeTag = c(1L, NA))
 
   datacheckr::check_data3(capture, values, key = "Capture", select = TRUE)
 }
 
 check_lex_recapture <- function(recapture) {
-  values <- list(RecaptureDateTime = Sys.time(),
+  values <- list(DateTimeRecapture = Sys.time(),
                  Capture = factor(1),
-                 Section = factor(1),
+                 SectionRecapture = factor(1),
                  TBarTag1 = TRUE,
                  TBarTag2 = TRUE,
                  TagsRemoved = TRUE,
@@ -61,24 +61,24 @@ check_lex_recapture <- function(recapture) {
 
 check_lex_detection <- function(detection) {
 
-  values <- list(DetectionDateTime = Sys.time(),
+  values <- list(DateTimeDetection = Sys.time(),
                  Capture = factor(1),
                  Receiver = factor(1),
                  Detections = c(1L, datacheckr::max_integer()))
 
-  datacheckr::check_data3(detection, values, key = c("DetectionDateTime", "Capture", "Receiver"),
+  datacheckr::check_data3(detection, values, key = c("DateTimeDetection", "Capture", "Receiver"),
                           select = TRUE)
 }
 
 check_lex_depth <- function(depth) {
 
   values <- list(
-    DepthDateTime = Sys.time(),
+    DateTimeDepth = Sys.time(),
     Capture = factor(1),
     Receiver = factor(1),
     Depth = c(0, 340))
 
-  datacheckr::check_data3(depth, values, key = c("DepthDateTime", "Capture", "Receiver"),
+  datacheckr::check_data3(depth, values, key = c("DateTimeDepth", "Capture", "Receiver"),
                           select = TRUE)
 }
 
@@ -86,9 +86,9 @@ check_lex_joins <- function(data) {
 
   datacheckr::check_join(data$station, data$section@data, "Section")
   datacheckr::check_join(data$deployment,  data$station, "Station")
-  datacheckr::check_join(data$capture,  data$section@data, "Section")
-  datacheckr::check_join(data$recapture,  data$capture, "Capture", extra = TRUE)
-  datacheckr::check_join(data$recapture,  data$section@data, "Section")
+  datacheckr::check_join(data$capture,  data$section@data, c(SectionCapture = "Section"))
+  datacheckr::check_join(data$recapture,  data$capture, "Capture")
+  datacheckr::check_join(data$recapture,  data$section@data, c(SectionRecapture = "Section"))
   datacheckr::check_join(data$detection,  data$capture, "Capture")
   datacheckr::check_join(data$depth,  data$capture, "Capture")
 

@@ -120,8 +120,8 @@ make_section <- function(data) {
 #' @export
 make_detect_data <-  function(
   data, capture = data$capture,
-  start_date = min(as.Date(capture$CaptureDateTime)),
-  end_date = min(Sys.Date(), max(as.Date(capture$TagExpireDateTime))),
+  start_date = min(as.Date(capture$DateTimeCapture)),
+  end_date = min(Sys.Date(), max(as.Date(capture$DateTimeTagExpire))),
   hourly_interval = 6L) {
 
   data %<>% check_lex_data()

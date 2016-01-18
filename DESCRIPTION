@@ -10,7 +10,7 @@ Depends:
     R (>= 3.1.0)
 Imports:
     broom,
-    datacheckr (>= 0.0.2.9010),
+    datacheckr (>= 0.0.2.9011),
     dplyr,
     ggplot2 (>= 2.0.0),
     ggrepel (>= 0.4),
@@ -23,7 +23,7 @@ Imports:
     spdep
 Suggests:
     klesdatr,
-    qlexdatr (>= 0.0.0.9004),
+    qlexdatr (>= 0.0.0.9005),
     testthat
 License: MIT + file LICENSE
 LazyData: true
