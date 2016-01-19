@@ -12,7 +12,7 @@ tidy_section <- function(section) {
   section
 }
 
-plot_section <- function(section) {
+plot_lex_section <- function(section) {
 
   ggplot2::ggplot(data = section@data, ggplot2::aes_(x = ~EastingSection / 1000,
                                                      y = ~NorthingSection / 1000)) +
@@ -25,7 +25,7 @@ plot_section <- function(section) {
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
 }
 
-plot_station <- function(station, section = NULL) {
+plot_lex_station <- function(station, section = NULL) {
   ggplot2::ggplot(data = station, ggplot2::aes_(x = ~EastingStation / 1000,
                                                 y = ~NorthingStation / 1000)) +
     tidy_section(section) +
@@ -36,7 +36,7 @@ plot_station <- function(station, section = NULL) {
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
 }
 
-plot_deployment <- function(deployment) {
+plot_lex_deployment <- function(deployment) {
   tz <- lubridate::tz(deployment$DateTimeReceiverIn[1])
   ggplot2::ggplot(data = deployment, ggplot2::aes_(y = ~Station)) +
     ggplot2::geom_segment(ggplot2::aes_(
@@ -46,7 +46,7 @@ plot_deployment <- function(deployment) {
     ggplot2::scale_y_discrete()
 }
 
-plot_capture <- function(capture) {
+plot_lex_capture <- function(capture) {
   capture %<>% dplyr::mutate_(.dots = list("Year" = ~lubridate::year(DateTimeCapture)))
 
   ggplot2::ggplot(data = capture, ggplot2::aes_(x = ~Length)) +
@@ -56,7 +56,7 @@ plot_capture <- function(capture) {
     ggplot2::scale_y_continuous(name = "Captures")
 }
 
-plot_recapture <- function(recapture) {
+plot_lex_recapture <- function(recapture) {
   tz <- lubridate::tz(recapture$DateTimeRecapture[1])
   recapture %<>% dplyr::mutate_(.dots = list("SectionRecapture" = ~factor(SectionRecapture)))
 
@@ -65,7 +65,7 @@ plot_recapture <- function(recapture) {
     ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz))
 }
 
-plot_detection <- function(detection) {
+plot_lex_detection <- function(detection) {
   detection %<>% dplyr::mutate_(.dots = list("Date" = ~as.Date(DateTimeDetection)))
 
   detection %<>% dplyr::group_by_(~Date) %>%
@@ -78,7 +78,7 @@ plot_detection <- function(detection) {
     ggplot2::scale_y_continuous(name = "Total Daily Detections", labels = scales::comma)
 }
 
-plot_depth <- function(depth) {
+plot_lex_depth <- function(depth) {
   tz <- lubridate::tz(depth$DateTimeDepth[1])
   ggplot2::ggplot(data = depth, ggplot2::aes_(x = ~DateTimeDepth, y = ~Depth * -1)) +
     ggplot2::geom_point(alpha = 1/3) +
@@ -86,16 +86,9 @@ plot_depth <- function(depth) {
     ggplot2::scale_y_continuous(name = "Depth (m)")
 }
 
-plot_data_name <- function(data) {
-  name <- names(data)
-  expr <- paste0("data$", name, " <- plot_", name, "(data$", name, ")")
-  eval(parse(text = expr))
-  invisible(data)
-}
-
 #' @export
 plot.lex_data <- function(x, ...) {
-  x %<>% purrr::lmap(fun_data_name, fun = "plot")
+  x %<>% purrr::lmap(fun_data_name, fun = "plot_lex")
   lapply(x, print)
   invisible(NULL)
 }

@@ -1,6 +1,0 @@
-context("check-lex-data")
-
-test_that("qlexdatr passes checks", {
-  data <- input_lex_data("qlexdatr")
-  expect_is(check_lex_data(data), "lex_data")
-})

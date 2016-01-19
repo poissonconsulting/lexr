@@ -1,6 +1,6 @@
 Package: lexr
 Title: Lake Exploitation Study Data Plotting and Analysis
-Version: 0.0.0.9003
+Version: 0.0.0.9004
 Authors@R: c(
     person("Joe", "Thorley", email = "joe@poissonconsulting.ca", role = c("aut", "cre")),
     person("Gary", "Pavan", role = "aut"),
@@ -15,12 +15,15 @@ Imports:
     ggplot2 (>= 2.0.0),
     ggrepel (>= 0.4),
     lubridate,
+    plyr,
     purrr,
     magrittr,
     rgeos,
     scales,
     sp,
-    spdep
+    spa,
+    spdep,
+    tidyr
 Suggests:
     klesdatr,
     qlexdatr (>= 0.0.0.9005),

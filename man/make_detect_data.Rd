@@ -6,13 +6,17 @@
 \usage{
 make_detect_data(data, capture = data$capture,
   start_date = min(as.Date(capture$DateTimeCapture)),
-  end_date = min(Sys.Date(), max(as.Date(capture$DateTimeTagExpire))),
-  hourly_interval = 6L)
+  end_date = min(as.Date("2015-12-31"),
+  max(as.Date(capture$DateTimeTagExpire))), hourly_interval = 6L)
 }
 \arguments{
 \item{data}{The lex_data object to check.}
 
 \item{capture}{A data frame of the capture data to use.}
+
+\item{start_date}{A date of the start.}
+
+\item{end_date}{A date of the end.}
 
 \item{hourly_interval}{A count indicating the hourly interval.}
 }

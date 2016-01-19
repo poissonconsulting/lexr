@@ -25,6 +25,7 @@ add_coverage_code <- function(x) {
 }
 
 calc_coverage_code_interval <- function(y, section) {
+  . <- NULL
   stopifnot(nrow(section@data) == 1)
   cov <- (nrow(y) * pi * 0.5 ^ 2) / section@data$Area[1]
   cov %<>% ifelse(. > 1, 1, .)
@@ -92,6 +93,7 @@ set_interval <- function(col, interval) {
 }
 
 set_intervals <- function(data, interval) {
+  . <- NULL
   colnames <- colnames(data)
   colnames <- colnames[grepl("^DateTime.+", colnames)]
   if (length(colnames)) {
@@ -103,6 +105,7 @@ set_intervals <- function(data, interval) {
 
 make_interval <- function(data, start_date, end_date, hourly_interval) {
   message("making interval...")
+  . <- NULL
   check_date(start_date)
   check_date(end_date)
   check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
@@ -115,8 +118,12 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
   interval <- dplyr::data_frame(DateTime = seq(start_date, end_date, by = "6 hours"))
   interval %<>% dplyr::mutate_(.dots = list(Interval = ~1:nrow(.),
                                             Date = ~as.Date(DateTime),
+                                            DayteTime = ~DateTime,
+                                            Year = ~as.integer(lubridate::year(DateTime)),
+                                            Month = ~as.integer(lubridate::month(DateTime)),
                                             Hour = ~lubridate::hour(DateTime)))
-  interval %<>% dplyr::select_(~Interval, ~Date, ~Hour, ~DateTime)
+  lubridate::year(interval$DayteTime) <- 2000
+  interval %<>% dplyr::select_(~Interval, ~Date, ~Year, ~Month, ~Hour, ~DayteTime, ~DateTime)
   data$interval <- interval
   data %<>% lapply(set_intervals, interval = .$interval)
   data
@@ -188,6 +195,8 @@ make_section <- function(data) {
 #' Makes detect_data object from a lex_data object.
 #' @inheritParams check_lex_data
 #' @param capture A data frame of the capture data to use.
+#' @param start_date A date of the start.
+#' @param end_date A date of the end.
 #' @param hourly_interval A count indicating the hourly interval.
 #'
 #' @return A detect_data object.
@@ -195,7 +204,7 @@ make_section <- function(data) {
 make_detect_data <-  function(
   data, capture = data$capture,
   start_date = min(as.Date(capture$DateTimeCapture)),
-  end_date = min(Sys.Date(), max(as.Date(capture$DateTimeTagExpire))),
+  end_date = min(as.Date("2015-12-31"), max(as.Date(capture$DateTimeTagExpire))),
   hourly_interval = 6L) {
 
   data %<>% check_lex_data()
