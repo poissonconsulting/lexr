@@ -20,7 +20,7 @@ add_coverage_code <- function(x) {
   if (anyDuplicated(x$Station))
     error("multiple receivers at the same station")
   x %<>% dplyr::arrange_(~Station)
-  x$CoverageCode <- paste0(x$Station)
+  x$CoverageCode <- paste0(x$Station, collapse = "")
   x
 }
 

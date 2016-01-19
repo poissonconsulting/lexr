@@ -31,9 +31,8 @@ check_detect_coverage <- function(coverage) {
     coverage, list(Interval = c(1L, max_integer()),
                    Section = factor(1),
                    Stations = c(1L, 9L),
-                   Coverage = c(0, 1)))
-#  ,
-#    key = c("Interval", "Section"), select = TRUE)
+                   Coverage = c(0, 1)),
+  key = c("Interval", "Section"), select = TRUE)
 }
 
 check_detect_capture <- function(capture) {

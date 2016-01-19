@@ -16,7 +16,7 @@
 #' lex <- input_lex_data("qlexdatr")
 #' check_lex_data(lex)
 #' print(lex)
-#' # plot(data)
+#' plot(lex)
 
 #' detect <- make_detect_data(lex)
 #' check_detect_data(detect)
