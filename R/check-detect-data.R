@@ -3,58 +3,36 @@ check_detect_section <- function(section) {
     section, list(Section = factor(1),
                   Habitat = factor(1),
                   Area = c(0, 100),
-                  Bounded = TRUE),
+                  Bounded = TRUE,
+                  EastingSection = 1,
+                  NorthingSection = 1),
     key = "Section", select = TRUE)
 }
 
 check_detect_distance <- function(distance) {
-  stopifnot(is.matrix(distance))
-  stopifnot(is.integer(distance))
-  distance
+  datacheckr::check_data2(
+    distance, list(SectionFrom = factor(1),
+                  SectionTo = factor(1),
+                  Distance = c(0L, 50L)),
+    key = c("SectionFrom", "SectionTo"), select = TRUE)
 }
 
 check_detect_interval <- function(interval) {
-  values <- list(Interval = c(1L, nrow(interval)),
-                 DateTime = Sys.time())
-
-  datacheckr::check_data2(interval, values, key = "Interval")
-  interval %<>% subset(select = names(values))
-  invisible(interval)
-}
-
-check_detect_deployment <- function(deployment) {
-
-  values <-  list(Station = 1L,
-                  Receiver = 1L,
-                  ReceiverDateTimeIn = Sys.time(),
-                  ReceiverDateTimeOut = Sys.time())
-
-  datacheckr::check_data2(deployment, values, key = c("Station", "Receiver", "ReceiverDateTimeIn"))
-  deployment %<>% subset(select = names(values))
-  invisible(deployment)
+  datacheckr::check_data2(
+    interval, list(Interval = c(1L, nrow(interval)),
+                 Date = as.Date("2000-01-01"),
+                 Hour = c(1L, 23L),
+                 DateTime = Sys.time()),
+    key = c("Interval"), select = TRUE)
 }
 
 check_detect_coverage <- function(coverage) {
-  values <- list(Section = 1L,
-                 Interval = 1L,
-                 Coverage = c(0, 1))
-
-  datacheckr::check_data2(coverage, values, key = c("Section", "Interval"))
-  coverage %<>% subset(select = names(values))
-  invisible(coverage)
-}
-
-check_detect_recapture <- function(recapture) {
-  values <- list(Interval = 1L,
-                 Section = 1L,
-                 TBarTag1 = TRUE,
-                 TBarTag2 = TRUE,
-                 TagsRemoved = TRUE,
-                 Released = TRUE)
-
-  datacheckr::check_data2(recapture, values)
-  recapture %<>% subset(select = names(values))
-  invisible(recapture)
+  datacheckr::check_data2(
+    coverage, list(IntervalDeployment = c(1L, max_integer()),
+                 Section = factor(1),
+                 Stations = c(1L, 9L),
+                 Coverage = c(0, 1)),
+    key = c("IntervalDeployment", "Section"), select = TRUE)
 }
 
 check_detect_capture <- function(capture) {
@@ -69,6 +47,19 @@ check_detect_capture <- function(capture) {
   datacheckr::check_data2(capture, values, key = "Capture")
   capture %<>% subset(select = names(values))
   invisible(capture)
+}
+
+check_detect_recapture <- function(recapture) {
+  values <- list(Interval = 1L,
+                 Section = 1L,
+                 TBarTag1 = TRUE,
+                 TBarTag2 = TRUE,
+                 TagsRemoved = TRUE,
+                 Released = TRUE)
+
+  datacheckr::check_data2(recapture, values)
+  recapture %<>% subset(select = names(values))
+  invisible(recapture)
 }
 
 check_detect_detection <- function(detection) {
