@@ -211,9 +211,9 @@ make_detect_data <-  function(
   data %<>% filter_captures(capture)
   data %<>% make_interval(start_date = start_date, end_date = end_date,
                           hourly_interval = hourly_interval)
-  data %<>% make_detection()
   data %<>% make_coverage()
   data %<>% make_capture()
+  data %<>% make_detection()
   data %<>% make_distance()
   data %<>% make_section()
   data <- data[detect_data_names()]
