@@ -57,9 +57,11 @@ make_coverage <- function(data) {
   deployment %<>% expand_deployment()
   data$section@data$Area <- rgeos::gArea(data$section, byid = TRUE) / 10 ^ 6
   coverage <- dplyr::inner_join(data$station, deployment, by = "Station")
-  coverage %<>% dplyr::select_(~IntervalDeployment, ~Section, ~Station, ~EastingStation, ~NorthingStation)
+  coverage %<>% dplyr::select_(~IntervalDeployment, ~Section, ~Station,
+                               ~EastingStation, ~NorthingStation)
 
   coverage %<>% plyr::ddply(c("Section"), calc_coverage, section = data$section)
+  coverage %<>% dplyr::rename_(.dots = list(Interval = "IntervalDeployment"))
   data$coverage <- dplyr::as.tbl(coverage)
   data
 }
@@ -125,7 +127,10 @@ make_capture <- function(data) {
    capture <- data$capture
    capture$Reward1 %<>% factor(levels = c(0, 10, 100))
    capture$Reward2 %<>% factor(levels = c(0, 10, 100))
-   capture %<>% dplyr::select_(~Capture, ~IntervalCapture, ~SectionCapture, ~Length,
+   levels(capture$Reward1) <- list("$10" = c("0", "10"), "$100" = "100")
+   levels(capture$Reward2) <- list("$10" = c("0", "10"), "$100" = "100")
+   capture %<>% dplyr::select_(~Capture, ~IntervalCapture, ~SectionCapture,
+                               ~IntervalTagExpire, ~Length,
                                ~Reward1, ~Reward2, ~Species)
    data$capture <- capture
    data
@@ -147,7 +152,7 @@ make_distance <- function(data) {
   section_names <- levels(data$section@data$Section)
   colnames(distance) <- section_names
   distance %<>% as.data.frame()
-  distance$SectionFrom <- section_names
+  distance$SectionFrom <- factor(section_names, levels = section_names)
   distance %<>% tidyr::gather_("SectionTo", "Distance", section_names)
   data$distance <- dplyr::as.tbl(distance)
   data

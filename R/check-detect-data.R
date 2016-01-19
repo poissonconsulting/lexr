@@ -1,5 +1,5 @@
 check_detect_section <- function(section) {
-  datacheckr::check_data2(
+  datacheckr::check_data3(
     section, list(Section = factor(1),
                   Habitat = factor(1),
                   Area = c(0, 100),
@@ -10,83 +10,81 @@ check_detect_section <- function(section) {
 }
 
 check_detect_distance <- function(distance) {
-  datacheckr::check_data2(
+  datacheckr::check_data3(
     distance, list(SectionFrom = factor(1),
-                  SectionTo = factor(1),
-                  Distance = c(0L, 50L)),
+                   SectionTo = factor(1),
+                   Distance = c(0L, 50L)),
     key = c("SectionFrom", "SectionTo"), select = TRUE)
 }
 
 check_detect_interval <- function(interval) {
-  datacheckr::check_data2(
+  datacheckr::check_data3(
     interval, list(Interval = c(1L, nrow(interval)),
-                 Date = as.Date("2000-01-01"),
-                 Hour = c(1L, 23L),
-                 DateTime = Sys.time()),
+                   Date = as.Date("2000-01-01"),
+                   Hour = c(0L, 23L),
+                   DateTime = Sys.time()),
     key = c("Interval"), select = TRUE)
 }
 
 check_detect_coverage <- function(coverage) {
-  datacheckr::check_data2(
-    coverage, list(IntervalDeployment = c(1L, max_integer()),
-                 Section = factor(1),
-                 Stations = c(1L, 9L),
-                 Coverage = c(0, 1)),
-    key = c("IntervalDeployment", "Section"), select = TRUE)
+  datacheckr::check_data3(
+    coverage, list(Interval = c(1L, max_integer()),
+                   Section = factor(1),
+                   Stations = c(1L, 9L),
+                   Coverage = c(0, 1)))
+#  ,
+#    key = c("Interval", "Section"), select = TRUE)
 }
 
 check_detect_capture <- function(capture) {
-  values <- list(Capture = c(1L, 1000L),
-                 Interval = 1L,
-                 Section = 1L,
-                 Length = c(200L, 1000L),
-                 Reward1 = c(1L, 10L, 100L),
-                 Reward2 = c(1L, 10L, 100L),
-                 TagExpireInterval = 1L)
-
-  datacheckr::check_data2(capture, values, key = "Capture")
-  capture %<>% subset(select = names(values))
-  invisible(capture)
+  datacheckr::check_data3(
+    capture, list(Capture = factor(1),
+                  IntervalCapture = 1L,
+                  SectionCapture = factor(1),
+                  Length = c(200L, 1000L),
+                  Reward1 = factor(rep("$10", 3), levels = c("$10", "$100")),
+                  Reward2 = factor(rep("$10", 3), levels = c("$10", "$100")),
+                  IntervalTagExpire = 1L),
+    key = "Capture", select = TRUE)
 }
 
 check_detect_recapture <- function(recapture) {
-  values <- list(Interval = 1L,
-                 Section = 1L,
-                 TBarTag1 = TRUE,
-                 TBarTag2 = TRUE,
-                 TagsRemoved = TRUE,
-                 Released = TRUE)
-
-  datacheckr::check_data2(recapture, values)
-  recapture %<>% subset(select = names(values))
-  invisible(recapture)
+  datacheckr::check_data3(
+    recapture, list(IntervalRecapture = 1L,
+                  Capture = factor(1),
+                  SectionRecapture = factor(1),
+                  TBarTag1 = TRUE,
+                  TBarTag2 = TRUE,
+                  TagsRemoved = TRUE,
+                  Released = TRUE),
+    key = c("IntervalRecapture", "Capture"), select = TRUE)
 }
 
 check_detect_detection <- function(detection) {
-
-  values <- list(Interval = 1L,
-                 Section = 1L,
-                 Capture = 1L)
-
-  datacheckr::check_data2(detection, values, key = c("Interval", "Section", "Capture"))
-  detection %<>% subset(select = names(values))
-  invisible(detection)
+  datacheckr::check_data3(
+    detection, list(IntervalDetection = 1L,
+                 Section = factor(1),
+                 Capture = factor(1),
+                 Receivers = c(1L, 9L),
+                 Detections = c(2L, max_integer())),
+  key = c("IntervalDetection", "Section", "Capture"), select = TRUE)
 }
 
 check_detect_joins <- function(data) {
-
   datacheckr::check_join(data$coverage, data$section, "Section")
-  datacheckr::check_join(data$distance, data$section, "Section")
-  datacheckr::check_join(data$capture,  data$section, "Section")
-  datacheckr::check_join(data$recapture,  data$section, "Section")
+  datacheckr::check_join(data$distance, data$section, c(SectionFrom = "Section"))
+  datacheckr::check_join(data$distance, data$section, c(SectionTo = "Section"))
+  datacheckr::check_join(data$coverage, data$section, "Section")
+  datacheckr::check_join(data$capture,  data$section, c(SectionCapture = "Section"))
+  datacheckr::check_join(data$recapture,  data$section, c(SectionRecapture = "Section"))
   datacheckr::check_join(data$detection,  data$section, "Section")
 
   datacheckr::check_join(data$coverage,  data$interval, "Interval")
-  datacheckr::check_join(data$capture,  data$interval, "Interval")
-  datacheckr::check_join(data$recapture,  data$interval, "Interval")
-  datacheckr::check_join(data$detection,  data$interval, "Interval")
+  datacheckr::check_join(data$capture,  data$interval, c(IntervalCapture = "Interval"))
+  datacheckr::check_join(data$recapture,  data$interval, c(IntervalRecapture = "Interval"))
+  datacheckr::check_join(data$detection,  data$interval, c(IntervalDetection = "Interval"))
 
-  datacheckr::check_join(data$recapture,  data$capture, "Capture", extra = TRUE)
+  datacheckr::check_join(data$recapture,  data$capture, "Capture")
   datacheckr::check_join(data$detection,  data$capture, "Capture")
   invisible(data)
 }
