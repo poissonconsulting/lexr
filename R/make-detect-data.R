@@ -120,11 +120,16 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
   data
 }
 
-# make_capture <- function(data) {
-#   capture <- data$capture
-#   data$capture <- capture
-#   data
-# }
+make_capture <- function(data) {
+  message("making capture...")
+   capture <- data$capture
+   capture$Reward1 %<>% factor(levels = c(0, 10, 100))
+   capture$Reward2 %<>% factor(levels = c(0, 10, 100))
+   capture %<>% dplyr::select_(~Capture, ~IntervalCapture, ~SectionCapture, ~Length,
+                               ~Reward1, ~Reward2, ~Species)
+   data$capture <- capture
+   data
+}
 
 make_distance <- function(data) {
   message("making distance...")
@@ -197,9 +202,7 @@ make_detect_data <-  function(
   data %<>% make_capture()
   data %<>% make_distance()
   data %<>% make_section()
-  data$depth <- NULL
-  data$deployment <- NULL
-  data$station <- NULL
+  data <- data[detect_data_names()]
   class(data) <- "detect_data"
   return(data)
 }
