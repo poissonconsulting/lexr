@@ -1,52 +1,67 @@
+expand_deployment_row <- function(x) {
+  stopifnot(nrow(x) == 1)
+  data <- dplyr::data_frame(
+    IntervalDeployment = x$IntervalReceiverIn:x$IntervalReceiverOut)
+  x %<>% merge(data)
+  x$IntervalReceiverIn <- NULL
+  x$IntervalReceiverOut <- NULL
+  x
+}
 
+expand_deployment <- function(deployment) {
+  if (any(deployment$IntervalDateTimeIn < deployment$IntervalDateTimeOut))
+    error("receiver deployed before retrieved")
+  deployment %<>% plyr::adply(1, expand_deployment_row)
+  stopifnot(!anyDuplicated(deployment))
+  deployment
+}
 
+add_coverage_code <- function(x) {
+  if (anyDuplicated(x$Station))
+    error("multiple receivers at the same station")
+  x %<>% dplyr::arrange_(~Station)
+  x$CoverageCode <- paste0(x$Station)
+  x
+}
 
+calc_coverage_code_interval <- function(y, section) {
+  stopifnot(nrow(section@data) == 1)
+  cov <- (nrow(y) * pi * 0.5 ^ 2) / section@data$Area[1]
+  cov %<>% ifelse(. > 1, 1, .)
+  cov
+}
 
-#   deployment %<>% dplyr::arrange_(~ReceiverDateTimeIn)
-#   deployment %<>% dplyr::mutate_(.dots = list(
-#     "Duration" = ~as.integer(difftime(ReceiverDateTimeOut, ReceiverDateTimeIn, units = "secs"))))
-#   if (any(deployment$Duration <= 0)) {
-#     deployment %<>% dplyr::filter_(~Duration <= 0)
-#     error("receiver retrieved before deployed\n", capture_output(deployment))
-#   }
-#   deployment_diff <- function (x) {
-#     x %<>% dplyr::arrange_(~ReceiverDateTimeIn)
-#     x$Difference <- c(diff(as.integer(x$ReceiverDateTimeIn)), NA)
-#     x
-#   }
-#   deployment %<>% plyr::ddply("Station", deployment_diff)
-#   overlap <- !is.na(deployment$Difference) & deployment$Difference < deployment$Duration
-#   if (FALSE) { #(any(overlap)) {
-#     overlap <- which(overlap)
-#     overlap <- sort(unique(c(overlap, overlap + 1)))
-#     deployment %<>% dplyr::slice_(~overlap)
-#     error("multiple receivers at the same station\n", capture_output(deployment))
-#   }
+calc_coverage_code <- function(x, section) {
+  x %<>% dplyr::arrange_(~IntervalDeployment)
+  y <- dplyr::filter_(x, ~IntervalDeployment == x$IntervalDeployment[1]) %>% dplyr::as.tbl()
+  x$Coverage <- calc_coverage_code_interval(y, section)
+  x %<>% dplyr::group_by_(~IntervalDeployment, ~Section) %>%
+    dplyr::summarise_(.dots = list(Stations = "n()", Coverage = "first(Coverage)"))
+  x
+}
 
+calc_coverage <- function(data, section) {
+  section <- section[section@data$Section == data$Section[1],]
+  data$Station %<>% droplevels() %>% as.integer()
+  stopifnot(max(data$Station) < 10)
+  data %<>% plyr::ddply("IntervalDeployment", add_coverage_code)
+  data %<>% plyr::ddply("CoverageCode", calc_coverage_code, section)
+  data$CoverageCode <- NULL
+  data
+}
 
-make_coverage <- function(section, section_polygons, station, station_deployment,
-                               hourly_interval = 6) {
+make_coverage <- function(data) {
+  message("making coverage...")
+  deployment <- data$deployment
 
-  station_deployment %<>% dplyr::full_join(station, by = "Station")
-  if (any(is.na(station_deployment$Receiver)))
-    check_stop("st")
+  deployment %<>% expand_deployment()
+  data$section@data$Area <- rgeos::gArea(data$section, byid = TRUE) / 10 ^ 6
+  coverage <- dplyr::inner_join(data$station, deployment, by = "Station")
+  coverage %<>% dplyr::select_(~IntervalDeployment, ~Section, ~Station, ~EastingStation, ~NorthingStation)
 
-
-  coverage <- dplyr::inner_join(section, receiver, by = "Section")
-  coverage %<>% dplyr::inner_join(deployment, by = "Receiver")
-  coverage %<>% dplyr::group_by(Section, DeploymentDate) %>% dplyr::summarise(Receivers = n())
-  coverage %<>% dplyr::inner_join(section, by = "Section")
-  coverage %<>% dplyr::mutate(Coverage = Receivers * pi * 0.5^2 / Area)
-  coverage$Coverage[coverage$Coverage > 1] <- 1
-  coverage %<>% dplyr::select(Section, DeploymentDate, Coverage)
-
-  all <- expand.grid(DeploymentDate = seq(from = min(coverage$DeploymentDate), to = max(coverage$DeploymentDate), by = "day"),
-                     Section = section$Section)
-
-  coverage %<>% dplyr::right_join(all, by = c("Section", "DeploymentDate"))
-  coverage$Coverage[is.na(coverage$Coverage)] <- 0
-
-  as.data.frame(coverage)
+  coverage %<>% plyr::ddply(c("Section"), calc_coverage, section = data$section)
+  data$coverage <- dplyr::as.tbl(coverage)
+  data
 }
 
 filter_captures <- function(data, capture) {
@@ -105,6 +120,12 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
   data
 }
 
+# make_capture <- function(data) {
+#   capture <- data$capture
+#   data$capture <- capture
+#   data
+# }
+
 make_distance <- function(data) {
   message("making distance...")
   neighbours <- spdep::poly2nb(data$section, row.names = data$section@data$Section)
@@ -138,24 +159,15 @@ make_detection <- function(data) {
   detection <- data$detection
   detection %<>% dplyr::inner_join(data$deployment, by = "Receiver")
   detection %<>% dplyr::filter_(~IntervalDetection >= IntervalReceiverIn,
-                        ~IntervalDetection <= IntervalReceiverOut)
+                                ~IntervalDetection <= IntervalReceiverOut)
   detection %<>% dplyr::inner_join(data$station, by = "Station")
   detection %<>% plyr::ddply(c("IntervalDetection", "Section", "Capture"), sum_detections)
   data$detection <- dplyr::as.tbl(detection)
-  data$deployment <- NULL
-  data$station <- NULL
   data
 }
 
 make_section <- function(data) {
   message("making section...")
-  data$polygon <- dplyr::as.tbl(broom::tidy(data$section))
-  data$polygon %<>% dplyr::rename_(.dots = list(Easting = "lat",
-                                                Northing = "long",
-                                                Hole = "hole",
-                                                Group = "id"))
-  data$polygon %<>% dplyr::select_(~Easting, ~Northing, ~Hole, ~Group)
-  data$section@data$Area <- rgeos::gArea(data$section, byid = TRUE) / 10 ^ 6
   data$section <- data$section@data
   data
 }
@@ -178,12 +190,16 @@ make_detect_data <-  function(
 
   data %<>% check_lex_data()
   data %<>% filter_captures(capture)
-  data$depth <- NULL
   data %<>% make_interval(start_date = start_date, end_date = end_date,
                           hourly_interval = hourly_interval)
   data %<>% make_detection()
+  data %<>% make_coverage()
+  data %<>% make_capture()
   data %<>% make_distance()
   data %<>% make_section()
+  data$depth <- NULL
+  data$deployment <- NULL
+  data$station <- NULL
   class(data) <- "detect_data"
   return(data)
 }
