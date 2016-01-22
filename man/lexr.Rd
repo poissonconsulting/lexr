@@ -9,7 +9,7 @@
 Lake Exploitation Study Data Plotting and Analysis
 }
 \examples{
-
+\dontrun{
 library(dplyr) # so tbl data frames print nice
 library(magrittr) # for piping operator
 library(qlexdatr) # data set for example
@@ -22,5 +22,6 @@ detect <- make_detect_data(lex)
 # check_detect_data(detect)
 print(detect)
 plot(detect)
+}
 }
 

@@ -50,11 +50,12 @@ check_lex_capture <- function(capture) {
 check_lex_recapture <- function(recapture) {
   values <- list(DateTimeRecapture = Sys.time(),
                  Capture = factor(1),
-                 SectionRecapture = factor(1),
+                 SectionRecapture = factor(c(1, NA)),
                  TBarTag1 = TRUE,
                  TBarTag2 = TRUE,
                  TagsRemoved = TRUE,
-                 Released = TRUE)
+                 Released = TRUE,
+                 Public = TRUE)
 
   datacheckr::check_data3(recapture, values, select = TRUE)
 }
@@ -88,7 +89,8 @@ check_lex_joins <- function(data) {
   datacheckr::check_join(data$deployment,  data$station, "Station")
   datacheckr::check_join(data$capture,  data$section@data, c(SectionCapture = "Section"))
   datacheckr::check_join(data$recapture,  data$capture, "Capture")
-  datacheckr::check_join(data$recapture,  data$section@data, c(SectionRecapture = "Section"))
+  datacheckr::check_join(data$recapture,  data$section@data,
+                         c(SectionRecapture = "Section"), ignore_nas = TRUE)
   datacheckr::check_join(data$detection,  data$capture, "Capture")
   datacheckr::check_join(data$depth,  data$capture, "Capture")
 
