@@ -19,7 +19,7 @@ check_lex_data(lex)
 print(lex)
 plot(lex)
 detect <- make_detect_data(lex)
-check_detect_data(detect)
+# check_detect_data(detect)
 print(detect)
 plot(detect)
 }
