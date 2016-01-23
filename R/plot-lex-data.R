@@ -19,7 +19,7 @@ plot_lex_section <- function(section) {
     tidy_section(section) +
     ggplot2::geom_point(alpha = 1/3) +
     ggrepel::geom_text_repel(ggplot2::aes_(x = ~EastingSection / 1000, label = ~Section),
-                       size = 4) +
+                             size = 4) +
     ggplot2::coord_equal() +
     ggplot2::scale_x_continuous(name = "Easting (km)", labels = scales::comma) +
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
@@ -86,9 +86,32 @@ plot_lex_depth <- function(depth) {
     ggplot2::scale_y_continuous(name = "Depth (m)")
 }
 
+plot_deployment_detection <- function (deployment, detection, station) {
+
+  deployment %<>% dplyr::inner_join(station, by = "Station")
+  detection %<>% dplyr::inner_join(deployment, by = "Receiver")
+  detection %<>% dplyr::filter_(~DateTimeDetection >= DateTimeReceiverIn)
+  detection %<>% dplyr::filter_(~DateTimeDetection <= DateTimeReceiverOut)
+
+  tz <- lubridate::tz(deployment$DateTimeReceiverIn)
+  ggplot2::ggplot(data = deployment, ggplot2::aes_(y = ~Station)) +
+    ggplot2::facet_grid(Section~., scales = "free_y", space = "free_y") +
+    ggplot2::geom_segment(ggplot2::aes_(
+      x = ~DateTimeReceiverIn, xend = ~DateTimeReceiverOut, yend = ~Station),
+      alpha = 1/3, size = 3, color = "red") +
+    ggplot2::geom_point(data = detection, ggplot2::aes_(x = ~DateTimeDetection), alpha = 1/4) +
+    ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz)) +
+    ggplot2::scale_y_discrete()
+}
+
 #' @export
-plot.lex_data <- function(x, ...) {
-  x %<>% purrr::lmap(fun_data_name, fun = "plot_lex")
-  lapply(x, print)
+plot.lex_data <- function(x, all = FALSE, ...) {
+  datacheckr::check_flag(all)
+  y <- purrr::lmap(x, fun_data_name, fun = "plot_lex")
+  lapply(y, print)
+  if (all) {
+    print(plot_lex_station(x$station, x$section))
+    print(plot_deployment_detection(x$deployment, x$detection, x$station))
+  }
   invisible(NULL)
 }
