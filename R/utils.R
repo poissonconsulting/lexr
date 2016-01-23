@@ -29,9 +29,9 @@ lex_data_names <- function() c("section", "station", "deployment", "capture",
 detect_data_names <- function() c("section", "distance", "interval", "coverage", "capture",
        "recapture", "detection")
 
-fun_data_name <- function(data, fun) {
+fun_data_name <- function(data, fun, ...) {
   name <- names(data)
-  expr <- paste0("data$", name, " <- ", fun, "_", name, "(data$", name, ")")
+  expr <- paste0("data$", name, " <- ", fun, "_", name, "(data$", name, ", ...)")
   eval(parse(text = expr))
   invisible(data)
 }

@@ -37,7 +37,7 @@ plot_lex_station <- function(station, section = NULL) {
 }
 
 plot_lex_deployment <- function(deployment) {
-  tz <- lubridate::tz(deployment$DateTimeReceiverIn[1])
+  tz <- lubridate::tz(deployment$DateTimeReceiverIn)
   ggplot2::ggplot(data = deployment, ggplot2::aes_(y = ~Station)) +
     ggplot2::geom_segment(ggplot2::aes_(
       x = ~DateTimeReceiverIn, xend = ~DateTimeReceiverOut, yend = ~Station),
@@ -57,7 +57,7 @@ plot_lex_capture <- function(capture) {
 }
 
 plot_lex_recapture <- function(recapture) {
-  tz <- lubridate::tz(recapture$DateTimeRecapture[1])
+  tz <- lubridate::tz(recapture$DateTimeRecapture)
   recapture %<>% dplyr::mutate_(.dots = list("SectionRecapture" = ~factor(SectionRecapture)))
 
   ggplot2::ggplot(data = recapture, ggplot2::aes_(x = ~DateTimeRecapture, y = ~SectionRecapture)) +
@@ -79,7 +79,7 @@ plot_lex_detection <- function(detection) {
 }
 
 plot_lex_depth <- function(depth) {
-  tz <- lubridate::tz(depth$DateTimeDepth[1])
+  tz <- lubridate::tz(depth$DateTimeDepth)
   ggplot2::ggplot(data = depth, ggplot2::aes_(x = ~DateTimeDepth, y = ~Depth * -1)) +
     ggplot2::geom_point(alpha = 1/3) +
     ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz)) +

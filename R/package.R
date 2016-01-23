@@ -8,18 +8,27 @@
 #' @examples
 #' \dontrun{
 #' library(dplyr) # so tbl data frames print nice
-#' library(magrittr) # for piping operator
-#' library(qlexdatr) # data set for example
+#' library(klexdatr) # data set for example
 #' library(lexr)
-
-#' lex <- input_lex_data("qlexdatr")
-#' check_lex_data(lex)
-#' print(lex)
-#' plot(lex)
-
-#' detect <- make_detect_data(lex)
-#' # check_detect_data(detect)
-#' print(detect)
-#' plot(detect)
+#'
+#' qlex <- input_lex_data("qlexdatr")
+#' check_lex_data(qlex)
+#' print(qlex)
+#' plot(qlex)
+#'
+#' qdetect <- make_detect_data(qlex)
+#' check_detect_data(qdetect)
+#' print(qdetect)
+#' plot(qdetect)
+#'
+#' klex <- input_lex_data("klexdatr")
+#' check_lex_data(klex)
+#' print(klex)
+#' plot(klex)
+#'
+#' kdetect <- make_detect_data(klex)
+#' check_detect_data(kdetect)
+#' print(kdetect)
+#' plot(kdetect)
 #' }
 NULL

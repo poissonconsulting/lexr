@@ -13,7 +13,7 @@ check_detect_distance <- function(distance) {
   datacheckr::check_data3(
     distance, list(SectionFrom = factor(1),
                    SectionTo = factor(1),
-                   Distance = c(0L, 50L)),
+                   Distance = c(0L, as.integer(ceiling(sqrt(nrow(distance)))))),
     key = c("SectionFrom", "SectionTo"), select = TRUE)
 }
 
@@ -58,7 +58,8 @@ check_detect_recapture <- function(recapture) {
                   TBarTag1 = TRUE,
                   TBarTag2 = TRUE,
                   TagsRemoved = TRUE,
-                  Released = TRUE),
+                  Released = TRUE,
+                  Public = TRUE),
     key = c("IntervalRecapture", "Capture"), select = TRUE)
 }
 

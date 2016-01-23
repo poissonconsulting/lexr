@@ -17,8 +17,6 @@ expand_deployment <- function(deployment) {
 }
 
 add_coverage_code <- function(x) {
-  if (anyDuplicated(x$Station))
-    error("multiple receivers at the same station")
   x %<>% dplyr::arrange_(~Station)
   x$CoverageCode <- paste0(x$Station, collapse = "")
   x
@@ -41,10 +39,26 @@ calc_coverage_code <- function(x, section) {
   x
 }
 
+check_consecutive_dups <- function(duplicates) {
+  intervals <- duplicates$IntervalDeployment
+  intervals %<>% sort() %>% diff()
+  if (any(intervals == 1))
+    error("multiple receivers at the same station")
+  NULL
+}
+
 calc_coverage <- function(data, section) {
   section <- section[section@data$Section == data$Section[1],]
   data$Station %<>% droplevels() %>% as.integer()
   stopifnot(max(data$Station) < 10)
+
+  if (anyDuplicated(data[c("IntervalDeployment", "Station")])) {
+    duplicates <- data[c("IntervalDeployment", "Station")]
+    data <- data[!duplicated(duplicates),,drop = FALSE]
+    duplicates <- duplicates[duplicated(duplicates),,drop = FALSE]
+    plyr::ddply(duplicates, "Station", check_consecutive_dups)
+  }
+
   data %<>% plyr::ddply("IntervalDeployment", add_coverage_code)
   data %<>% plyr::ddply("CoverageCode", calc_coverage_code, section)
   data$CoverageCode <- NULL
@@ -92,6 +106,47 @@ set_interval <- function(col, interval) {
   data$Interval
 }
 
+adjust_datetime_section <- function(section, start_date, end_date) {
+  section
+}
+
+adjust_datetime_station <- function(station, start_date, end_date) {
+  station
+}
+
+adjust_datetime_deployment <- function(deployment, start_date, end_date) {
+  deployment %<>% dplyr::filter_(~DateTimeReceiverIn <= end_date)
+  deployment %<>% dplyr::filter_(~DateTimeReceiverOut >= start_date)
+  deployment$DateTimeReceiverIn[deployment$DateTimeReceiverIn < start_date] <- start_date
+  deployment$DateTimeReceiverOut[deployment$DateTimeReceiverOut > end_date] <- end_date
+  deployment
+}
+
+adjust_datetime_capture <- function (capture, start_date, end_date) {
+  capture %<>% dplyr::filter_(~DateTimeCapture >= start_date)
+  capture %<>% dplyr::filter_(~DateTimeCapture <= end_date)
+  capture$DateTimeTagExpire[capture$DateTimeTagExpire > end_date] <- end_date
+  capture
+}
+
+adjust_datetime_recapture <- function (recapture, start_date, end_date) {
+  recapture %<>% dplyr::filter_(~DateTimeRecapture >= start_date)
+  recapture %<>% dplyr::filter_(~DateTimeRecapture <= end_date)
+  recapture
+}
+
+adjust_datetime_detection <- function(detection, start_date, end_date) {
+  detection %<>% dplyr::filter_(~DateTimeDetection >= start_date)
+  detection %<>% dplyr::filter_(~DateTimeDetection <= end_date)
+  detection
+}
+
+adjust_datetime_depth <- function(depth, start_date, end_date) {
+  depth %<>% dplyr::filter_(~DateTimeDepth >= start_date)
+  depth %<>% dplyr::filter_(~DateTimeDepth <= end_date)
+  depth
+}
+
 set_intervals <- function(data, interval) {
   . <- NULL
   colnames <- colnames(data)
@@ -110,10 +165,14 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
   check_date(end_date)
   check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
 
-  tz <- lubridate::tz(data$capture$DateTimeCapture[1])
+  if (end_date <= start_date) error("start_date must be before end_date")
+
+  tz <- lubridate::tz(data$capture$DateTimeCapture)
 
   start_date %<>% paste("00:00:00") %>% as.POSIXct(tz = tz)
   end_date %<>% paste("23:59:59") %>% as.POSIXct(tz = tz)
+
+  data %<>% purrr::lmap(fun_data_name, fun = "adjust_datetime", start_date, end_date)
 
   interval <- dplyr::data_frame(DateTime = seq(start_date, end_date, by = "6 hours"))
   interval %<>% dplyr::mutate_(.dots = list(Interval = ~1:nrow(.),
@@ -131,16 +190,16 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
 
 make_capture <- function(data) {
   message("making capture...")
-   capture <- data$capture
-   capture$Reward1 %<>% factor(levels = c(0, 10, 100))
-   capture$Reward2 %<>% factor(levels = c(0, 10, 100))
-   levels(capture$Reward1) <- list("Low" = c("0", "10"), "High" = "100")
-   levels(capture$Reward2) <- list("Low" = c("0", "10"), "High" = "100")
-   capture %<>% dplyr::select_(~Capture, ~IntervalCapture, ~SectionCapture,
-                               ~IntervalTagExpire, ~Length,
-                               ~Reward1, ~Reward2, ~Species)
-   data$capture <- capture
-   data
+  capture <- data$capture
+  capture$Reward1 %<>% factor(levels = c(0, 10, 100))
+  capture$Reward2 %<>% factor(levels = c(0, 10, 100))
+  levels(capture$Reward1) <- list("Low" = c("0", "10"), "High" = "100")
+  levels(capture$Reward2) <- list("Low" = c("0", "10"), "High" = "100")
+  capture %<>% dplyr::select_(~Capture, ~IntervalCapture, ~SectionCapture,
+                              ~IntervalTagExpire, ~Length,
+                              ~Reward1, ~Reward2, ~Species)
+  data$capture <- capture
+  data
 }
 
 make_distance <- function(data) {
@@ -161,6 +220,7 @@ make_distance <- function(data) {
   distance %<>% as.data.frame()
   distance$SectionFrom <- factor(section_names, levels = section_names)
   distance %<>% tidyr::gather_("SectionTo", "Distance", section_names)
+  distance %<>% dplyr::mutate_(.dots = list(SectionTo = ~factor(SectionTo, levels = section_names), Distance = ~as.integer(Distance)))
   data$distance <- dplyr::as.tbl(distance)
   data
 }
@@ -188,7 +248,6 @@ make_section <- function(data) {
   data$section <- data$section@data
   data
 }
-#
 
 #' Make Detect Data
 #'

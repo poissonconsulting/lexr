@@ -30,6 +30,8 @@ check_lex_deployment <- function(deployment) {
 
   datacheckr::check_data3(deployment, values,
                           key = c("Station", "Receiver", "DateTimeReceiverIn"), select = TRUE)
+  deployment %<>% dplyr::arrange_(~DateTimeReceiverIn, ~DateTimeReceiverOut, ~Station)
+  deployment
 }
 
 check_lex_capture <- function(capture) {
@@ -45,6 +47,8 @@ check_lex_capture <- function(capture) {
                  DepthRangeTag = c(1L, NA))
 
   datacheckr::check_data3(capture, values, key = "Capture", select = TRUE)
+  capture %<>% dplyr::arrange_(~DateTimeCapture, ~Capture)
+  capture
 }
 
 check_lex_recapture <- function(recapture) {
@@ -58,6 +62,8 @@ check_lex_recapture <- function(recapture) {
                  Public = TRUE)
 
   datacheckr::check_data3(recapture, values, select = TRUE)
+  recapture %<>% dplyr::arrange_(~DateTimeRecapture, ~Capture)
+  recapture
 }
 
 check_lex_detection <- function(detection) {
@@ -69,6 +75,8 @@ check_lex_detection <- function(detection) {
 
   datacheckr::check_data3(detection, values, key = c("DateTimeDetection", "Capture", "Receiver"),
                           select = TRUE)
+  detection %<>% dplyr::arrange_(~DateTimeDetection, ~Capture, ~Receiver)
+  detection
 }
 
 check_lex_depth <- function(depth) {
@@ -81,6 +89,8 @@ check_lex_depth <- function(depth) {
 
   datacheckr::check_data3(depth, values, key = c("DateTimeDepth", "Capture", "Receiver"),
                           select = TRUE)
+  depth %<>% dplyr::arrange_(~DateTimeDepth, ~Capture, ~Receiver)
+  depth
 }
 
 check_lex_joins <- function(data) {
