@@ -14,7 +14,7 @@
 #' qlex <- input_lex_data("qlexdatr")
 #' check_lex_data(qlex)
 #' print(qlex)
-#' plot(qlex)
+#' plot(qlex, all = TRUE)
 #'
 #' qdetect <- make_detect_data(qlex)
 #' check_detect_data(qdetect)
@@ -24,7 +24,7 @@
 #' klex <- input_lex_data("klexdatr")
 #' check_lex_data(klex)
 #' print(klex)
-#' plot(klex)
+#' plot(klex, all = TRUE)
 #'
 #' kdetect <- make_detect_data(klex)
 #' check_detect_data(kdetect)

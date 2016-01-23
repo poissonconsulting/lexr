@@ -1,4 +1,5 @@
-plot_detect_coverage <- function(coverage) {
+plot_detect_coverage <- function(coverage, interval) {
+  coverage %<>% dplyr::inner_join(interval, by = "Interval")
 
   coverage %<>% dplyr::mutate_(.dots = list(Year = "lubridate::year(Date)",
                                DayteTime = "DateTime"))
@@ -12,9 +13,19 @@ plot_detect_coverage <- function(coverage) {
     ggplot2::expand_limits(y = c(0,1))
 }
 
+plot_detect_overview <- function (capture, recapture, detection, interval) {
+  capture %<>% inner_join(interval, by = c(IntervalCapture = "Interval"))
+  recapture %<>% inner_join(interval, by = c(IntervalRecapture = "Interval"))
+  detection %<>% inner_join(interval, by = c(IntervalDetection = "Interval"))
+
+
+}
+
 #' @export
-plot.detect_data <- function(x, ...) {
-  coverage <- dplyr::inner_join(x$coverage, x$interval, by = "Interval")
-  print(plot_detect_coverage(coverage))
+plot.detect_data <- function(x, all = FALSE...) {
+  print(plot_detect_coverage(x$coverage, x$interval))
+  if (all) {
+    print(plot_detect_overview(x$capture, x$recapture, x$detection, x$interval))
+  }
   invisible(NULL)
 }
