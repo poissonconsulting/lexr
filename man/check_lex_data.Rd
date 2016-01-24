@@ -4,10 +4,12 @@
 \alias{check_lex_data}
 \title{Check Lake Exploitation Data}
 \usage{
-check_lex_data(data)
+check_lex_data(data, all = FALSE)
 }
 \arguments{
 \item{data}{The lex_data object to check.}
+
+\item{all}{A flag indicating whether to run all checks.}
 }
 \value{
 A flag indicating whether the package data passes the checks.

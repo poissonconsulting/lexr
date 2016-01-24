@@ -31,7 +31,7 @@ check_lex_deployment <- function(deployment) {
   datacheckr::check_data3(deployment, values,
                           key = c("Station", "Receiver", "DateTimeReceiverIn"), select = TRUE)
   deployment %<>% dplyr::arrange_(~DateTimeReceiverIn, ~DateTimeReceiverOut, ~Station)
-  deployment
+  invisible(deployment)
 }
 
 check_lex_capture <- function(capture) {
@@ -48,7 +48,7 @@ check_lex_capture <- function(capture) {
 
   datacheckr::check_data3(capture, values, key = "Capture", select = TRUE)
   capture %<>% dplyr::arrange_(~DateTimeCapture, ~Capture)
-  capture
+  invisible(capture)
 }
 
 check_lex_recapture <- function(recapture) {
@@ -63,7 +63,7 @@ check_lex_recapture <- function(recapture) {
 
   datacheckr::check_data3(recapture, values, select = TRUE)
   recapture %<>% dplyr::arrange_(~DateTimeRecapture, ~Capture)
-  recapture
+  invisible(recapture)
 }
 
 check_lex_detection <- function(detection) {
@@ -76,7 +76,7 @@ check_lex_detection <- function(detection) {
   datacheckr::check_data3(detection, values, key = c("DateTimeDetection", "Capture", "Receiver"),
                           select = TRUE)
   detection %<>% dplyr::arrange_(~DateTimeDetection, ~Capture, ~Receiver)
-  detection
+  invisible(detection)
 }
 
 check_lex_depth <- function(depth) {
@@ -90,7 +90,7 @@ check_lex_depth <- function(depth) {
   datacheckr::check_data3(depth, values, key = c("DateTimeDepth", "Capture", "Receiver"),
                           select = TRUE)
   depth %<>% dplyr::arrange_(~DateTimeDepth, ~Capture, ~Receiver)
-  depth
+  invisible(depth)
 }
 
 check_lex_joins <- function(data) {
@@ -109,19 +109,39 @@ check_lex_joins <- function(data) {
   invisible(data)
 }
 
+check_lex_deployment_detection <- function(deployment, detection) {
+  deployment$DeploymentID <- 1:nrow(deployment)
+  detection %<>% dplyr::inner_join(deployment, by = "Receiver")
+  detection %<>% dplyr::filter_(~DateTimeDetection >= DateTimeReceiverIn)
+  detection %<>% dplyr::filter_(~DateTimeDetection <= DateTimeReceiverOut)
+
+  deployment %<>% dplyr::filter_(~!DeploymentID %in% unique(detection$DeploymentID))
+  deployment$DeploymentID <- NULL
+  if (nrow(deployment)) {
+    warning(nrow(deployment), " deployments with no detections")
+    print(as.data.frame(deployment))
+  }
+  invisible(deployment)
+}
+
 #' Check Lake Exploitation Data
 #'
 #' Checks loaded lake exploitation data and returns a TRUE if passes all the tests.
 #' Otherwise stops with an informative error.
 #'
 #' @param data The lex_data object to check.
+#' @param all A flag indicating whether to run all checks.
 #' @return A flag indicating whether the package data passes the checks.
 #' @export
-check_lex_data <- function(data) {
+check_lex_data <- function(data, all = FALSE) {
   if (!inherits(data, "lex_data")) error("data must be a lex_data object")
+  datacheckr::check_flag(all)
   if (!identical(names(data), lex_data_names())) error("data must have correct names")
   data %<>% purrr::lmap(fun_data_name, fun = "check_lex")
   check_lex_joins(data)
+  if (all) {
+    check_lex_deployment_detection(data$deployment, data$detection)
+  }
   class(data) <- "lex_data"
   invisible(data)
 }

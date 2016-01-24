@@ -42,6 +42,8 @@ plot_lex_deployment <- function(deployment) {
     ggplot2::geom_segment(ggplot2::aes_(
       x = ~DateTimeReceiverIn, xend = ~DateTimeReceiverOut, yend = ~Station),
       alpha = 1/2, size = 3) +
+    ggplot2::geom_point(ggplot2::aes_(
+      x = ~DateTimeReceiverIn), color = "blue") +
     ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz)) +
     ggplot2::scale_y_discrete()
 }
@@ -86,7 +88,7 @@ plot_lex_depth <- function(depth) {
     ggplot2::scale_y_continuous(name = "Depth (m)")
 }
 
-plot_deployment_detection <- function (deployment, detection, station) {
+plot_lex_deployment_detection <- function (deployment, detection, station) {
 
   deployment %<>% dplyr::inner_join(station, by = "Station")
   detection %<>% dplyr::inner_join(deployment, by = "Receiver")
@@ -100,6 +102,24 @@ plot_deployment_detection <- function (deployment, detection, station) {
       x = ~DateTimeReceiverIn, xend = ~DateTimeReceiverOut, yend = ~Station),
       alpha = 1/3, size = 3, color = "red") +
     ggplot2::geom_point(data = detection, ggplot2::aes_(x = ~DateTimeDetection), alpha = 1/4) +
+    ggplot2::geom_point(ggplot2::aes_(x = ~DateTimeReceiverIn), color = "blue") +
+    ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz)) +
+    ggplot2::scale_y_discrete()
+}
+
+plot_lex_receiver_detection <- function (deployment, detection) {
+
+  detection %<>% dplyr::inner_join(deployment, by = "Receiver")
+  detection %<>% dplyr::filter_(~DateTimeDetection >= DateTimeReceiverIn)
+  detection %<>% dplyr::filter_(~DateTimeDetection <= DateTimeReceiverOut)
+
+  tz <- lubridate::tz(deployment$DateTimeReceiverIn)
+  ggplot2::ggplot(data = deployment, ggplot2::aes_(y = ~Receiver)) +
+    ggplot2::geom_segment(ggplot2::aes_(
+      x = ~DateTimeReceiverIn, xend = ~DateTimeReceiverOut, yend = ~Receiver),
+      alpha = 1/3, size = 3, color = "red") +
+    ggplot2::geom_point(data = detection, ggplot2::aes_(x = ~DateTimeDetection), alpha = 1/4) +
+    ggplot2::geom_point(ggplot2::aes_(x = ~DateTimeReceiverIn), color = "blue") +
     ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz)) +
     ggplot2::scale_y_discrete()
 }
@@ -111,7 +131,8 @@ plot.lex_data <- function(x, all = FALSE, ...) {
   lapply(y, print)
   if (all) {
     print(plot_lex_station(x$station, x$section))
-    print(plot_deployment_detection(x$deployment, x$detection, x$station))
+    print(plot_lex_deployment_detection(x$deployment, x$detection, x$station))
+    print(plot_lex_receiver_detection(x$deployment, x$detection))
   }
   invisible(NULL)
 }
