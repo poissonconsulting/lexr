@@ -174,7 +174,7 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
 
   data %<>% purrr::lmap(fun_data_name, fun = "adjust_datetime", start_date, end_date)
 
-  interval <- dplyr::data_frame(DateTime = seq(start_date, end_date, by = "6 hours"))
+  interval <- dplyr::data_frame(DateTime = seq(start_date, end_date, by = paste(hourly_interval,"hours")))
   interval %<>% dplyr::mutate_(.dots = list(Interval = ~1:nrow(.),
                                             Date = ~as.Date(DateTime),
                                             DayteTime = ~DateTime,
