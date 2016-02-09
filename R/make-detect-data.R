@@ -84,6 +84,11 @@ make_coverage <- function(data) {
 filter_captures <- function(data, capture) {
   capture %<>% check_lex_capture()
   capture$Capture %<>% droplevels()
+
+  data$recapture$Capture %<>% as.character()
+  data$detection$Capture %<>% as.character()
+  data$depth$Capture %<>% as.character()
+
   levels(data$recapture$Capture) <- levels(capture$Capture)
   levels(data$detection$Capture) <- levels(capture$Capture)
   levels(data$depth$Capture) <- levels(capture$Capture)
