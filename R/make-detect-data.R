@@ -107,7 +107,7 @@ set_interval <- function(col, interval) {
   hourly_interval <- interval$Hour[2] - interval$Hour[1]
   lubridate::hour(col) <- lubridate::hour(col) %/% hourly_interval * hourly_interval
   data <- dplyr::data_frame(DateTime = col)
-  data %<>% dplyr::inner_join(interval, by = "DateTime")
+  data %<>% dplyr::left_join(interval, by = "DateTime")
   data$Interval
 }
 
@@ -158,6 +158,7 @@ set_intervals <- function(data, interval) {
   colnames <- colnames[grepl("^DateTime.+", colnames)]
   if (length(colnames)) {
     data[colnames] %<>% lapply(set_interval, interval = interval)
+    data[colnames] %<>% na.omit() # delete rows with missing intervals
     colnames(data) %<>% sub("^(DateTime)(.+)$", "Interval\\2" , .)
   }
   data
@@ -166,11 +167,6 @@ set_intervals <- function(data, interval) {
 make_interval <- function(data, start_date, end_date, hourly_interval) {
   message("making interval...")
   . <- NULL
-  check_date(start_date)
-  check_date(end_date)
-  check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
-
-  if (end_date <= start_date) error("start_date must be before end_date")
 
   tz <- lubridate::tz(data$capture$DateTimeCapture)
 
@@ -181,7 +177,7 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
 
   interval <- dplyr::data_frame(DateTime = seq(start_date, end_date, by = paste(hourly_interval,"hours")))
   interval %<>% dplyr::mutate_(.dots = list(Interval = ~1:nrow(.),
-                                            Date = ~as.Date(DateTime),
+                                            Date = ~date(DateTime),
                                             DayteTime = ~DateTime,
                                             Year = ~as.integer(lubridate::year(DateTime)),
                                             Month = ~as.integer(lubridate::month(DateTime)),
@@ -267,11 +263,23 @@ make_section <- function(data) {
 #' @export
 make_detect_data <-  function(
   data, capture = data$capture,
-  start_date = min(as.Date(capture$DateTimeCapture)),
-  end_date = min(as.Date("2015-12-31"), max(as.Date(capture$DateTimeTagExpire))),
+  start_date = min(lexr::date(capture$DateTimeCapture)),
+  end_date = min(as.Date("2015-12-31"), max(lexr::date(capture$DateTimeTagExpire))),
   hourly_interval = 6L) {
 
+  check_data2(capture)
+  check_date(start_date)
+  check_date(end_date)
+  check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
+
+  if (end_date <= start_date) error("start_date must be before end_date")
+
   data %<>% check_lex_data()
+  capture %<>% dplyr::filter_(~date(capture$DateTimeCapture) >= start_date,
+                              ~date(capture$DateTimeCapture) <= end_date)
+
+  if (!nrow(capture)) error("no captures fall within the specified dates")
+
   data %<>% filter_captures(capture)
   data %<>% make_interval(start_date = start_date, end_date = end_date,
                           hourly_interval = hourly_interval)

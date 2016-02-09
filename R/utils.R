@@ -35,3 +35,11 @@ fun_data_name <- function(data, fun, ...) {
   eval(parse(text = expr))
   invisible(data)
 }
+
+#' Date
+#'
+#' @param x The time vector to generate the dates for.
+#' @export
+date <- function(x) {
+  as.Date(paste(lubridate::year(x), lubridate::month(x), lubridate::day(x), sep = "-"))
+}
