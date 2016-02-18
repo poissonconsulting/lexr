@@ -101,6 +101,8 @@ filter_captures <- function(data, capture) {
 }
 
 set_interval <- function(col, interval) {
+  if(!length(col))
+    return(integer(0))
   lubridate::minute(col) <- 0
   lubridate::second(col) <- 0
 
