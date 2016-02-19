@@ -1,6 +1,6 @@
 check_detect_section <- function(section) {
-  datacheckr::check_data3(
-    section, list(Section = factor(1),
+  section@data %<>% datacheckr::check_data3(
+    list(Section = factor(1),
                   Habitat = factor(1),
                   Area = c(0, 100),
                   Bounded = TRUE,
@@ -8,6 +8,7 @@ check_detect_section <- function(section) {
                   NorthingSection = 1,
                   ColorCode = rep("[#].{6,6}", 2)),
     key = "Section", select = TRUE)
+  invisible(section)
 }
 
 check_detect_distance <- function(distance) {
@@ -77,14 +78,14 @@ check_detect_detection <- function(detection) {
 }
 
 check_detect_joins <- function(data) {
-  datacheckr::check_join(data$coverage, data$section, "Section")
-  datacheckr::check_join(data$distance, data$section, c(SectionFrom = "Section"))
-  datacheckr::check_join(data$distance, data$section, c(SectionTo = "Section"))
-  datacheckr::check_join(data$coverage, data$section, "Section")
-  datacheckr::check_join(data$capture,  data$section, c(SectionCapture = "Section"))
-  datacheckr::check_join(data$recapture,  data$section,
+  datacheckr::check_join(data$coverage, data$section@data, "Section")
+  datacheckr::check_join(data$distance, data$section@data, c(SectionFrom = "Section"))
+  datacheckr::check_join(data$distance, data$section@data, c(SectionTo = "Section"))
+  datacheckr::check_join(data$coverage, data$section@data, "Section")
+  datacheckr::check_join(data$capture,  data$section@data, c(SectionCapture = "Section"))
+  datacheckr::check_join(data$recapture,  data$section@data,
                          c(SectionRecapture = "Section"), ignore_nas = TRUE)
-  datacheckr::check_join(data$detection,  data$section, "Section")
+  datacheckr::check_join(data$detection,  data$section@data, "Section")
 
   datacheckr::check_join(data$coverage,  data$interval, "Interval")
   datacheckr::check_join(data$capture,  data$interval, c(IntervalCapture = "Interval"))

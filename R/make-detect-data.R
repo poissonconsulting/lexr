@@ -251,10 +251,9 @@ proportion_range <- function (x, na.rm = FALSE) {
 
 make_section <- function(data) {
   message("making section...")
-  data$section <- data$section@data
-  red <- proportion_range(data$section$Easting)
-  blue <- proportion_range(data$section$Northing)
-  data$section$ColorCode <- grDevices::rgb(red = red, blue = blue, green = 0.5)
+  red <- proportion_range(data$section@data$Easting)
+  blue <- proportion_range(data$section@data$Northing)
+  data$section@data$ColorCode <- grDevices::rgb(red = red, blue = blue, green = 0.5)
   data
 }
 

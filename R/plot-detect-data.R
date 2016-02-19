@@ -15,8 +15,8 @@ plot_detect_coverage <- function(coverage, interval) {
 
 plot_detect_distance <- function(distance, section) {
   distance %<>% dplyr::filter_(~Distance == 1L)
-  from <- inner_join(distance, section, by = c(SectionFrom = "Section"))
-  to <- inner_join(distance, section, by = c(SectionTo = "Section"))
+  from <- inner_join(distance, section@data, by = c(SectionFrom = "Section"))
+  to <- inner_join(distance, section@data, by = c(SectionTo = "Section"))
   to %<>% dplyr::select_(.dots = list(SectionTo = "SectionTo", EastingTo = "EastingSection",
                                       NorthingTo = "NorthingSection"))
   from %<>% dplyr::select_(.dots = list(SectionFrom = "SectionFrom", EastingFrom = "EastingSection",
@@ -24,14 +24,14 @@ plot_detect_distance <- function(distance, section) {
 
   distance <- dplyr::bind_cols(from, to)
 
-  ggplot2::ggplot(data = section, ggplot2::aes_(
+  ggplot2::ggplot(data = section@data, ggplot2::aes_(
     x = ~EastingSection / 1000, y = ~NorthingSection / 1000)) +
     ggplot2::geom_point() +
     ggplot2::geom_segment(data = distance, ggplot2::aes_(
       x = ~EastingFrom / 1000, y = ~NorthingFrom / 1000,
       xend = ~EastingTo / 1000, yend = ~NorthingTo / 1000),
       arrow = ggplot2::arrow(length = ggplot2::unit(0.1, "inches"), type = "closed"), alpha = 1/2) +
-    ggrepel::geom_text_repel(data = section, ggplot2::aes_(label = ~Section),
+    ggrepel::geom_text_repel(data = section@data, ggplot2::aes_(label = ~Section),
                              size = 4) +
     ggplot2::coord_equal() +
     ggplot2::scale_x_continuous(name = "Easting (km)", labels = scales::comma) +
@@ -43,9 +43,9 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
   tz <- lubridate::tz(interval$DateTime)
   first_year <- lubridate::year(interval$DateTime[1])
   last_year <- lubridate::year(interval$DateTime[nrow(interval)])
-  capture %<>% dplyr::inner_join(section, by = c(SectionCapture = "Section"))
-  recapture %<>% dplyr::inner_join(section, by = c(SectionRecapture = "Section"))
-  detection %<>% dplyr::inner_join(section, by = c(Section = "Section"))
+  capture %<>% dplyr::inner_join(section@data, by = c(SectionCapture = "Section"))
+  recapture %<>% dplyr::inner_join(section@data, by = c(SectionRecapture = "Section"))
+  detection %<>% dplyr::inner_join(section@data, by = c(Section = "Section"))
 
   capture %<>% dplyr::inner_join(interval, by = c(IntervalCapture = "Interval"))
   capture %<>% dplyr::inner_join(dplyr::select_(interval, .dots = list(Interval = "Interval", DateTimeTagExpire = "DateTime")),
