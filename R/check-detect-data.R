@@ -5,7 +5,8 @@ check_detect_section <- function(section) {
                   Area = c(0, 100),
                   Bounded = TRUE,
                   EastingSection = 1,
-                  NorthingSection = 1),
+                  NorthingSection = 1,
+                  ColorCode = rep("[#].{6,6}", 2)),
     key = "Section", select = TRUE)
 }
 

@@ -85,10 +85,6 @@ filter_captures <- function(data, capture) {
   capture %<>% check_lex_capture()
   capture$Capture %<>% droplevels()
 
-  data$recapture$Capture %<>% as.character()
-  data$detection$Capture %<>% as.character()
-  data$depth$Capture %<>% as.character()
-
   levels(data$recapture$Capture) <- levels(capture$Capture)
   levels(data$detection$Capture) <- levels(capture$Capture)
   levels(data$depth$Capture) <- levels(capture$Capture)
@@ -248,9 +244,16 @@ make_detection <- function(data) {
   data
 }
 
+proportion_range <- function (x, na.rm = FALSE) {
+  (x - min(x, na.rm = na.rm)) / (max(x, na.rm = na.rm) - min(x, na.rm = na.rm))
+}
+
 make_section <- function(data) {
   message("making section...")
   data$section <- data$section@data
+  red <- proportion_range(data$section$Easting)
+  blue <- proportion_range(data$section$Northing)
+  data$section$ColorCode <- grDevices::rgb(red = red, blue = blue, green = 0.5)
   data
 }
 
