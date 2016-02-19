@@ -106,7 +106,8 @@ set_interval <- function(col, interval) {
   lubridate::minute(col) <- 0
   lubridate::second(col) <- 0
 
-  hourly_interval <- interval$Hour[2] - interval$Hour[1]
+  hourly_interval <- difftime(interval$DateTime[2], interval$DateTime[1], units = "hours") %>%
+    as.integer()
   lubridate::hour(col) <- lubridate::hour(col) %/% hourly_interval * hourly_interval
   data <- dplyr::data_frame(DateTime = col)
   data %<>% dplyr::left_join(interval, by = "DateTime")
