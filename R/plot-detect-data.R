@@ -39,11 +39,17 @@ plot_detect_distance <- function(distance, section) {
 }
 
 plot_detect_overview <- function(capture, recapture, detection, section, interval) {
+
+  tz <- lubridate::tz(interval$DateTime)
+  first_year <- lubridate::year(interval$DateTime[1])
+  last_year <- lubridate::year(interval$DateTime[nrow(interval)])
   capture %<>% dplyr::inner_join(section, by = c(SectionCapture = "Section"))
   recapture %<>% dplyr::inner_join(section, by = c(SectionRecapture = "Section"))
   detection %<>% dplyr::inner_join(section, by = c(Section = "Section"))
 
   capture %<>% dplyr::inner_join(interval, by = c(IntervalCapture = "Interval"))
+  capture %<>% dplyr::inner_join(dplyr::select_(interval, .dots = list(Interval = "Interval", DateTimeTagExpire = "DateTime")),
+                                 by = c(IntervalTagExpire = "Interval"))
   recapture %<>% dplyr::inner_join(interval, by = c(IntervalRecapture = "Interval"))
   detection %<>% dplyr::inner_join(interval, by = c(IntervalDetection = "Interval"))
 
@@ -58,14 +64,19 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
   #
   ggplot2::ggplot(data = detection, ggplot2::aes_string(x = "DateTime", y = "Capture")) +
     ggplot2::facet_grid(Species~. , scales = "free_y", space = "free_y") +
-    #     ggplot2::geom_segment(data = fish, ggplot2::aes_string(x = "CaptureDate", xend = "ExpirationDate", yend = "Fish"), alpha = 1/2) +
-    ggplot2::geom_point(ggplot2::aes_string(color = "Section"), alpha = 1/3) +
+    ggplot2::geom_segment(data = capture, ggplot2::aes_string(xend = "DateTimeTagExpire", yend = "Capture"), alpha = 1/2) +
+    ggplot2::geom_point(ggplot2::aes_string(color = "ColorCode"), alpha = 1/3) +
     ggplot2::geom_point(data = capture, color = "red") +
-  ggplot2::geom_point(data = recapture, ggplot2::aes_string(shape = "Released"), color = "black", size = 3) +
-    ggplot2::scale_x_datetime(name = "Date", expand = c(0,0))
-    #     ggplot2::scale_colour_continuous(low = "grey25", high = "grey75", guide = ggplot2::guide_colourbar(reverse = TRUE)) +
-    #     ggplot2::scale_shape_manual(values = c(17,15)) +
-    #     ggplot2::expand_limits(x = as.Date(paste0(c(first_year(), last_year() + 1), "-01-01")))
+    ggplot2::geom_point(data = recapture, ggplot2::aes_string(shape = "Released"), color = "black", size = 3) +
+    ggplot2::scale_x_datetime(name = "Date", expand = c(0,0), date_breaks = "1 year", date_labels = "%Y") +
+    ggplot2::scale_color_identity() +
+    ggplot2::scale_shape_manual(values = c(17,15)) +
+    ggplot2::expand_limits(x = as.POSIXct(paste0(c(first_year, last_year + 1), "-01-01"), tz = tz)) +
+    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                   panel.grid.minor.y = ggplot2::element_blank(),
+                   axis.text.y = ggplot2::element_blank(),
+                   axis.ticks.y = ggplot2::element_blank(),
+                   legend.position = "none")
 }
 
 #' @export
