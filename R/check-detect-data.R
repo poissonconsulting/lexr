@@ -42,6 +42,7 @@ check_detect_coverage <- function(coverage) {
 check_detect_capture <- function(capture) {
   datacheckr::check_data3(
     capture, list(Capture = factor(1),
+                  Species = factor(1),
                   IntervalCapture = 1L,
                   SectionCapture = factor(1),
                   Length = c(200L, 1000L),

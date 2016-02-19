@@ -6,8 +6,8 @@
 \usage{
 make_detect_data(data, capture = data$capture,
   start_date = min(lexr::date(capture$DateTimeCapture)),
-  end_date = min(as.Date("2015-12-31"),
-  max(lexr::date(capture$DateTimeTagExpire))), hourly_interval = 6L)
+  end_date = max(lexr::date(capture$DateTimeTagExpire)),
+  hourly_interval = 6L)
 }
 \arguments{
 \item{data}{The lex_data object to check.}

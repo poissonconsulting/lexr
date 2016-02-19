@@ -17,8 +17,7 @@
 #' print(qlex)
 #' plot(qlex, all = TRUE)
 #'
-#' qdetect <- make_detect_data(qlex)
-#' check_detect_data(qdetect)
+#' qdetect <- make_detect_data(qlex, end_date = as.Date("2015-09-26"))
 #' print(qdetect)
 #' plot(qdetect)
 #'
@@ -28,7 +27,6 @@
 #' plot(klex, all = TRUE)
 #'
 #' kdetect <- make_detect_data(klex)
-#' check_detect_data(kdetect)
 #' print(kdetect)
 #' plot(kdetect)
 #' }

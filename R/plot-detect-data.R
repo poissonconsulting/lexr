@@ -2,10 +2,10 @@ plot_detect_coverage <- function(coverage, interval) {
   coverage %<>% dplyr::inner_join(interval, by = "Interval")
 
   coverage %<>% dplyr::mutate_(.dots = list(Year = "lubridate::year(Date)",
-                               DayteTime = "DateTime"))
+                                            DayteTime = "DateTime"))
   lubridate::year(coverage$DayteTime) <- 2000
   ggplot2::ggplot(data = coverage, ggplot2::aes_(x = ~DayteTime,
-                                                     y = ~Coverage)) +
+                                                 y = ~Coverage)) +
     ggplot2::facet_grid(Section~Year) +
     ggplot2::geom_area() +
     ggplot2::scale_x_datetime(name = "Date", breaks = scales::date_breaks("6 months"), labels = scales::date_format("%b")) +
@@ -20,12 +20,12 @@ plot_detect_distance <- function(distance, section) {
   to %<>% dplyr::select_(.dots = list(SectionTo = "SectionTo", EastingTo = "EastingSection",
                                       NorthingTo = "NorthingSection"))
   from %<>% dplyr::select_(.dots = list(SectionFrom = "SectionFrom", EastingFrom = "EastingSection",
-                                      NorthingFrom = "NorthingSection"))
+                                        NorthingFrom = "NorthingSection"))
 
   distance <- dplyr::bind_cols(from, to)
 
   ggplot2::ggplot(data = section, ggplot2::aes_(
-      x = ~EastingSection / 1000, y = ~NorthingSection / 1000)) +
+    x = ~EastingSection / 1000, y = ~NorthingSection / 1000)) +
     ggplot2::geom_point() +
     ggplot2::geom_segment(data = distance, ggplot2::aes_(
       x = ~EastingFrom / 1000, y = ~NorthingFrom / 1000,
@@ -38,41 +38,41 @@ plot_detect_distance <- function(distance, section) {
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
 }
 
-plot_detect_overview <- function(capture, recapture, detection, interval) {
-  capture %<>% inner_join(interval, by = c(IntervalCapture = "Interval"))
-  recapture %<>% inner_join(interval, by = c(IntervalRecapture = "Interval"))
-  detection %<>% inner_join(interval, by = c(IntervalDetection = "Interval"))
+plot_detect_overview <- function(capture, recapture, detection, section, interval) {
+  capture %<>% dplyr::inner_join(section, by = c(SectionCapture = "Section"))
+  recapture %<>% dplyr::inner_join(section, by = c(SectionRecapture = "Section"))
+  detection %<>% dplyr::inner_join(section, by = c(Section = "Section"))
 
-#   location %<>% dplyr::inner_join(fish, by = "Fish")
-#
-#   recapture <- klesdatr::recapture %>% dplyr::inner_join(fish, by = "Fish")
-#
-#   location$Section %<>% as.integer()
-#   recapture$Recapture <- factor(recapture$Released)
-#   levels(recapture$Recapture) %<>% list(Released = "TRUE", Retained = "FALSE")
-#   location$Fish %<>% as.integer()
-#   fish$Fish %<>% as.integer()
-#   recapture$Fish %<>% as.integer()
-#
-#   ggplot2::ggplot(data = location, ggplot2::aes_string(x = "DetectionDate", y = "Fish")) +
-#     ggplot2::facet_grid(Species~. , scales = "free_y", space = "free_y") +
-#     ggplot2::geom_segment(data = fish, ggplot2::aes_string(x = "CaptureDate", xend = "ExpirationDate", yend = "Fish"), alpha = 1/2) +
-#     ggplot2::geom_point(ggplot2::aes_string(color = "Section"), alpha = 1/2) +
-#     ggplot2::geom_point(data = fish, ggplot2::aes_string(x = "CaptureDate"), color = "red") +
-#     ggplot2::geom_point(data = recapture, ggplot2::aes_string(x = "RecaptureDate", shape = "Recapture"), color = "black", size = 3) +
-#     ggplot2::scale_x_date(name = "Date", expand = c(0,0)) +
-#     ggplot2::scale_y_continuous(expand = c(0,1)) +
-#     ggplot2::scale_colour_continuous(low = "grey25", high = "grey75", guide = ggplot2::guide_colourbar(reverse = TRUE)) +
-#     ggplot2::scale_shape_manual(values = c(17,15)) +
-#     ggplot2::expand_limits(x = as.Date(paste0(c(first_year(), last_year() + 1), "-01-01")))
-  NULL
+  capture %<>% dplyr::inner_join(interval, by = c(IntervalCapture = "Interval"))
+  recapture %<>% dplyr::inner_join(interval, by = c(IntervalRecapture = "Interval"))
+  detection %<>% dplyr::inner_join(interval, by = c(IntervalDetection = "Interval"))
+
+  recapture %<>% dplyr::inner_join(dplyr::select_(capture, ~Capture, ~Species), by = "Capture")
+  detection %<>% dplyr::inner_join(dplyr::select_(capture, ~Capture, ~Species), by = "Capture")
+
+  recapture$Released %<>% factor()
+  levels(recapture$Released) %<>% list(Released = "TRUE", Retained = "FALSE")
+  #   location$Fish %<>% as.integer()
+  #   fish$Fish %<>% as.integer()
+  #   recapture$Fish %<>% as.integer()
+  #
+  ggplot2::ggplot(data = detection, ggplot2::aes_string(x = "DateTime", y = "Capture")) +
+    ggplot2::facet_grid(Species~. , scales = "free_y", space = "free_y") +
+    #     ggplot2::geom_segment(data = fish, ggplot2::aes_string(x = "CaptureDate", xend = "ExpirationDate", yend = "Fish"), alpha = 1/2) +
+    ggplot2::geom_point(ggplot2::aes_string(color = "Section"), alpha = 1/3) +
+    ggplot2::geom_point(data = capture, color = "red") +
+  ggplot2::geom_point(data = recapture, ggplot2::aes_string(shape = "Released"), color = "black", size = 3) +
+    ggplot2::scale_x_datetime(name = "Date", expand = c(0,0))
+    #     ggplot2::scale_colour_continuous(low = "grey25", high = "grey75", guide = ggplot2::guide_colourbar(reverse = TRUE)) +
+    #     ggplot2::scale_shape_manual(values = c(17,15)) +
+    #     ggplot2::expand_limits(x = as.Date(paste0(c(first_year(), last_year() + 1), "-01-01")))
 }
 
 #' @export
 plot.detect_data <- function(x, all = FALSE, ...) {
-  print(plot_detect_coverage(x$coverage, x$interval))
-  print(plot_detect_distance(x$distance, x$section))
-    print(plot_detect_overview(x$capture, x$recapture, x$detection, x$interval))
+  #  print(plot_detect_coverage(x$coverage, x$interval))
+  #  print(plot_detect_distance(x$distance, x$section))
+  print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))
   if (all) {
   }
   invisible(NULL)

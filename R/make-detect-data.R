@@ -85,13 +85,14 @@ filter_captures <- function(data, capture) {
   capture %<>% check_lex_capture()
   capture$Capture %<>% droplevels()
 
-  levels(data$recapture$Capture) <- levels(capture$Capture)
-  levels(data$detection$Capture) <- levels(capture$Capture)
-  levels(data$depth$Capture) <- levels(capture$Capture)
+  data$recapture %<>% dplyr::filter_(~Capture %in% capture$Capture)
+  data$detection %<>% dplyr::filter_(~Capture %in% capture$Capture)
+  data$depth %<>% dplyr::filter_(~Capture %in% capture$Capture)
 
-  data$recapture %<>% dplyr::filter_(~!is.na(Capture))
-  data$detection %<>% dplyr::filter_(~!is.na(Capture))
-  data$depth %<>% dplyr::filter_(~!is.na(Capture))
+  data$recapture$Capture %<>% factor(levels = levels(capture$Capture))
+  data$detection$Capture %<>% factor(levels = levels(capture$Capture))
+  data$depth$Capture %<>% factor(levels = levels(capture$Capture))
+
   data$capture <- capture
   data
 }
@@ -271,7 +272,7 @@ make_section <- function(data) {
 make_detect_data <-  function(
   data, capture = data$capture,
   start_date = min(lexr::date(capture$DateTimeCapture)),
-  end_date = min(as.Date("2015-12-31"), max(lexr::date(capture$DateTimeTagExpire))),
+  end_date = max(lexr::date(capture$DateTimeTagExpire)),
   hourly_interval = 6L) {
 
   check_data2(capture)
@@ -297,5 +298,5 @@ make_detect_data <-  function(
   data %<>% make_section()
   data <- data[detect_data_names()]
   class(data) <- "detect_data"
-  return(data)
+  check_detect_data(data)
 }
