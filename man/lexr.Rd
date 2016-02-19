@@ -11,6 +11,7 @@ Lake Exploitation Study Data Plotting and Analysis
 \examples{
 \dontrun{
 library(dplyr) # so tbl data frames print nice
+library(qlexdatr) # data set for example
 library(klexdatr) # data set for example
 library(lexr)
 

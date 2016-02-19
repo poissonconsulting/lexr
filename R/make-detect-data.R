@@ -219,12 +219,13 @@ make_distance <- function(data) {
   dim <- dim(distance)
   distance <- as.integer(distance)
   dim(distance) <- dim
-  section_names <- levels(data$section@data$Section)
+  section_names <- as.character(data$section@data$Section)
   colnames(distance) <- section_names
   distance %<>% as.data.frame()
-  distance$SectionFrom <- factor(section_names, levels = section_names)
+  distance$SectionFrom <- factor(section_names, levels = levels(data$section@data$Section))
   distance %<>% tidyr::gather_("SectionTo", "Distance", section_names)
-  distance %<>% dplyr::mutate_(.dots = list(SectionTo = ~factor(SectionTo, levels = section_names), Distance = ~as.integer(Distance)))
+  distance$Distance %<>% as.integer()
+  distance$SectionTo %<>% factor(levels = levels(data$section@data$Section))
   data$distance <- dplyr::as.tbl(distance)
   data
 }
