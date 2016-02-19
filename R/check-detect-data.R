@@ -47,7 +47,7 @@ check_detect_capture <- function(capture) {
                   SectionCapture = factor(1),
                   Length = c(200L, 1000L),
                   Reward1 = factor(rep("Low", 3), levels = c("Low", "High")),
-                  Reward2 = factor(rep("Low", 3), levels = c("Low", "High")),
+                  Reward2 = factor(c(rep("Low", 3), NA), levels = c("Low", "High")),
                   IntervalTagExpire = 1L),
     key = "Capture", select = TRUE)
 }
@@ -56,7 +56,7 @@ check_detect_recapture <- function(recapture) {
   datacheckr::check_data3(
     recapture, list(IntervalRecapture = 1L,
                   Capture = factor(1),
-                  SectionRecapture = factor(1),
+                  SectionRecapture = factor(c(1, NA)),
                   TBarTag1 = TRUE,
                   TBarTag2 = TRUE,
                   TagsRemoved = TRUE,
@@ -81,7 +81,8 @@ check_detect_joins <- function(data) {
   datacheckr::check_join(data$distance, data$section, c(SectionTo = "Section"))
   datacheckr::check_join(data$coverage, data$section, "Section")
   datacheckr::check_join(data$capture,  data$section, c(SectionCapture = "Section"))
-  datacheckr::check_join(data$recapture,  data$section, c(SectionRecapture = "Section"))
+  datacheckr::check_join(data$recapture,  data$section,
+                         c(SectionRecapture = "Section"), ignore_nas = TRUE)
   datacheckr::check_join(data$detection,  data$section, "Section")
 
   datacheckr::check_join(data$coverage,  data$interval, "Interval")

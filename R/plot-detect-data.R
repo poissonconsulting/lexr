@@ -58,10 +58,7 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
 
   recapture$Released %<>% factor()
   levels(recapture$Released) %<>% list(Released = "TRUE", Retained = "FALSE")
-  #   location$Fish %<>% as.integer()
-  #   fish$Fish %<>% as.integer()
-  #   recapture$Fish %<>% as.integer()
-  #
+
   ggplot2::ggplot(data = detection, ggplot2::aes_string(x = "DateTime", y = "Capture")) +
     ggplot2::facet_grid(Species~. , scales = "free_y", space = "free_y") +
     ggplot2::geom_segment(data = capture, ggplot2::aes_string(xend = "DateTimeTagExpire", yend = "Capture"), alpha = 1/2) +
@@ -81,8 +78,8 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
 
 #' @export
 plot.detect_data <- function(x, all = FALSE, ...) {
-  #  print(plot_detect_coverage(x$coverage, x$interval))
-  #  print(plot_detect_distance(x$distance, x$section))
+  print(plot_detect_coverage(x$coverage, x$interval))
+  print(plot_detect_distance(x$distance, x$section))
   print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))
   if (all) {
   }
