@@ -62,6 +62,7 @@ check_detect_recapture <- function(recapture) {
                   TagsRemoved = TRUE,
                   Released = TRUE,
                   Public = TRUE),
+    min_row = 0,
     key = c("IntervalRecapture", "Capture"), select = TRUE)
 }
 

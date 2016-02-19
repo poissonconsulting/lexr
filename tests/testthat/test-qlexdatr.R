@@ -1,7 +1,16 @@
 context("qlexdatr")
 
 test_that("qlexdatr", {
-   require(qlexdatr)
-   lex <- input_lex_data("qlexdatr")
-   expect_is(check_lex_data(lex), "lex_data")
+  require(qlexdatr)
+  require(dplyr)
+  require(lubridate)
+
+  lex <- input_lex_data("qlexdatr")
+  expect_is(check_lex_data(lex), "lex_data")
+
+  capture <- filter(lex$capture, year(DateTimeCapture) == 2014)
+  start_date <- as.Date("2014-01-01")
+  end_date <- as.Date("2014-12-31")
+  hourly_interval <- 6L # klexdatr tests 24L
+  expect_is(make_detect_data(lex, capture, start_date, end_date, hourly_interval), "detect_data")
 })
