@@ -38,20 +38,42 @@ plot_detect_distance <- function(distance, section) {
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
 }
 
-plot_detect_overview <- function (capture, recapture, detection, interval) {
+plot_detect_overview <- function(capture, recapture, detection, interval) {
   capture %<>% inner_join(interval, by = c(IntervalCapture = "Interval"))
   recapture %<>% inner_join(interval, by = c(IntervalRecapture = "Interval"))
   detection %<>% inner_join(interval, by = c(IntervalDetection = "Interval"))
 
-
+#   location %<>% dplyr::inner_join(fish, by = "Fish")
+#
+#   recapture <- klesdatr::recapture %>% dplyr::inner_join(fish, by = "Fish")
+#
+#   location$Section %<>% as.integer()
+#   recapture$Recapture <- factor(recapture$Released)
+#   levels(recapture$Recapture) %<>% list(Released = "TRUE", Retained = "FALSE")
+#   location$Fish %<>% as.integer()
+#   fish$Fish %<>% as.integer()
+#   recapture$Fish %<>% as.integer()
+#
+#   ggplot2::ggplot(data = location, ggplot2::aes_string(x = "DetectionDate", y = "Fish")) +
+#     ggplot2::facet_grid(Species~. , scales = "free_y", space = "free_y") +
+#     ggplot2::geom_segment(data = fish, ggplot2::aes_string(x = "CaptureDate", xend = "ExpirationDate", yend = "Fish"), alpha = 1/2) +
+#     ggplot2::geom_point(ggplot2::aes_string(color = "Section"), alpha = 1/2) +
+#     ggplot2::geom_point(data = fish, ggplot2::aes_string(x = "CaptureDate"), color = "red") +
+#     ggplot2::geom_point(data = recapture, ggplot2::aes_string(x = "RecaptureDate", shape = "Recapture"), color = "black", size = 3) +
+#     ggplot2::scale_x_date(name = "Date", expand = c(0,0)) +
+#     ggplot2::scale_y_continuous(expand = c(0,1)) +
+#     ggplot2::scale_colour_continuous(low = "grey25", high = "grey75", guide = ggplot2::guide_colourbar(reverse = TRUE)) +
+#     ggplot2::scale_shape_manual(values = c(17,15)) +
+#     ggplot2::expand_limits(x = as.Date(paste0(c(first_year(), last_year() + 1), "-01-01")))
+  NULL
 }
 
 #' @export
 plot.detect_data <- function(x, all = FALSE, ...) {
   print(plot_detect_coverage(x$coverage, x$interval))
   print(plot_detect_distance(x$distance, x$section))
-  if (all) {
     print(plot_detect_overview(x$capture, x$recapture, x$detection, x$interval))
+  if (all) {
   }
   invisible(NULL)
 }
