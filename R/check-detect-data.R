@@ -12,6 +12,7 @@ check_detect_section <- function(section) {
                   NorthingSection = 1,
                   ColorCode = rep("[#].{6,6}", 2)),
     key = "Section", select = TRUE)
+  datacheckr::check_key(section@data, "Area") # unique key for tiebreaks
   invisible(section)
 }
 
@@ -77,8 +78,10 @@ check_detect_detection <- function(detection) {
                  Section = factor(1),
                  Capture = factor(1),
                  Receivers = c(1L, 9L),
-                 Detections = c(2L, max_integer())),
-  key = c("IntervalDetection", "Section", "Capture"), select = TRUE)
+                 Detections = c(3L, max_integer()),
+                 Sections = c(1L, max_integer()),
+                 Jump = c(0L, max_integer())),
+  key = c("IntervalDetection", "Capture"), select = TRUE)
 }
 
 check_detect_joins <- function(data) {

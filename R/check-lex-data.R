@@ -74,7 +74,7 @@ check_lex_detection <- function(detection) {
   values <- list(DateTimeDetection = Sys.time(),
                  Capture = factor(1),
                  Receiver = factor(1),
-                 Detections = c(1L, datacheckr::max_integer()))
+                 Detections = c(3L, datacheckr::max_integer()))
 
   datacheckr::check_data3(detection, values, key = c("DateTimeDetection", "Capture", "Receiver"),
                           select = TRUE)

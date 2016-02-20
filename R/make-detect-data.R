@@ -233,6 +233,30 @@ sum_detections <- function(data) {
   dplyr::data_frame(Receivers = Receivers, Detections = Detections)
 }
 
+filter_detections <- function(data, section) {
+  data$Sections <- nrow(data)
+  if (nrow(data) == 1)
+    return(data)
+
+  data %<>% dplyr::arrange_(~-Detections, ~Receivers, ~Area) # area for tiebreaker
+  dplyr::slice(data, 1)
+}
+
+non_zero <- function(x) {
+  x[x < 0] <- 0
+  x
+}
+
+set_jumps <- function (data, distance) {
+  data %<>% dplyr::arrange_(~IntervalDetection)
+  data$SectionFrom <- c(data$Section[1], data$Section[-nrow(data)])
+  data$SectionFrom <- factor(x = levels(data$Section)[data$SectionFrom],
+                             levels = levels(data$Section))
+  data$Intervals <- c(0, diff(data$IntervalDetection))
+  data %<>% inner_join(distance, by = c(SectionFrom = "SectionFrom", Section = "SectionTo"))
+  data %<>% dplyr::mutate_(.dots = list(Jump = ~as.integer(non_zero(Distance - Intervals))))
+}
+
 make_detection <- function(data) {
   message("making detection...")
   detection <- data$detection
@@ -241,6 +265,11 @@ make_detection <- function(data) {
                                 ~IntervalDetection <= IntervalReceiverOut)
   detection %<>% dplyr::inner_join(data$station, by = "Station")
   detection %<>% plyr::ddply(c("IntervalDetection", "Section", "Capture"), sum_detections)
+  detection %<>% dplyr::inner_join(dplyr::select_(data$section@data, ~Section, ~Area), by = "Section")
+  detection %<>% plyr::ddply(c("IntervalDetection", "Capture"), filter_detections)
+  detection %<>% plyr::ddply("Capture", set_jumps, data$distance)
+  detection %<>% dplyr::select_(~IntervalDetection, ~Section, ~Capture, ~Receivers,
+                                ~Detections, ~Sections, ~Jump)
   data$detection <- dplyr::as.tbl(detection)
   data
 }
@@ -292,8 +321,8 @@ make_detect_data <-  function(
                           hourly_interval = hourly_interval)
   data %<>% make_coverage()
   data %<>% make_capture()
-  data %<>% make_detection()
   data %<>% make_distance()
+  data %<>% make_detection()
   data %<>% make_section()
   data <- data[detect_data_names()]
   class(data) <- "detect_data"
