@@ -38,6 +38,31 @@ plot_detect_distance <- function(distance, section) {
     ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma)
 }
 
+plot_detect_section <- function(section) {
+
+  polygon <- broom::tidy(section)
+  polygon %<>% dplyr::rename_(.dots = list(Section = "id", EastingSection = "long",
+                                           NorthingSection = "lat"))
+  polygon$Section %<>% factor(levels = levels(section@data$Section))
+  polygon %<>% dplyr::inner_join(dplyr::select_(section@data, ~-EastingSection, ~-NorthingSection), by = "Section")
+
+  ggplot2::ggplot(data = section@data, ggplot2::aes_(x = ~EastingSection / 1000,
+                                                     y = ~NorthingSection / 1000,
+                                                     group = ~Section)) +
+    ggplot2::geom_polygon(data = dplyr::filter_(polygon, ~!hole),
+                          ggplot2::aes_(fill = ~ColorCode, color = ~ColorCode)) +
+    ggplot2::geom_point(ggplot2::aes_(color = ~ColorCode), size = 4) +
+    ggplot2::geom_polygon(data = dplyr::filter_(polygon, ~!hole),
+                          color = "grey25", fill = "transparent") +
+    ggrepel::geom_text_repel(ggplot2::aes_(label = ~Section),
+                             size = 4) +
+    ggplot2::coord_equal() +
+    ggplot2::scale_x_continuous(name = "Easting (km)", labels = scales::comma) +
+    ggplot2::scale_y_continuous(name = "Northing (km)", labels = scales::comma) +
+    ggplot2::scale_color_identity() +
+    ggplot2::scale_fill_identity()
+}
+
 plot_detect_overview <- function(capture, recapture, detection, section, interval) {
 
   tz <- lubridate::tz(interval$DateTime)
@@ -78,6 +103,7 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
 
 #' @export
 plot.detect_data <- function(x, all = FALSE, ...) {
+  print(plot_detect_section(x$section))
   print(plot_detect_coverage(x$coverage, x$interval))
   print(plot_detect_distance(x$distance, x$section))
   print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))

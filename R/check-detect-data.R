@@ -1,4 +1,8 @@
 check_detect_section <- function(section) {
+
+  if (!identical(row.names(section), as.character(section@data$Section)))
+    error("section row names must be identical to section@data$Section")
+
   section@data %<>% datacheckr::check_data3(
     list(Section = factor(1),
                   Habitat = factor(1),

@@ -2,6 +2,9 @@ check_lex_section <- function(section) {
   if (!inherits(section, "SpatialPolygonsDataFrame"))
     error("section must be a spatial polygons data frame")
 
+  if (!identical(row.names(section), as.character(section@data$Section)))
+    error("section row names must be identical to section@data$Section")
+
   values <- list(Section = factor(1),
                  Habitat = factor(1),
                  Bounded = TRUE,
