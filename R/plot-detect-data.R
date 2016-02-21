@@ -79,6 +79,7 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
   tz <- lubridate::tz(interval$DateTime)
   first_year <- lubridate::year(interval$DateTime[1])
   last_year <- lubridate::year(interval$DateTime[nrow(interval)])
+
   capture %<>% dplyr::inner_join(section@data, by = c(SectionCapture = "Section"))
   recapture %<>% dplyr::inner_join(section@data, by = c(SectionRecapture = "Section"))
   detection %<>% dplyr::inner_join(section@data, by = c(Section = "Section"))
@@ -112,11 +113,84 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
                    legend.position = "none")
 }
 
+plot_fish_year <- function(detection, section, capture, recapture) {
+  tz <- lubridate::tz(detection$DateTime)
+  year <- detection$Year[1]
+  capture %<>% dplyr::filter_(~Year == year, ~Capture == detection$Capture[1])
+  recapture %<>% dplyr::filter_(~Year == year, ~Capture == detection$Capture[1])
+  section <- section@data
+
+  detection %<>% tidyr::gather_("XY", "UTM", c("EastingSection", "NorthingSection"))
+  section %<>% tidyr::gather_("XY", "UTM", c("EastingSection", "NorthingSection"))
+  capture %<>% tidyr::gather_("XY", "UTM", c("EastingSection", "NorthingSection"))
+  recapture %<>% tidyr::gather_("XY", "UTM", c("EastingSection", "NorthingSection"))
+
+  detection$XY %<>% factor()
+  section$XY %<>% factor()
+  capture$XY %<>% factor()
+  recapture$XY %<>% factor()
+
+  levels(detection$XY) <- list(Northing = "NorthingSection", Easting = "EastingSection")
+  levels(section$XY) <- list(Northing = "NorthingSection", Easting = "EastingSection")
+  levels(capture$XY) <- list(Northing = "NorthingSection", Easting = "EastingSection")
+  levels(recapture$XY) <- list(Northing = "NorthingSection", Easting = "EastingSection")
+
+  section$DayteTime <- detection$DayteTime[1]
+
+  gp <- ggplot2::ggplot(data = detection, ggplot2::aes_string(x = "DayteTime", y = "UTM / 1000")) +
+    ggplot2::facet_grid(XY~., space = "free_y", scales = "free_y") +
+    ggplot2::geom_line() +
+    ggplot2::geom_blank(data = section) +
+    ggplot2::geom_point(data = capture, color = "red") +
+    ggplot2::geom_point(data = recapture) +
+    ggplot2::geom_point(ggplot2::aes_string(color = "ColorCode")) +
+    ggplot2::scale_x_datetime(name = paste(detection$Capture[1], year),
+                              breaks = scales::date_breaks("3 months"),
+                              labels = scales::date_format("%b"), expand = c(0,0)) +
+    ggplot2::scale_y_continuous(name = "UTM (km)", expand = c(0, 1), label = scales::comma) +
+    ggplot2::scale_color_identity() +
+    ggplot2::expand_limits(x = as.POSIXct(paste0(c("2000", "2001"), "-01-01"), tz = tz))
+
+  print(gp)
+  NULL
+}
+
+plot_detect_fish_year <- function(capture, recapture, detection, section, interval) {
+
+  tz <- lubridate::tz(interval$DateTime)
+  first_year <- lubridate::year(interval$DateTime[1])
+  last_year <- lubridate::year(interval$DateTime[nrow(interval)])
+
+  capture %<>% dplyr::inner_join(section@data, by = c(SectionCapture = "Section"))
+  recapture %<>% dplyr::inner_join(section@data, by = c(SectionRecapture = "Section"))
+  detection %<>% dplyr::inner_join(section@data, by = c(Section = "Section"))
+
+  capture %<>% dplyr::inner_join(interval, by = c(IntervalCapture = "Interval"))
+  capture %<>% dplyr::inner_join(dplyr::select_(interval, .dots = list(Interval = "Interval", DateTimeTagExpire = "DateTime")),
+                                 by = c(IntervalTagExpire = "Interval"))
+  recapture %<>% dplyr::inner_join(interval, by = c(IntervalRecapture = "Interval"))
+  detection %<>% dplyr::inner_join(interval, by = c(IntervalDetection = "Interval"))
+
+  recapture %<>% dplyr::inner_join(dplyr::select_(capture, ~Capture, ~Species), by = "Capture")
+  detection %<>% dplyr::inner_join(dplyr::select_(capture, ~Capture, ~Species), by = "Capture")
+
+  recapture$Released %<>% factor()
+  levels(recapture$Released) %<>% list(Released = "TRUE", Retained = "FALSE")
+
+  detection$Year <- lubridate::year(detection$DateTime)
+
+  plyr::ddply(detection, c("Capture", "Year"), plot_fish_year, section, capture, recapture)
+}
+
+
 #' @export
-plot.detect_data <- function(x, ...) {
+plot.detect_data <- function(x, all = FALSE, ...) {
   print(plot_detect_section(x$section))
   print(plot_detect_coverage(x$coverage, x$section, x$interval))
   print(plot_detect_distance(x$distance, x$section))
   print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))
+  if (all) {
+    plot_detect_fish_year(x$capture, x$recapture, x$detection, x$section, x$interval)
+  }
   invisible(NULL)
 }
