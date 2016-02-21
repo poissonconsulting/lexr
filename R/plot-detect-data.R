@@ -113,12 +113,10 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
 }
 
 #' @export
-plot.detect_data <- function(x, all = FALSE, ...) {
+plot.detect_data <- function(x, ...) {
   print(plot_detect_section(x$section))
   print(plot_detect_coverage(x$coverage, x$section, x$interval))
   print(plot_detect_distance(x$distance, x$section))
   print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))
-  if (all) {
-  }
   invisible(NULL)
 }

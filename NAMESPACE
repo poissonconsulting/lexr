@@ -3,6 +3,7 @@
 S3method(plot,detect_data)
 S3method(plot,lex_data)
 S3method(print,SpatialPolygonsDataFrame)
+S3method(summary,detect_data)
 export(check_detect_data)
 export(check_lex_data)
 export(date)

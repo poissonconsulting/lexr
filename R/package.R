@@ -17,17 +17,19 @@
 #' print(qlex)
 #' plot(qlex, all = TRUE)
 #'
-#' qdetect <- make_detect_data(qlex, end_date = as.Date("2015-09-26"))
+#' qdetect <- make_detect_data(qlex, hourly_interval = 24L, end_date = as.Date("2015-09-26"))
 #' print(qdetect)
 #' plot(qdetect)
+#' summary(qdetect)
 #'
 #' klex <- input_lex_data("klexdatr")
 #' check_lex_data(klex)
 #' print(klex)
 #' plot(klex, all = TRUE)
 #'
-#' kdetect <- make_detect_data(klex)
+#' kdetect <- make_detect_data(klex, hourly_interval = 24L)
 #' print(kdetect)
 #' plot(kdetect)
+#' summary(kdetect)
 #' }
 NULL
