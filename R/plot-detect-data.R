@@ -116,6 +116,8 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
 plot_fish_year <- function(detection, section, capture, recapture) {
   tz <- lubridate::tz(detection$DateTime)
   year <- detection$Year[1]
+  message(paste("plotting fish", detection$Capture[1], year, "..."))
+
   capture %<>% dplyr::filter_(~Year == year, ~Capture == detection$Capture[1])
   recapture %<>% dplyr::filter_(~Year == year, ~Capture == detection$Capture[1])
   section <- section@data
@@ -135,21 +137,29 @@ plot_fish_year <- function(detection, section, capture, recapture) {
   levels(capture$XY) <- list(Northing = "NorthingSection", Easting = "EastingSection")
   levels(recapture$XY) <- list(Northing = "NorthingSection", Easting = "EastingSection")
 
+  recapture$Released %<>% factor()
+  levels(recapture$Released) %<>% list(Released = "TRUE", Retained = "FALSE")
+
   section$DayteTime <- detection$DayteTime[1]
+  detection$Jump <- detection$Jump > 0
 
   gp <- ggplot2::ggplot(data = detection, ggplot2::aes_string(x = "DayteTime", y = "UTM / 1000")) +
     ggplot2::facet_grid(XY~., space = "free_y", scales = "free_y") +
     ggplot2::geom_line() +
     ggplot2::geom_blank(data = section) +
+    ggplot2::geom_point(data = dplyr::filter_(detection, ~!Jump), ggplot2::aes_string(color = "ColorCode")) +
+    ggplot2::geom_point(data = dplyr::filter_(detection, ~Jump), ggplot2::aes_string(color = "ColorCode"), shape = 17) +
     ggplot2::geom_point(data = capture, color = "red") +
-    ggplot2::geom_point(data = recapture) +
-    ggplot2::geom_point(ggplot2::aes_string(color = "ColorCode")) +
-    ggplot2::scale_x_datetime(name = paste(detection$Capture[1], year),
+    ggplot2::geom_point(data = recapture, ggplot2::aes_string(shape = "Released"), color = "black", size = 3) +
+    ggplot2::scale_x_datetime(name = "Date",
                               breaks = scales::date_breaks("3 months"),
                               labels = scales::date_format("%b"), expand = c(0,0)) +
     ggplot2::scale_y_continuous(name = "UTM (km)", expand = c(0, 1), label = scales::comma) +
+    ggplot2::scale_shape_manual(values = c(17,15)) +
     ggplot2::scale_color_identity() +
-    ggplot2::expand_limits(x = as.POSIXct(paste0(c("2000", "2001"), "-01-01"), tz = tz))
+    ggplot2::ggtitle(paste(detection$Capture[1], year)) +
+    ggplot2::expand_limits(x = as.POSIXct(paste0(c("2000", "2001"), "-01-01"), tz = tz)) +
+    ggplot2::theme(legend.position = "none")
 
   print(gp)
   NULL
@@ -185,10 +195,10 @@ plot_detect_fish_year <- function(capture, recapture, detection, section, interv
 
 #' @export
 plot.detect_data <- function(x, all = FALSE, ...) {
-  print(plot_detect_section(x$section))
-  print(plot_detect_coverage(x$coverage, x$section, x$interval))
-  print(plot_detect_distance(x$distance, x$section))
-  print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))
+#  print(plot_detect_section(x$section))
+#  print(plot_detect_coverage(x$coverage, x$section, x$interval))
+#  print(plot_detect_distance(x$distance, x$section))
+#  print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))
   if (all) {
     plot_detect_fish_year(x$capture, x$recapture, x$detection, x$section, x$interval)
   }
