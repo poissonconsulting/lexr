@@ -253,7 +253,7 @@ set_jumps <- function (data, distance) {
   data$SectionFrom <- factor(x = levels(data$Section)[data$SectionFrom],
                              levels = levels(data$Section))
   data$Intervals <- c(0, diff(data$IntervalDetection))
-  data %<>% inner_join(distance, by = c(SectionFrom = "SectionFrom", Section = "SectionTo"))
+  data %<>% dplyr::inner_join(distance, by = c(SectionFrom = "SectionFrom", Section = "SectionTo"))
   data %<>% dplyr::mutate_(.dots = list(Jump = ~as.integer(non_zero(Distance - Intervals))))
 }
 

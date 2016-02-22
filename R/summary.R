@@ -3,7 +3,7 @@ percent_true <- function(x) {
 }
 
 summarise_movement <- function (data) {
-  data_frame(
+  dplyr::data_frame(
     Simultaneous = percent_true(data$Sections > 1),
     Jumps = percent_true(data$Jump > 0),
     MaxJump = max(data$Jump),

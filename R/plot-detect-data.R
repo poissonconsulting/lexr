@@ -51,8 +51,8 @@ plot_detect_coverage <- function(coverage, section, interval) {
 
 plot_detect_distance <- function(distance, section) {
   distance %<>% dplyr::filter_(~Distance == 1L)
-  from <- inner_join(distance, section@data, by = c(SectionFrom = "Section"))
-  to <- inner_join(distance, section@data, by = c(SectionTo = "Section"))
+  from <- dplyr::inner_join(distance, section@data, by = c(SectionFrom = "Section"))
+  to <- dplyr::inner_join(distance, section@data, by = c(SectionTo = "Section"))
   to %<>% dplyr::select_(.dots = list(SectionTo = "SectionTo", EastingTo = "EastingSection",
                                       NorthingTo = "NorthingSection"))
   from %<>% dplyr::select_(.dots = list(SectionFrom = "SectionFrom", EastingFrom = "EastingSection",
@@ -103,7 +103,7 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
     ggplot2::geom_segment(data = capture, ggplot2::aes_string(xend = "DateTimeTagExpire", yend = "Capture"), alpha = 1/2) +
     ggplot2::geom_point(ggplot2::aes_string(color = "ColorCode"), alpha = 1/3) +
     ggplot2::geom_point(data = capture, color = "red") +
-    ggplot2::geom_point(data = recapture, ggplot2::aes_string(shape = "Released"), color = "black", size = 3) +
+    ggplot2::geom_point(data = recapture, ggplot2::aes_string(shape = "Released"), color = "black") +
     ggplot2::scale_x_datetime(name = "Date", expand = c(0,0), date_breaks = "1 year", date_labels = "%Y") +
     ggplot2::scale_color_identity() +
     ggplot2::scale_shape_manual(values = c(17,15)) +
@@ -152,7 +152,7 @@ plot_fish_year <- function(detection, section, capture, recapture) {
     ggplot2::geom_point(data = dplyr::filter_(detection, ~!Jump), ggplot2::aes_string(color = "ColorCode")) +
     ggplot2::geom_point(data = dplyr::filter_(detection, ~Jump), ggplot2::aes_string(color = "ColorCode"), shape = 17) +
     ggplot2::geom_point(data = capture, color = "red") +
-    ggplot2::geom_point(data = recapture, ggplot2::aes_string(shape = "Released"), color = "black", size = 3) +
+    ggplot2::geom_point(data = recapture, ggplot2::aes_string(shape = "Released"), color = "black") +
     ggplot2::scale_x_datetime(name = "Date",
                               breaks = scales::date_breaks("3 months"),
                               labels = scales::date_format("%b"), expand = c(0,0)) +
