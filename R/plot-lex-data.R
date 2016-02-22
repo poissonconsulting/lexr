@@ -3,10 +3,10 @@ tidy_section <- function(section) {
     suppressMessages(section %<>% broom::tidy())
     section <- list(
       ggplot2::geom_polygon(data = dplyr::filter_(section, ~!hole),
-                            ggplot2::aes_(x = ~long / 1000, y = ~lat / 1000, group = ~id),
+                            ggplot2::aes_(x = ~long / 1000, y = ~lat / 1000, group = ~group),
                             alpha = 1/5, color = "grey50"),
       ggplot2::geom_polygon(data = dplyr::filter_(section, ~hole),
-                            ggplot2::aes_(x = ~long / 1000, y = ~lat / 1000, group = ~id),
+                            ggplot2::aes_(x = ~long / 1000, y = ~lat / 1000, group = ~group),
                             color = "white"))
   }
   section

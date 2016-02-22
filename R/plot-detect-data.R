@@ -16,6 +16,8 @@ plot_detect_section <- function(section) {
                                                      group = ~Section)) +
     ggplot2::geom_polygon(data = dplyr::filter_(polygon, ~!hole),
                           ggplot2::aes_(fill = ~ColorCode, color = ~ColorCode)) +
+    ggplot2::geom_polygon(data = dplyr::filter_(polygon, ~hole),
+                          ggplot2::aes_(color = ~ColorCode, group = ~group), fill = "white") +
     ggplot2::geom_point(ggplot2::aes_(color = ~ColorCode), size = 4) +
     ggplot2::geom_polygon(data = dplyr::filter_(polygon, ~!hole),
                           color = "grey25", fill = "transparent") +
