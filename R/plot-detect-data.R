@@ -35,8 +35,12 @@ plot_detect_coverage <- function(coverage, section, interval) {
   first_year <- lubridate::year(interval$DateTime[1])
   last_year <- lubridate::year(interval$DateTime[nrow(interval)])
 
+  all <- expand.grid(Section = unique(coverage$Section), Interval = interval$Interval)
+  coverage %<>% dplyr::right_join(all, by = c("Section", "Interval"))
+  coverage$Coverage[is.na(coverage$Coverage)] <- 0
   coverage %<>% dplyr::inner_join(interval, by = "Interval")
   coverage %<>% dplyr::inner_join(section@data, by = "Section")
+  coverage %<>% dplyr::select_(~DateTime, ~Coverage, ~Section, ~ColorCode)
 
   ggplot2::ggplot(data = coverage, ggplot2::aes_(x = ~DateTime,
                                                  y = ~Coverage)) +
@@ -197,8 +201,9 @@ plot_detect_fish_year <- function(capture, recapture, detection, section, interv
 
 #' @export
 plot.detect_data <- function(x, all = FALSE, ...) {
- print(plot_detect_section(x$section))
+# print(plot_detect_section(x$section))
  print(plot_detect_coverage(x$coverage, x$section, x$interval))
+  stop()
  print(plot_detect_distance(x$distance, x$section))
  print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))
   if (all) {

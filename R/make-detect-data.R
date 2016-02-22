@@ -68,8 +68,8 @@ calc_coverage <- function(data, section) {
 make_coverage <- function(data) {
   message("making coverage...")
   deployment <- data$deployment
-
   deployment %<>% expand_deployment()
+
   data$section@data$Area <- rgeos::gArea(data$section, byid = TRUE) / 10 ^ 6
   coverage <- dplyr::inner_join(data$station, deployment, by = "Station")
   coverage %<>% dplyr::select_(~IntervalDeployment, ~Section, ~Station,
