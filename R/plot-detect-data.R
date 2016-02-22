@@ -195,10 +195,10 @@ plot_detect_fish_year <- function(capture, recapture, detection, section, interv
 
 #' @export
 plot.detect_data <- function(x, all = FALSE, ...) {
-#  print(plot_detect_section(x$section))
-#  print(plot_detect_coverage(x$coverage, x$section, x$interval))
-#  print(plot_detect_distance(x$distance, x$section))
-#  print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))
+ print(plot_detect_section(x$section))
+ print(plot_detect_coverage(x$coverage, x$section, x$interval))
+ print(plot_detect_distance(x$distance, x$section))
+ print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))
   if (all) {
     plot_detect_fish_year(x$capture, x$recapture, x$detection, x$section, x$interval)
   }
