@@ -1,6 +1,6 @@
 tidy_section <- function(section) {
   if (!is.null(section)) {
-    section %<>% broom::tidy()
+    suppressMessages(section %<>% broom::tidy())
     section <- list(
       ggplot2::geom_polygon(data = dplyr::filter_(section, ~!hole),
                             ggplot2::aes_(x = ~long / 1000, y = ~lat / 1000, group = ~id),

@@ -1,5 +1,5 @@
 section_polygon <- function(section) {
-  polygon <- broom::tidy(section)
+  suppressMessages(polygon <- broom::tidy(section))
   polygon %<>% dplyr::rename_(.dots = list(Section = "id", EastingSection = "long",
                                            NorthingSection = "lat"))
   polygon$Section %<>% factor(levels = levels(section@data$Section))
