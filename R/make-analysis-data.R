@@ -58,6 +58,7 @@ make_analysis_coverage <- function(data) {
   coverage$Coverage[is.na(coverage$Coverage)] <- 0
 
   coverage %<>% tidyr::spread_("Interval", "Coverage")
+  coverage$Section <- NULL
   data$coverage <- as.matrix(coverage)
   data
 }
@@ -82,6 +83,13 @@ make_analysis_recapture <- function(data) {
   data$recapture %<>% factors_to_integers()
   data
 }
+make_analysis_alive <- function(data) {
+  message("making analysis alive...")
+
+  alive <- matrix(NA, nrow = nrow(data$capture), ncol = nrow(data$interval))
+  data$alive <- alive
+  data
+}
 
 make_analysis_detection <- function(data) {
   message("making analysis detection...")
@@ -95,6 +103,7 @@ make_analysis_detection <- function(data) {
   detection <- dplyr::left_join(all, data$detection,
                                 by = c("IntervalDetection", "Capture"))
   detection %<>% tidyr::spread_("IntervalDetection", "Section")
+  detection$Capture <- NULL
   data$detection <- as.matrix(detection)
   data
 }
@@ -135,6 +144,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_recapture()
   data %<>% make_analysis_interval()
   data %<>% make_analysis_coverage()
+  data %<>% make_analysis_alive()
   data %<>% make_analysis_detection()
   data <- data[analysis_data_names()]
   class(data) <- "analysis_data"
