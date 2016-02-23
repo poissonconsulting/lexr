@@ -12,6 +12,7 @@ theme_set(theme_bw(base_size = 10))
 qlex <- input_lex_data("qlexdatr")
 check_lex_data(qlex)
 qdetect <- make_detect_data(qlex, hourly_interval = 6L, end_date = as.Date("2015-09-26"))
+summary(qdetect)
 
 # create directory for plots
 dir.create("qlex", showWarnings = FALSE)

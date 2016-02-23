@@ -11,7 +11,8 @@ theme_set(theme_bw(base_size = 10))
 # input, check and process data
 klex <- input_lex_data("klexdatr")
 check_lex_data(klex)
-kdetect <- make_detect_data(klex, hourly_interval = 6L)
+kdetect <- make_detect_data(klex, hourly_interval = 6L, end_date = as.Date("2014-12-31"))
+summary(kdetect)
 
 # create directory for plots
 dir.create("klex", showWarnings = FALSE)
