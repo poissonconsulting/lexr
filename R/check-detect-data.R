@@ -28,7 +28,7 @@ check_detect_interval <- function(interval) {
   datacheckr::check_data3(
     interval, list(Interval = c(1L, nrow(interval)),
                    Date = as.Date("2000-01-01"),
-                   Year = c(2000L, 2016L),
+                   Year = c(2000L, 2030L),
                    Month = c(1L, 12L),
                    Hour = c(0L, 23L),
                    DayteTime = Sys.time(),
