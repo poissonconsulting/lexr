@@ -106,11 +106,10 @@ check_detect_joins <- function(data) {
 
 #' Check Lake Exploitation Detection Data
 #'
-#' Checks loaded lake exploitation data and returns a TRUE if passes all the tests.
+#' Checks loaded lake exploitation data and returns an invisible copy of the data.
 #' Otherwise stops with an informative error.
 #'
 #' @param data The detect_data object to check.
-#' @return A flag indicating whether the package data passes the checks.
 #' @export
 check_detect_data <- function(data) {
   if (!inherits(data, "detect_data")) error("data must be a detect_data object")

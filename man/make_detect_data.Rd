@@ -10,7 +10,7 @@ make_detect_data(data, capture = data$capture,
   hourly_interval = 6L)
 }
 \arguments{
-\item{data}{The lex_data object to check.}
+\item{data}{The lex_data object.}
 
 \item{capture}{A data frame of the capture data to use.}
 

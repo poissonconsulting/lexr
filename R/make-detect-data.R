@@ -81,8 +81,7 @@ make_coverage <- function(data) {
   data
 }
 
-filter_captures <- function(data, capture) {
-  capture %<>% check_lex_capture()
+filter_lex_captures <- function(data, capture) {
   capture$Capture %<>% droplevels()
 
   data$recapture %<>% dplyr::filter_(~Capture %in% capture$Capture)
@@ -300,7 +299,7 @@ make_section <- function(data) {
 #' Make Detect Data
 #'
 #' Makes detect_data object from a lex_data object.
-#' @inheritParams check_lex_data
+#' @param data The lex_data object.
 #' @param capture A data frame of the capture data to use.
 #' @param start_date A date of the start.
 #' @param end_date A date of the end.
@@ -321,13 +320,14 @@ make_detect_data <-  function(
 
   if (end_date <= start_date) error("start_date must be before end_date")
 
+  capture %<>% check_lex_capture()
   data %<>% check_lex_data()
   capture %<>% dplyr::filter_(~date(capture$DateTimeCapture) >= start_date,
                               ~date(capture$DateTimeCapture) <= end_date)
 
   if (!nrow(capture)) error("no captures fall within the specified dates")
 
-  data %<>% filter_captures(capture)
+  data %<>% filter_lex_captures(capture)
   data %<>% make_interval(start_date = start_date, end_date = end_date,
                           hourly_interval = hourly_interval)
   data %<>% make_coverage()

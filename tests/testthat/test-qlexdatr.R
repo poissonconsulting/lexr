@@ -12,5 +12,8 @@ test_that("qlexdatr", {
   start_date <- as.Date("2014-01-01")
   end_date <- as.Date("2014-12-31")
   hourly_interval <- 6L # klexdatr tests 24L
-  expect_is(make_detect_data(lex, capture, start_date, end_date, hourly_interval), "detect_data")
+  detect <- make_detect_data(lex, capture, start_date, end_date, hourly_interval)
+  expect_is(check_detect_data(detect), "detect_data")
+  analysis <- make_analysis_data(detect)
+  expect_is(check_analysis_data(analysis), "analysis_data")
 })
