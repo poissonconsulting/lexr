@@ -18,6 +18,8 @@ summary.detect_data <- function(object, ...) {
   summary$number_sections <- nlevels(data$section@data$Section)
   summary$number_captures <- nlevels(data$capture$Capture)
   summary$number_recaptures <- nrow(data$recapture)
+  summary$number_intervals <- nrow(data$interval)
+  summary$hourly_interval <- as.integer(difftime(data$interval$DateTime[2], data$interval$DateTime[1], units = "hours"))
   summary$start_datetime <- data$interval$DateTime[1]
   summary$end_datetime <- data$interval$DateTime[nrow(data$interval)]
   summary$total_detections <- sum(data$detection$Detections)
