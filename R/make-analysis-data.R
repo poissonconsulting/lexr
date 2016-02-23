@@ -53,7 +53,7 @@ make_analysis_coverage <- function(data) {
                      Section = data$section$Section)
 
   coverage <- dplyr::left_join(all, data$coverage,
-                                by = c("Interval", "Section"))
+                               by = c("Interval", "Section"))
 
   coverage$Coverage[is.na(coverage$Coverage)] <- 0
 
@@ -86,7 +86,26 @@ make_analysis_recapture <- function(data) {
 make_analysis_alive <- function(data) {
   message("making analysis alive...")
 
-  alive <- matrix(NA, nrow = nrow(data$capture), ncol = nrow(data$interval))
+  intervals <- nrow(data$interval)
+  captures <- nrow(data$capture)
+  alive <- matrix(NA, nrow = captures, ncol = intervals)
+
+  data$capture %<>% dplyr::arrange_(~Capture)
+
+  for (i in 1:captures) {
+    alive[i, 1:data$capture$IntervalCapture[i]] <- TRUE
+  }
+  if (nrow(data$recapture)) {
+    for (i in 1:nrow(data$recapture)) {
+      alive[data$recapture$Capture[i], 1:data$recapture$IntervalRecapture[i]] <- TRUE
+    }
+    retained <- dplyr::filter_(data$recapture, ~!Released, ~IntervalRecapture < intervals)
+    if (nrow(retained)) {
+      for (i in 1:nrow(retained)) {
+        alive[retained$Capture[i], (retained$IntervalRecapture[i] + 1):intervals] <- FALSE
+      }
+    }
+  }
   data$alive <- alive
   data
 }
