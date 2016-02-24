@@ -83,6 +83,17 @@ make_analysis_recapture <- function(data) {
   data$recapture %<>% factors_to_integers()
   data
 }
+
+last_movement <- function(data) {
+  if (nrow(data) == 1)
+    return(NULL)
+  data %<>% dplyr::arrange_(~IntervalDetection)
+  # can only assume alive at the section it moved from
+  data$Move <- c(diff(as.integer(data$Section)) != 0, FALSE)
+  whch <- which(data$Move)
+  data.frame(Interval = data$IntervalDetection[whch[length(whch)]])
+}
+
 make_analysis_alive <- function(data) {
   message("making analysis alive...")
 
@@ -104,6 +115,14 @@ make_analysis_alive <- function(data) {
       for (i in 1:nrow(retained)) {
         alive[retained$Capture[i], (retained$IntervalRecapture[i] + 1):intervals] <- FALSE
       }
+    }
+  }
+  move <- plyr::ddply(data$detection, "Capture", last_movement)
+  move$Capture %<>% as.integer()
+  print(move)
+  if (nrow(move)) {
+    for (i in 1:nrow(move)) {
+      alive[move$Capture[i], 1:move$Interval[i]] <- TRUE
     }
   }
   data$alive <- alive
