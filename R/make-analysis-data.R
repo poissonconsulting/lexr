@@ -168,8 +168,11 @@ make_analysis_distance <- function(data) {
 convert_analysis_data <- function (data) {
   list <- list()
   list$nSection <- nrow(data$section)
-  list$Step <- data$step
-  list$Distance <- data$distance
+  stay <- matrix(FALSE, nrow = list$nSection, ncol = list$nSection)
+  diag(stay) <- TRUE
+  jump <- !data$step
+  diag(jump) <- FALSE
+  list$Movement <- abind::abind(stay, data$step, jump, along = 3)
   list$nInterval <- nrow(data$interval)
   list$Coverage <- data$coverage
   list$nCapture <- nrow(data$capture)
@@ -178,6 +181,7 @@ convert_analysis_data <- function (data) {
   list$IntervalTagExpire <- data$capture$IntervalTagExpire
   list$Monitored <- data$monitored
   list$Detection <- data$detection
+  list$Detected <- !is.na(data$detection)
   list$Alive <- data$alive
   list
 }
