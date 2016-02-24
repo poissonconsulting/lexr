@@ -5,5 +5,7 @@
 ^qlexdatr.pdf$
 ^klex$
 ^qlex$
+^kdetect$
+^qdetect$
 ^README\.Rmd$
 ^README-.*\.png$

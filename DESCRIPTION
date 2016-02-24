@@ -26,8 +26,8 @@ Imports:
     spdep,
     tidyr
 Suggests:
-    klexdatr (>= 0.0.0.9009),
-    qlexdatr (>= 0.0.0.9011),
+    klexdatr (>= 0.0.0.9010),
+    qlexdatr (>= 0.0.0.9012),
     testthat
 License: MIT + file LICENSE
 LazyData: true

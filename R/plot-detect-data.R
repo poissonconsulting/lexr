@@ -105,7 +105,7 @@ plot_detect_overview <- function(capture, recapture, detection, section, interva
   ggplot2::ggplot(data = detection, ggplot2::aes_string(x = "DateTime", y = "Capture")) +
     ggplot2::facet_grid(Species~. , scales = "free_y", space = "free_y") +
     ggplot2::geom_segment(data = capture, ggplot2::aes_string(xend = "DateTimeTagExpire", yend = "Capture"), alpha = 1/2) +
-    ggplot2::geom_point(ggplot2::aes_string(color = "ColorCode"), alpha = 1/3) +
+    ggplot2::geom_point(ggplot2::aes_string(color = "ColorCode"), alpha = 1/3, size = 1) +
     ggplot2::geom_point(data = capture, color = "red") +
     ggplot2::geom_point(data = recapture, ggplot2::aes_string(shape = "Released"), color = "black") +
     ggplot2::scale_x_datetime(name = "Date", expand = c(0,0), date_breaks = "1 year", date_labels = "%Y") +

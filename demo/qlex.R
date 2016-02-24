@@ -14,19 +14,6 @@ check_lex_data(qlex)
 qdetect <- make_detect_data(qlex, hourly_interval = 6L, end_date = as.Date("2015-09-26"))
 summary(qdetect)
 
-# create directory for plots
-dir.create("qlex", showWarnings = FALSE)
+plot_data_dir(qlex, all = TRUE)
+plot_data_dir(qdetect, all = TRUE)
 
-# plot base data
-setwd("qlex")
-png("qlex%03d.png", width = 6, height = 6, units = "in", res = 300)
-plot(qlex, all = TRUE)
-dev.off()
-setwd("..")
-
-# plot processed data
-setwd("qlex")
-png("qdetect%03d.png", width = 6, height = 6, units = "in", res = 300)
-plot(qdetect, all = TRUE)
-dev.off()
-setwd("..")
