@@ -6,7 +6,6 @@ check_detect_dims <- function (data) {
   stopifnot(identical(dim(data$step), c(sections, sections)))
   stopifnot(identical(dim(data$distance), c(sections, sections)))
   stopifnot(identical(dim(data$coverage), c(sections, intervals)))
-  stopifnot(identical(dim(data$monitored), c(captures, intervals)))
   stopifnot(identical(dim(data$detection), c(captures, intervals)))
   stopifnot(identical(dim(data$alive), c(captures, intervals)))
   invisible(data)

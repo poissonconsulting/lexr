@@ -84,23 +84,6 @@ make_analysis_capture <- function(data) {
   data
 }
 
-make_analysis_monitored <- function(data) {
-  message("making analysis monitored...")
-
-  intervals <- nrow(data$interval)
-  captures <- nrow(data$capture)
-  monitored <- matrix(FALSE, nrow = captures, ncol = intervals)
-
-  data$capture %<>% dplyr::arrange_(~Capture)
-
-  for (i in 1:captures) {
-    monitored[i, data$capture$IntervalCapture[i]:data$capture$IntervalTagExpire[i]] <- TRUE
-  }
-
-  data$monitored <- monitored
-  data
-}
-
 make_analysis_recapture <- function(data) {
   message("making analysis recapture...")
 
@@ -190,8 +173,9 @@ convert_analysis_data <- function (data) {
   list$nInterval <- nrow(data$interval)
   list$Coverage <- data$coverage
   list$nCapture <- nrow(data$capture)
-  list$IntervalCapture <- data$Capture$IntervalCapture
-  list$SectionCapture <- data$Capture$SectionCapture
+  list$IntervalCapture <- data$capture$IntervalCapture
+  list$SectionCapture <- data$capture$SectionCapture
+  list$IntervalTagExpire <- data$capture$IntervalTagExpire
   list$Monitored <- data$monitored
   list$Detection <- data$detection
   list$Alive <- data$alive
@@ -219,7 +203,6 @@ make_analysis_data <-  function(
   data %<>% make_analysis_section()
   data %<>% make_analysis_distance()
   data %<>% make_analysis_capture()
-  data %<>% make_analysis_monitored()
   data %<>% make_analysis_recapture()
   data %<>% make_analysis_interval()
   data %<>% make_analysis_coverage()
