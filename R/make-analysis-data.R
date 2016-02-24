@@ -34,12 +34,18 @@ factors_to_integers <- function (data) {
   data
 }
 
+logicals_to_integers <- function (data) {
+  data[sapply(data, is.logical)] %<>% lapply(as.integer)
+  data
+}
+
 make_analysis_section <- function(data) {
   message("making analysis section...")
 
   data$section <- data$section@data
   data$section %<>% dplyr::select_(~Section, ~Habitat, ~Area, ~Bounded)
   data$section %<>% factors_to_integers()
+  data$section %<>% logicals_to_integers()
   data
 }
 
@@ -74,6 +80,7 @@ make_analysis_capture <- function(data) {
   message("making analysis capture...")
 
   data$capture %<>% factors_to_integers()
+  data$capture %<>% logicals_to_integers()
   data
 }
 
@@ -98,6 +105,7 @@ make_analysis_recapture <- function(data) {
   message("making analysis recapture...")
 
   data$recapture %<>% factors_to_integers()
+  data$recapture %<>% logicals_to_integers()
   data
 }
 
@@ -174,6 +182,22 @@ make_analysis_distance <- function(data) {
   data
 }
 
+convert_analysis_data <- function (data) {
+  list <- list()
+  list$nSection <- nrow(data$section)
+  list$Step <- data$step
+  list$Distance <- data$distance
+  list$nInterval <- nrow(data$interval)
+  list$Coverage <- data$coverage
+  list$nCapture <- nrow(data$capture)
+  list$IntervalCapture <- data$Capture$IntervalCapture
+  list$SectionCapture <- data$Capture$SectionCapture
+  list$Monitored <- data$monitored
+  list$Detection <- data$detection
+  list$Alive <- data$alive
+  list
+}
+
 #' Make Analysis Data
 #'
 #' Makes analysis_data object from a detect_data object.
@@ -204,5 +228,6 @@ make_analysis_data <-  function(
   data <- data[analysis_data_names()]
   class(data) <- "analysis_data"
   data %<>% check_analysis_data()
+  data %<>% convert_analysis_data()
   data
 }
