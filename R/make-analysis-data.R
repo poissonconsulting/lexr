@@ -77,6 +77,23 @@ make_analysis_capture <- function(data) {
   data
 }
 
+make_analysis_monitored <- function(data) {
+  message("making analysis monitored...")
+
+  intervals <- nrow(data$interval)
+  captures <- nrow(data$capture)
+  monitored <- matrix(FALSE, nrow = captures, ncol = intervals)
+
+  data$capture %<>% dplyr::arrange_(~Capture)
+
+  for (i in 1:captures) {
+    monitored[i, data$capture$IntervalCapture[i]:data$capture$IntervalTagExpire[i]] <- TRUE
+  }
+
+  data$monitored <- monitored
+  data
+}
+
 make_analysis_recapture <- function(data) {
   message("making analysis recapture...")
 
@@ -119,7 +136,6 @@ make_analysis_alive <- function(data) {
   }
   move <- plyr::ddply(data$detection, "Capture", last_movement)
   move$Capture %<>% as.integer()
-  print(move)
   if (nrow(move)) {
     for (i in 1:nrow(move)) {
       alive[move$Capture[i], 1:move$Interval[i]] <- TRUE
@@ -179,6 +195,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_section()
   data %<>% make_analysis_distance()
   data %<>% make_analysis_capture()
+  data %<>% make_analysis_monitored()
   data %<>% make_analysis_recapture()
   data %<>% make_analysis_interval()
   data %<>% make_analysis_coverage()

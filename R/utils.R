@@ -30,8 +30,8 @@ detect_data_names <- function() c("section", "distance", "interval", "coverage",
        "recapture", "detection")
 
 analysis_data_names <- function() c("section", "step", "distance", "interval",
-                                    "coverage", "capture", "recapture", "detection",
-                                    "alive")
+                                    "coverage", "capture", "recapture", "monitored",
+                                    "detection", "alive")
 
 fun_data_name <- function(data, fun, ...) {
   name <- names(data)
