@@ -139,6 +139,7 @@ make_analysis_alive <- function(data) {
 make_analysis_detection <- function(data) {
   message("making analysis detection...")
 
+  data$detection %<>% dplyr::filter_(~Jump == 0)
   data$detection %<>% dplyr::select_(~IntervalDetection, ~Capture, ~Section)
   data$detection %<>% factors_to_integers()
 
@@ -170,9 +171,7 @@ convert_analysis_data <- function (data) {
   list$nSection <- nrow(data$section)
   stay <- matrix(FALSE, nrow = list$nSection, ncol = list$nSection)
   diag(stay) <- TRUE
-  jump <- !data$step
-  diag(jump) <- FALSE
-  list$Movement <- abind::abind(stay, data$step, jump, along = 3)
+  list$Movement <- abind::abind(stay, data$step, along = 3)
   list$nInterval <- nrow(data$interval)
   list$Coverage <- data$coverage
   list$nCapture <- nrow(data$capture)
