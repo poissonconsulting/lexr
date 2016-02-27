@@ -29,9 +29,9 @@ lex_data_names <- function() c("section", "station", "deployment", "capture",
 detect_data_names <- function() c("section", "distance", "interval", "coverage", "capture",
        "recapture", "detection")
 
-analysis_data_names <- function() c("section", "step", "distance", "interval",
+analysis_data_names <- function() c("section", "distance", "period",
                                     "coverage", "capture", "recapture",
-                                    "detection", "alive")
+                                    "detection")
 
 fun_data_name <- function(data, fun, ...) {
   name <- names(data)

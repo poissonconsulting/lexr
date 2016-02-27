@@ -12,6 +12,23 @@ summarise_movement <- function (data) {
 }
 
 #' @export
+summary.lex_data <- function(object, ...) {
+  data <- object
+  summary <- list()
+  summary$number_sections <- nlevels(data$section@data$Section)
+  summary$number_captures <- nlevels(data$capture$Capture)
+  summary$number_species <- nlevels(data$capture$Species)
+  summary$number_recaptures <- nrow(data$recapture)
+  summary$number_intervals <- nrow(data$interval)
+  summary$time_difference <- get_difftime(data)
+  summary$first_detection <- data$detection$DateTimeDetected[1]
+  summary$last_detection <- data$detection$DateTimeDetected[nrow(data$detection)]
+  summary$total_detections <- sum(data$detection$Detections)
+
+  summary
+}
+
+#' @export
 summary.detect_data <- function(object, ...) {
   data <- object
   summary <- list()
@@ -19,7 +36,7 @@ summary.detect_data <- function(object, ...) {
   summary$number_captures <- nlevels(data$capture$Capture)
   summary$number_recaptures <- nrow(data$recapture)
   summary$number_intervals <- nrow(data$interval)
-  summary$hourly_interval <- as.integer(difftime(data$interval$DateTime[2], data$interval$DateTime[1], units = "hours"))
+  summary$time_difference <- get_difftime(data)
   summary$start_datetime <- data$interval$DateTime[1]
   summary$end_datetime <- data$interval$DateTime[nrow(data$interval)]
   summary$total_detections <- sum(data$detection$Detections)

@@ -13,6 +13,7 @@ check_detect_section <- function(section) {
                   ColorCode = rep("[#].{6,6}", 2)),
     key = "Section", select = TRUE)
   datacheckr::check_key(section@data, "Area") # unique key for tiebreaks
+  datacheckr::check_key(section@data, c("EastingSection", "NorthingSection"))
   invisible(section)
 }
 

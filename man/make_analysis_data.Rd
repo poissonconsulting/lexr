@@ -4,7 +4,8 @@
 \alias{make_analysis_data}
 \title{Make Analysis Data}
 \usage{
-make_analysis_data(data, capture = data$capture, section = data$section)
+make_analysis_data(data, capture = data$capture, section = data$section,
+  interval_period = get_difftime(data))
 }
 \arguments{
 \item{data}{A detect_data object to use.}
@@ -12,11 +13,18 @@ make_analysis_data(data, capture = data$capture, section = data$section)
 \item{capture}{A data frame of the capture data to use.}
 
 \item{section}{A data frame of the section data to use.}
+
+\item{interval_period}{A difftime element that will be used to group the interval or
+a vector indicating the actual interval groupings.}
 }
 \value{
 A detect_data object.
 }
 \description{
+If a difftime element, interval_period cannot be greater than 28 days
+i.e. \code{lubridate::make_difftime(60 * 60 * 24 * 28)}.
+}
+\details{
 Makes analysis_data object from a detect_data object.
 }
 

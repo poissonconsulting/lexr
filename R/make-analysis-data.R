@@ -43,9 +43,101 @@ make_analysis_section <- function(data) {
   message("making analysis section...")
 
   data$section <- data$section@data
-  data$section %<>% dplyr::select_(~Section, ~Habitat, ~Area, ~Bounded)
-  data$section %<>% factors_to_integers()
-  data$section %<>% logicals_to_integers()
+  data$section$ColorCode %<>% factor() # hack to deal with fact jaggernaut rejects character
+  data
+}
+
+make_analysis_distance <- function(data) {
+  message("making analysis distance...")
+
+  sections <- levels(data$distance$SectionFrom)
+  data$distance %<>% dplyr::arrange_(~SectionFrom, ~SectionTo)
+  distance <- matrix(data$distance$Distance, nrow = length(sections), ncol = length(sections), dimnames = list(sections, sections))
+
+  data$distance <- distance
+  data
+}
+
+rounded_hours <- function (x) {
+  stopifnot(lubridate::is.difftime(x))
+  x %<>% lubridate::as.duration() %>% as.integer() %>%
+        magrittr::divide_by(60 * 60) %>% round()
+  x
+}
+
+make_analysis_interval <- function(data, interval_period) {
+  message("making analysis interval...")
+
+  if (lubridate::is.difftime(interval_period)) {
+    if (length(interval_period) != 1) error("interval_period as a difftime must be length 1")
+    if (interval_period < get_difftime(data)) error("interval_period as a difftime must not be less than data's")
+    if (interval_period > make_difftime(60 * 60 * 24 * 28)) error("interval_period as a difftime must not be greater than 28 days")
+    if (interval_period == get_difftime(data)) {
+        interval_period <- data$interval$Interval
+    } else {
+      interval_period %<>% rounded_hours()
+      difftime <- get_difftime(data) %>% rounded_hours()
+      if (interval_period %% difftime != 0)
+        error("interval_period as a difftime must be a multiple of data's")
+      interval_period <- interval_period / difftime
+      interval_period <- rep(1:(nrow(data$interval) / interval_period), each = interval_period)
+    }
+  } else {
+    if (length(interval_period) != nrow(data$interval))
+      error("interval_period as a vector must be the same length as the number of intervals")
+  }
+  if (!is.factor(interval_period))
+    interval_period %<>% factor(levels = unique(interval_period))
+
+  data$interval$Period <- interval_period
+  data$interval %<>% dplyr::arrange_(~Interval)
+  data$period <- plyr::ddply(data$interval, "Period", dplyr::slice, 1)
+  data$period %<>% dplyr::select_(~-Interval)
+  data$period %<>% dplyr::select_(~Period, ~everything())
+  data$interval %<>% dplyr::select_(~Period, ~Interval)
+  data
+}
+
+replace_interval_with_period <- function(x, data, suffix = "") {
+  interval <- data$interval
+  if (!identical(suffix, "")) {
+    interval[paste0("Period", suffix)] <- interval["Period"]
+    interval["Period"] <- NULL
+  }
+  by = "Interval"
+  names(by) <- paste0("Interval", suffix)
+  x %<>% dplyr::left_join(interval, by = by)
+  x[paste0("Interval", suffix)] <- NULL
+  x
+}
+
+make_analysis_capture <- function(data) {
+  message("making analysis capture...")
+
+  data$capture %<>% replace_interval_with_period(data, "Capture")
+  data$capture %<>% replace_interval_with_period(data, "TagExpire")
+  data
+}
+
+group_recaptures <- function (recapture) {
+  recapture$Recaptures <- nrow(recapture)
+  if (nrow(recapture) == 1)
+    return(recapture)
+  is.na(recapture$SectionRecapture) <- TRUE
+  recapture$TBarTag1 <- any(recapture$TBarTag1)
+  recapture$TBarTag2 <- any(recapture$TBarTag2)
+  recapture$TagsRemoved <- any(recapture$TagsRemoved)
+  recapture$Released <- all(recapture$TagsRemoved)
+  recapture$Public <- any(recapture$Public)
+
+  dplyr::slice(recapture, 1)
+}
+
+make_analysis_recapture <- function(data) {
+  message("making analysis recapture...")
+
+  data$recapture %<>% replace_interval_with_period(data, "Recapture")
+  data$recapture %<>% plyr::ddply(c("Capture", "PeriodRecapture"), group_recaptures)
   data
 }
 
@@ -53,7 +145,6 @@ make_analysis_coverage <- function(data) {
   message("making analysis coverage...")
 
   data$coverage %<>% dplyr::select_(~Interval, ~Section, ~Coverage)
-  data$coverage %<>% factors_to_integers()
 
   all <- expand.grid(Interval = data$interval$Interval,
                      Section = data$section$Section)
@@ -63,32 +154,15 @@ make_analysis_coverage <- function(data) {
 
   coverage$Coverage[is.na(coverage$Coverage)] <- 0
 
-  coverage %<>% tidyr::spread_("Interval", "Coverage")
+  coverage %<>% replace_interval_with_period(data)
+  coverage %<>% dplyr::group_by_(~Section, ~Period) %>%
+    dplyr::summarise_(.dots = list(Coverage = ~mean(Coverage))) %>% dplyr::ungroup()
+
+  coverage %<>% tidyr::spread_("Period", "Coverage")
   coverage$Section <- NULL
-  data$coverage <- as.matrix(coverage)
-  data
-}
-
-make_analysis_interval <- function(data) {
-  message("making analysis interval...")
-
-  data$interval %<>% dplyr::select_(~Interval, ~Year, ~Month, ~Hour)
-  data
-}
-
-make_analysis_capture <- function(data) {
-  message("making analysis capture...")
-
-  data$capture %<>% factors_to_integers()
-  data$capture %<>% logicals_to_integers()
-  data
-}
-
-make_analysis_recapture <- function(data) {
-  message("making analysis recapture...")
-
-  data$recapture %<>% factors_to_integers()
-  data$recapture %<>% logicals_to_integers()
+  coverage %<>% as.matrix()
+  dimnames(coverage) <- list(data$section$Section, data$period$Period)
+  data$coverage <- coverage
   data
 }
 
@@ -139,65 +213,50 @@ make_analysis_alive <- function(data) {
 make_analysis_detection <- function(data) {
   message("making analysis detection...")
 
-#  data$detection %<>% dplyr::filter_(~Jump == 0)
-  data$detection %<>% dplyr::select_(~IntervalDetection, ~Capture, ~Section)
-  data$detection %<>% factors_to_integers()
+  detection <- dplyr::select_(data$detection, ~IntervalDetection, ~Capture, ~Section)
+  detection %<>% replace_interval_with_period(data, "Detection")
 
-  all <- expand.grid(IntervalDetection = data$interval$Interval,
-                     Capture = data$capture$Capture)
+  all <- expand.grid(PeriodDetection = data$period$Period,
+                     Capture = data$capture$Capture, Section = data$section$Section)
 
-  detection <- dplyr::left_join(all, data$detection,
-                                by = c("IntervalDetection", "Capture"))
-  detection %<>% tidyr::spread_("IntervalDetection", "Section")
-  detection$Capture <- NULL
-  data$detection <- as.matrix(detection)
+  detection$Periods <- 1
+  detection %<>% dplyr::left_join(all, .,
+                                by = c("PeriodDetection", "Capture", "Section"))
+
+  detection$Periods[is.na(detection$Periods)] <- 0
+
+  detection %<>% dplyr::group_by_(~PeriodDetection, ~Capture, ~Section) %>%
+    dplyr::summarise_(.dots = list(Periods = ~sum(Periods) / n())) %>% dplyr::ungroup()
+
+  detection %<>% reshape2::acast(list(.(Capture), .(PeriodDetection), .(Section)),
+                                 value.var = "Periods")
+  dimnames(detection) <- list(data$capture$Capture, data$period$Period, data$section$Section)
+  data$detection <- detection
   data
 }
 
-make_analysis_distance <- function(data) {
-  message("making analysis distance...")
-
-  sections <- levels(data$distance$SectionFrom)
-  data$distance %<>% dplyr::arrange_(~SectionFrom, ~SectionTo)
-  distance <- matrix(data$distance$Distance, nrow = length(sections), ncol = length(sections), dimnames = list(sections, sections))
-
-  data$distance <- distance
-  data$step <- data$distance == 1
+cleanup_analysis_data <- function (data) {
+  data <- data[analysis_data_names()]
+  class(data) <- "analysis_data"
   data
-}
-
-convert_analysis_data <- function (data) {
-  list <- list()
-  list$nSection <- nrow(data$section)
-  stay <- matrix(FALSE, nrow = list$nSection, ncol = list$nSection)
-  diag(stay) <- TRUE
-  jump <- !data$step
-  diag(jump) <- FALSE
-  list$Movement <- abind::abind(stay, data$step, jump, along = 3)
-  list$nInterval <- nrow(data$interval)
-  list$Coverage <- data$coverage
-  list$nCapture <- nrow(data$capture)
-  list$IntervalCapture <- data$capture$IntervalCapture
-  list$SectionCapture <- data$capture$SectionCapture
-  list$IntervalTagExpire <- data$capture$IntervalTagExpire
-  list$Monitored <- data$monitored
-  list$Detection <- data$detection
-  list$Detected <- !is.na(data$detection)
-  list$Alive <- data$alive
-  list
 }
 
 #' Make Analysis Data
+#'
+#' If a difftime element, interval_period cannot be greater than 28 days
+#' i.e. \code{lubridate::make_difftime(60 * 60 * 24 * 28)}.
 #'
 #' Makes analysis_data object from a detect_data object.
 #' @param data A detect_data object to use.
 #' @param capture A data frame of the capture data to use.
 #' @param section A data frame of the section data to use.
+#' @param interval_period A difftime element that will be used to group the interval or
+#' a vector indicating the actual interval groupings.
 #'
 #' @return A detect_data object.
 #' @export
 make_analysis_data <-  function(
-  data, capture = data$capture, section = data$section) {
+  data, capture = data$capture, section = data$section, interval_period = get_difftime(data)) {
 
   data %<>% check_detect_data()
   capture %<>% check_detect_capture()
@@ -205,17 +264,23 @@ make_analysis_data <-  function(
 
   data %<>% filter_detect_captures_section(capture, section)
   data %<>% check_detect_data()
+
   data %<>% make_analysis_section()
   data %<>% make_analysis_distance()
+
+  data %<>% make_analysis_interval(interval_period)
+
   data %<>% make_analysis_capture()
   data %<>% make_analysis_recapture()
-  data %<>% make_analysis_interval()
   data %<>% make_analysis_coverage()
-  data %<>% make_analysis_alive()
   data %<>% make_analysis_detection()
-  data <- data[analysis_data_names()]
-  class(data) <- "analysis_data"
+  data %<>% cleanup_analysis_data()
+
+#  data %<>% make_analysis_alive()
+
+  # do factor to integers and logical to integers at end...
+  # capture, section, recapture
+
   data %<>% check_analysis_data()
-  data %<>% convert_analysis_data()
   data
 }
