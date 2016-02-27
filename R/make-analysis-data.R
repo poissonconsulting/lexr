@@ -42,7 +42,7 @@ filter_detect_captures_section <- function(data, capture, section) {
 make_analysis_section <- function(data) {
   message("making analysis section...")
 
-  data$section <- data$section@data
+  data$section <- dplyr::as.tbl(data$section@data)
   data$section$ColorCode %<>% factor() # hack to deal with fact jaggernaut rejects character
   data
 }
@@ -95,6 +95,9 @@ make_analysis_interval <- function(data, interval_period) {
   data$period %<>% dplyr::select_(~-Interval)
   data$period %<>% dplyr::select_(~Period, ~everything())
   data$interval %<>% dplyr::select_(~Period, ~Interval)
+
+  data$period %<>% dplyr::as.tbl()
+  data$interval %<>% dplyr::as.tbl()
   data
 }
 
@@ -116,6 +119,7 @@ make_analysis_capture <- function(data) {
 
   data$capture %<>% replace_interval_with_period(data, "Capture")
   data$capture %<>% replace_interval_with_period(data, "TagExpire")
+  data$capture %<>% dplyr::as.tbl()
   data
 }
 
@@ -138,6 +142,7 @@ make_analysis_recapture <- function(data) {
   data$recapture %<>% replace_interval_with_period(data, "Recapture")
   data$recapture %<>% dplyr::mutate_(.dots = list(Recaptures = ~1L))
   data$recapture %<>% plyr::ddply(c("Capture", "PeriodRecapture"), group_recaptures)
+  data$recapture %<>% dplyr::as.tbl()
   data
 }
 
@@ -166,15 +171,15 @@ make_analysis_coverage <- function(data) {
   data
 }
 
-last_movement <- function(data) {
-  if (nrow(data) == 1)
-    return(NULL)
-  data %<>% dplyr::arrange_(~IntervalDetection)
-  # can only assume alive at the section it moved from
-  data$Move <- c(diff(as.integer(data$Section)) != 0, FALSE)
-  whch <- which(data$Move)
-  data.frame(Interval = data$IntervalDetection[whch[length(whch)]])
-}
+# last_movement <- function(data) {
+#   if (nrow(data) == 1)
+#     return(NULL)
+#   data %<>% dplyr::arrange_(~IntervalDetection)
+#   # can only assume alive at the section it moved from
+#   data$Move <- c(diff(as.integer(data$Section)) != 0, FALSE)
+#   whch <- which(data$Move)
+#   data.frame(Interval = data$IntervalDetection[whch[length(whch)]])
+# }
 
 # make_analysis_alive <- function(data) {
 #   message("making analysis alive...")
