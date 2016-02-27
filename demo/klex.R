@@ -14,5 +14,8 @@ check_lex_data(klex)
 kdetect <- make_detect_data(klex, hourly_interval = 6L, end_date = as.Date("2014-12-31"))
 summary(kdetect)
 
+kanalysis <- make_analysis_data(kdetect, interval_period = make_difftime(60 * 60 * 24 * 7 * 4))
+
 plot_data_dir(klex, all = TRUE)
 plot_data_dir(kdetect, all = TRUE)
+plot_data_dir(kanalysis, all = TRUE)

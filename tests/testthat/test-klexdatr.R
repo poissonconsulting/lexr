@@ -14,8 +14,8 @@ test_that("klexdatr", {
   hourly_interval <- 24L # qlexdatr tests 6L
   detect <- make_detect_data(lex, capture, start_date, end_date, hourly_interval)
   expect_is(check_detect_data(detect), "detect_data")
-  expect_identical(get_difftime(detect), make_difftime(num = 60 * 60 * hourly_interval, units = "hours"))
+  expect_identical(get_difftime(detect), lubridate::make_difftime(num = 60 * 60 * hourly_interval, units = "days"))
   expect_is(check_detect_data(detect), "detect_data")
-  analysis <- make_analysis_data(detect, make_difftime(60 * 60 * 24 * 7 * 4))
+  analysis <- make_analysis_data(detect, interval_period = lubridate::make_difftime(60 * 60 * 24 * 7 * 4))
   expect_is(check_analysis_data(analysis), "analysis_data")
 })

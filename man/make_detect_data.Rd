@@ -7,7 +7,7 @@
 make_detect_data(data, capture = data$capture,
   start_date = min(lexr::date(capture$DateTimeCapture)),
   end_date = max(lexr::date(capture$DateTimeTagExpire)),
-  hourly_interval = 6L)
+  hourly_interval = 1L)
 }
 \arguments{
 \item{data}{The lex_data object.}
@@ -24,6 +24,7 @@ make_detect_data(data, capture = data$capture,
 A detect_data object.
 }
 \description{
-Makes detect_data object from a lex_data object.
+Makes detect_data object from a lex_data object. The hourly interval can be
+1, 2, 3, 4, 6, 12 or 24.
 }
 

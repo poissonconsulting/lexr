@@ -79,7 +79,9 @@ check_lex_detection <- function(detection) {
   datacheckr::check_data3(detection, values, key = c("DateTimeDetection", "Capture", "Receiver"),
                           select = TRUE)
   detection %<>% dplyr::arrange_(~DateTimeDetection, ~Capture, ~Receiver)
-  expect_identical(get_difftime(lex), make_difftime(num = 60 * 60, units = "hours"))
+  if (!identical(get_difftime(detection$DateTimeDetection),
+                lubridate:: make_difftime(num = 60 * 60, units = "hours")))
+    error("detections should be hourly")
   invisible(detection)
 }
 

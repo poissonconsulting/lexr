@@ -32,6 +32,13 @@ check_analysis_period <- function(period) {
     key = c("Period"), select = TRUE)
 }
 
+check_analysis_interval <- function(interval) {
+  datacheckr::check_data3(
+    interval, list(Interval = 1L,
+                   Period = factor(1)),
+    key = c("Interval"), select = TRUE)
+}
+
 check_analysis_coverage <- function(coverage) {
   if (!is.matrix(coverage)) error("coverage must be a matrix")
   if (!is.numeric(coverage)) error("coverage must be an numeric matrix")

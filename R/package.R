@@ -4,6 +4,7 @@
 #' @name lexr
 #' @import datacheckr
 #' @importFrom magrittr %<>% %>%
+#' @importFrom plyr .
 #' @importFrom sp %over%
 #' @examples
 #' \dontrun{

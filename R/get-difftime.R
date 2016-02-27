@@ -7,6 +7,14 @@ get_difftime <- function(object) {
   UseMethod("get_difftime", object)
 }
 
+get_difftime.POSIXct <- function(object) {
+  datetimes <- unique(object)
+  datetimes %<>% sort()
+  n <- length(datetimes)
+  difftimes <- difftime(datetimes[2:n], datetimes[1:(n-1)])
+  min(difftimes, na.rm = TRUE)
+}
+
 #' @export
 get_difftime.lex_data <- function(object) {
   datetimes <- unique(object$detection$DateTimeDetection)

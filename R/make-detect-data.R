@@ -298,7 +298,9 @@ make_section <- function(data) {
 
 #' Make Detect Data
 #'
-#' Makes detect_data object from a lex_data object.
+#' Makes detect_data object from a lex_data object. The hourly interval can be
+#' 1, 2, 3, 4, 6, 12 or 24.
+#'
 #' @param data The lex_data object.
 #' @param capture A data frame of the capture data to use.
 #' @param start_date A date of the start.
@@ -311,7 +313,7 @@ make_detect_data <-  function(
   data, capture = data$capture,
   start_date = min(lexr::date(capture$DateTimeCapture)),
   end_date = max(lexr::date(capture$DateTimeTagExpire)),
-  hourly_interval = 6L) {
+  hourly_interval = 1L) {
 
   check_data2(capture)
   check_date(start_date)

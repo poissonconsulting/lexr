@@ -29,15 +29,15 @@ filter_detect_captures_section <- function(data, capture, section) {
   data
 }
 
-factors_to_integers <- function (data) {
-  data[sapply(data, is.factor)] %<>% lapply(as.integer)
-  data
-}
-
-logicals_to_integers <- function (data) {
-  data[sapply(data, is.logical)] %<>% lapply(as.integer)
-  data
-}
+# factors_to_integers <- function (data) {
+#   data[sapply(data, is.factor)] %<>% lapply(as.integer)
+#   data
+# }
+#
+# logicals_to_integers <- function (data) {
+#   data[sapply(data, is.logical)] %<>% lapply(as.integer)
+#   data
+# }
 
 make_analysis_section <- function(data) {
   message("making analysis section...")
@@ -71,7 +71,7 @@ make_analysis_interval <- function(data, interval_period) {
   if (lubridate::is.difftime(interval_period)) {
     if (length(interval_period) != 1) error("interval_period as a difftime must be length 1")
     if (interval_period < get_difftime(data)) error("interval_period as a difftime must not be less than data's")
-    if (interval_period > make_difftime(60 * 60 * 24 * 28)) error("interval_period as a difftime must not be greater than 28 days")
+    if (interval_period > lubridate::make_difftime(60 * 60 * 24 * 28)) error("interval_period as a difftime must not be greater than 28 days")
     if (interval_period == get_difftime(data)) {
         interval_period <- data$interval$Interval
     } else {
@@ -87,11 +87,10 @@ make_analysis_interval <- function(data, interval_period) {
     if (length(interval_period) != nrow(data$interval))
       error("interval_period as a vector must be the same length as the number of intervals")
   }
-  if (!is.factor(interval_period))
-    interval_period %<>% factor(levels = unique(interval_period))
 
   data$interval$Period <- interval_period
   data$interval %<>% dplyr::arrange_(~Interval)
+  data$interval$Period %<>% factor(levels = unique(.))
   data$period <- plyr::ddply(data$interval, "Period", dplyr::slice, 1)
   data$period %<>% dplyr::select_(~-Interval)
   data$period %<>% dplyr::select_(~Period, ~everything())
@@ -121,7 +120,6 @@ make_analysis_capture <- function(data) {
 }
 
 group_recaptures <- function (recapture) {
-  recapture$Recaptures <- nrow(recapture)
   if (nrow(recapture) == 1)
     return(recapture)
   is.na(recapture$SectionRecapture) <- TRUE
@@ -138,6 +136,7 @@ make_analysis_recapture <- function(data) {
   message("making analysis recapture...")
 
   data$recapture %<>% replace_interval_with_period(data, "Recapture")
+  data$recapture %<>% dplyr::mutate_(.dots = list(Recaptures = ~1L))
   data$recapture %<>% plyr::ddply(c("Capture", "PeriodRecapture"), group_recaptures)
   data
 }
@@ -177,39 +176,39 @@ last_movement <- function(data) {
   data.frame(Interval = data$IntervalDetection[whch[length(whch)]])
 }
 
-make_analysis_alive <- function(data) {
-  message("making analysis alive...")
-
-  intervals <- nrow(data$interval)
-  captures <- nrow(data$capture)
-  alive <- matrix(NA, nrow = captures, ncol = intervals)
-
-  data$capture %<>% dplyr::arrange_(~Capture)
-
-  for (i in 1:captures) {
-    alive[i, 1:data$capture$IntervalCapture[i]] <- TRUE
-  }
-  if (nrow(data$recapture)) {
-    for (i in 1:nrow(data$recapture)) {
-      alive[data$recapture$Capture[i], 1:data$recapture$IntervalRecapture[i]] <- TRUE
-    }
-    retained <- dplyr::filter_(data$recapture, ~!Released, ~IntervalRecapture < intervals)
-    if (nrow(retained)) {
-      for (i in 1:nrow(retained)) {
-        alive[retained$Capture[i], (retained$IntervalRecapture[i] + 1):intervals] <- FALSE
-      }
-    }
-  }
-  move <- plyr::ddply(data$detection, "Capture", last_movement)
-  move$Capture %<>% as.integer()
-  if (nrow(move)) {
-    for (i in 1:nrow(move)) {
-      alive[move$Capture[i], 1:move$Interval[i]] <- TRUE
-    }
-  }
-  data$alive <- alive
-  data
-}
+# make_analysis_alive <- function(data) {
+#   message("making analysis alive...")
+#
+#   intervals <- nrow(data$interval)
+#   captures <- nrow(data$capture)
+#   alive <- matrix(NA, nrow = captures, ncol = intervals)
+#
+#   data$capture %<>% dplyr::arrange_(~Capture)
+#
+#   for (i in 1:captures) {
+#     alive[i, 1:data$capture$IntervalCapture[i]] <- TRUE
+#   }
+#   if (nrow(data$recapture)) {
+#     for (i in 1:nrow(data$recapture)) {
+#       alive[data$recapture$Capture[i], 1:data$recapture$IntervalRecapture[i]] <- TRUE
+#     }
+#     retained <- dplyr::filter_(data$recapture, ~!Released, ~IntervalRecapture < intervals)
+#     if (nrow(retained)) {
+#       for (i in 1:nrow(retained)) {
+#         alive[retained$Capture[i], (retained$IntervalRecapture[i] + 1):intervals] <- FALSE
+#       }
+#     }
+#   }
+#   move <- plyr::ddply(data$detection, "Capture", last_movement)
+#   move$Capture %<>% as.integer()
+#   if (nrow(move)) {
+#     for (i in 1:nrow(move)) {
+#       alive[move$Capture[i], 1:move$Interval[i]] <- TRUE
+#     }
+#   }
+#   data$alive <- alive
+#   data
+# }
 
 make_analysis_detection <- function(data) {
   message("making analysis detection...")
@@ -276,11 +275,6 @@ make_analysis_data <-  function(
   data %<>% make_analysis_coverage()
   data %<>% make_analysis_detection()
   data %<>% cleanup_analysis_data()
-
-#  data %<>% make_analysis_alive()
-
-  # do factor to integers and logical to integers at end...
-  # capture, section, recapture
 
   data %<>% check_analysis_data()
   data
