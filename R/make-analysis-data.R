@@ -226,7 +226,7 @@ make_analysis_detection <- function(data) {
   detection$Periods[is.na(detection$Periods)] <- 0
 
   detection %<>% dplyr::group_by_(~PeriodDetection, ~Capture, ~Section) %>%
-    dplyr::summarise_(.dots = list(Periods = ~sum(Periods) / n())) %>% dplyr::ungroup()
+    dplyr::summarise_(.dots = list(Periods = ~mean(Periods))) %>% dplyr::ungroup()
 
   detection %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
                                       plyr::as.quoted(~PeriodDetection),

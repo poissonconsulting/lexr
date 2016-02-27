@@ -28,3 +28,9 @@ get_difftime.lex_data <- function(object) {
 get_difftime.detect_data <- function(object) {
   difftime(object$interval$DateTime[2], object$interval$DateTime[1])
 }
+
+#' @export
+get_difftime.analysis_data <- function(object) {
+  difftime(object$period$DateTime[2], object$period$DateTime[1])
+}
+

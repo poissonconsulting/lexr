@@ -52,3 +52,18 @@ summary.detect_data <- function(object, ...) {
 
   summary
 }
+
+#' @export
+summary.analysis_data <- function(object, ...) {
+  data <- object
+  summary <- list()
+  summary$number_sections <- nlevels(data$section$Section)
+  summary$number_captures <- nlevels(data$capture$Capture)
+  summary$number_recaptures <- nrow(data$recapture)
+  summary$number_periods <- nrow(data$period)
+  summary$time_difference <- get_difftime(data)
+  summary$start_datetime <- data$period$DateTime[1]
+  summary$end_datetime <- data$period$DateTime[nrow(data$period)]
+
+  summary
+}
