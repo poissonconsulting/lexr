@@ -15,7 +15,7 @@ check_analysis_distance <- function(distance) {
   if (!is.integer(distance)) error("distance must be an integer matrix")
   if (any(is.na(distance))) error("distance must not have missing values")
   if (any(distance < 0)) error("distance must be 0 or greater")
-  if (!isSymmetric(distance)) error("distance must be symmetric")
+  if (!isSymmetric(unname(distance))) error("distance must be symmetric")
 
   invisible(distance)
 }
@@ -87,6 +87,12 @@ check_analysis_detection <- function(detection) {
   detection
 }
 
+check_analysis_alive <- function(alive) {
+  if (!is.matrix(alive)) error("alive must be a matrix")
+  if (!is.logical(alive)) error("alive must be a logical matrix")
+
+  alive
+}
 
 check_detect_dims <- function(data) {
   nsection <- nrow(data$section)
@@ -96,10 +102,12 @@ check_detect_dims <- function(data) {
   stopifnot(identical(dim(data$distance), c(nsection, nsection)))
   stopifnot(identical(dim(data$coverage), c(nsection, nperiod)))
   stopifnot(identical(dim(data$detection), c(ncapture, nperiod, nsection)))
+  stopifnot(identical(dim(data$alive), c(ncapture, nperiod)))
 
   stopifnot(all(!is.null(dimnames(data$distance))))
   stopifnot(all(!is.null(dimnames(data$coverage))))
   stopifnot(all(!is.null(dimnames(data$detection))))
+  stopifnot(all(!is.null(dimnames(data$alive))))
 
   invisible(data)
 }

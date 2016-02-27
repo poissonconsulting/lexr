@@ -52,7 +52,7 @@ make_analysis_distance <- function(data) {
 
   sections <- levels(data$distance$SectionFrom)
   data$distance %<>% dplyr::arrange_(~SectionFrom, ~SectionTo)
-  distance <- matrix(data$distance$Distance, nrow = length(sections), ncol = length(sections), dimnames = list(sections, sections))
+  distance <- matrix(data$distance$Distance, nrow = length(sections), ncol = length(sections), dimnames = list(SectionFrom = sections, SectionTo = sections))
 
   data$distance <- distance
   data
@@ -61,7 +61,7 @@ make_analysis_distance <- function(data) {
 rounded_hours <- function (x) {
   stopifnot(lubridate::is.difftime(x))
   x %<>% lubridate::as.duration() %>% as.integer() %>%
-        magrittr::divide_by(60 * 60) %>% round()
+    magrittr::divide_by(60 * 60) %>% round()
   x
 }
 
@@ -73,7 +73,7 @@ make_analysis_interval <- function(data, interval_period) {
     if (interval_period < get_difftime(data)) error("interval_period as a difftime must not be less than data's")
     if (interval_period > lubridate::make_difftime(60 * 60 * 24 * 28)) error("interval_period as a difftime must not be greater than 28 days")
     if (interval_period == get_difftime(data)) {
-        interval_period <- data$interval$Interval
+      interval_period <- data$interval$Interval
     } else {
       interval_period %<>% rounded_hours()
       difftime <- get_difftime(data) %>% rounded_hours()
@@ -101,6 +101,16 @@ make_analysis_interval <- function(data, interval_period) {
   data
 }
 
+last_movement <- function(data) {
+  if (nrow(data) == 1)
+    return(NULL)
+  data %<>% dplyr::arrange_(~IntervalDetection)
+  # can only assume alive at the section it moved from
+  data$Move <- c(diff(as.integer(data$Section)) != 0, FALSE)
+  whch <- which(data$Move)
+  data.frame(Interval = data$IntervalDetection[whch[length(whch)]])
+}
+
 replace_interval_with_period <- function(x, data, suffix = "") {
   interval <- data$interval
   if (!identical(suffix, "")) {
@@ -112,6 +122,50 @@ replace_interval_with_period <- function(x, data, suffix = "") {
   x %<>% dplyr::left_join(interval, by = by)
   x[paste0("Interval", suffix)] <- NULL
   x
+}
+
+make_analysis_alive <- function(data) {
+  message("making analysis alive...")
+
+  intervals <- nrow(data$interval)
+  captures <- nrow(data$capture)
+  alive <- matrix(NA, nrow = captures, ncol = intervals)
+  dimnames(alive) <- list(Capture = data$capture$Capture, Interval = data$interval$Interval)
+
+  data$capture %<>% dplyr::arrange_(~Capture)
+
+  for (i in 1:captures) {
+    alive[i, 1:data$capture$IntervalCapture[i]] <- TRUE
+  }
+  if (nrow(data$recapture)) {
+    for (i in 1:nrow(data$recapture)) {
+      alive[data$recapture$Capture[i], 1:data$recapture$IntervalRecapture[i]] <- TRUE
+    }
+    retained <- dplyr::filter_(data$recapture, ~!Released, ~IntervalRecapture < intervals)
+    if (nrow(retained)) {
+      for (i in 1:nrow(retained)) {
+        alive[retained$Capture[i], (retained$IntervalRecapture[i] + 1):intervals] <- FALSE
+      }
+    }
+  }
+  move <- plyr::ddply(data$detection, "Capture", last_movement)
+  move$Capture %<>% as.integer()
+  if (nrow(move)) {
+    for (i in 1:nrow(move)) {
+      alive[move$Capture[i], 1:move$Interval[i]] <- TRUE
+    }
+  }
+  alive %<>% reshape2::melt(as.is = TRUE, value.name = "Alive")
+  alive$Capture %<>% factor(levels = levels(data$capture$Capture))
+  alive$Interval %<>% as.integer()
+  alive %<>% replace_interval_with_period(data)
+  alive %<>% dplyr::group_by_(~Capture, ~Period) %>%
+    dplyr::summarise_(.dots = list(Alive = ~any(Alive))) %>% dplyr::ungroup()
+  alive %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
+                                  plyr::as.quoted(~Period)), value.var = "Alive")
+  dimnames(alive) <- list(Capture = data$capture$Capture, Period = data$period$Period)
+  data$alive <- alive
+  data
 }
 
 make_analysis_capture <- function(data) {
@@ -166,54 +220,10 @@ make_analysis_coverage <- function(data) {
   coverage %<>% tidyr::spread_("Period", "Coverage")
   coverage$Section <- NULL
   coverage %<>% as.matrix()
-  dimnames(coverage) <- list(data$section$Section, data$period$Period)
+  dimnames(coverage) <- list(Section = data$section$Section, Period = data$period$Period)
   data$coverage <- coverage
   data
 }
-
-# last_movement <- function(data) {
-#   if (nrow(data) == 1)
-#     return(NULL)
-#   data %<>% dplyr::arrange_(~IntervalDetection)
-#   # can only assume alive at the section it moved from
-#   data$Move <- c(diff(as.integer(data$Section)) != 0, FALSE)
-#   whch <- which(data$Move)
-#   data.frame(Interval = data$IntervalDetection[whch[length(whch)]])
-# }
-
-# make_analysis_alive <- function(data) {
-#   message("making analysis alive...")
-#
-#   intervals <- nrow(data$interval)
-#   captures <- nrow(data$capture)
-#   alive <- matrix(NA, nrow = captures, ncol = intervals)
-#
-#   data$capture %<>% dplyr::arrange_(~Capture)
-#
-#   for (i in 1:captures) {
-#     alive[i, 1:data$capture$IntervalCapture[i]] <- TRUE
-#   }
-#   if (nrow(data$recapture)) {
-#     for (i in 1:nrow(data$recapture)) {
-#       alive[data$recapture$Capture[i], 1:data$recapture$IntervalRecapture[i]] <- TRUE
-#     }
-#     retained <- dplyr::filter_(data$recapture, ~!Released, ~IntervalRecapture < intervals)
-#     if (nrow(retained)) {
-#       for (i in 1:nrow(retained)) {
-#         alive[retained$Capture[i], (retained$IntervalRecapture[i] + 1):intervals] <- FALSE
-#       }
-#     }
-#   }
-#   move <- plyr::ddply(data$detection, "Capture", last_movement)
-#   move$Capture %<>% as.integer()
-#   if (nrow(move)) {
-#     for (i in 1:nrow(move)) {
-#       alive[move$Capture[i], 1:move$Interval[i]] <- TRUE
-#     }
-#   }
-#   data$alive <- alive
-#   data
-# }
 
 make_analysis_detection <- function(data) {
   message("making analysis detection...")
@@ -226,7 +236,7 @@ make_analysis_detection <- function(data) {
 
   detection$Periods <- 1
   detection %<>% dplyr::left_join(all, .,
-                                by = c("PeriodDetection", "Capture", "Section"))
+                                  by = c("PeriodDetection", "Capture", "Section"))
 
   detection$Periods[is.na(detection$Periods)] <- 0
 
@@ -236,7 +246,9 @@ make_analysis_detection <- function(data) {
   detection %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
                                       plyr::as.quoted(~PeriodDetection),
                                       plyr::as.quoted(~Section)), value.var = "Periods")
-  dimnames(detection) <- list(data$capture$Capture, data$period$Period, data$section$Section)
+  dimnames(detection) <- list(Capture = data$capture$Capture,
+                              Period = data$period$Period,
+                              Section = data$section$Section)
   data$detection <- detection
   data
 }
@@ -275,6 +287,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_distance()
 
   data %<>% make_analysis_interval(interval_period)
+  data %<>% make_analysis_alive()
 
   data %<>% make_analysis_capture()
   data %<>% make_analysis_recapture()
