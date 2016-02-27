@@ -7,5 +7,7 @@
 ^qlex$
 ^kdetect$
 ^qdetect$
+^kanalysis$
+^qanalysis$
 ^README\.Rmd$
 ^README-.*\.png$

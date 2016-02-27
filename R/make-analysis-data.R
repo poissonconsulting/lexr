@@ -228,8 +228,9 @@ make_analysis_detection <- function(data) {
   detection %<>% dplyr::group_by_(~PeriodDetection, ~Capture, ~Section) %>%
     dplyr::summarise_(.dots = list(Periods = ~sum(Periods) / n())) %>% dplyr::ungroup()
 
-  detection %<>% reshape2::acast(list(.(Capture), .(PeriodDetection), .(Section)),
-                                 value.var = "Periods")
+  detection %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
+                                      plyr::as.quoted(~PeriodDetection),
+                                      plyr::as.quoted(~Section)), value.var = "Periods")
   dimnames(detection) <- list(data$capture$Capture, data$period$Period, data$section$Section)
   data$detection <- detection
   data

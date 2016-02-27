@@ -25,8 +25,8 @@ plot_fish <- function(detection, section, capture, recapture, period) {
   recapture$Released %<>% factor()
   levels(recapture$Released) %<>% list(Released = "TRUE", Retained = "FALSE")
 
-  period %<>% dplyr::slice(c(1,n()))
-  section %<>% dplyr::slice(c(1,n()))
+  period %<>% dplyr::slice(c(1,nrow(.)))
+  section %<>% dplyr::slice(c(1,nrow(.)))
   blank <- dplyr::bind_cols(section, period)
 
   gp <- ggplot2::ggplot(data = detection, ggplot2::aes_string(x = "DateTime", y = "UTM / 1000")) +

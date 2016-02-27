@@ -11,7 +11,7 @@ check_lex_section <- function(section) {
                  EastingSection = 1,
                  NorthingSection = 1)
 
-  datacheckr::check_data3(section@data, values, key = "Section", select = TRUE)
+  check_data3(section@data, values, key = "Section", select = TRUE)
   invisible(section)
 }
 
@@ -21,7 +21,7 @@ check_lex_station <- function(station) {
                  EastingStation = 1,
                  NorthingStation = 1)
 
-  datacheckr::check_data3(station, values, key = "Station", select = TRUE)
+  check_data3(station, values, key = "Station", select = TRUE)
 }
 
 check_lex_deployment <- function(deployment) {
@@ -31,7 +31,7 @@ check_lex_deployment <- function(deployment) {
                   DateTimeReceiverIn = Sys.time(),
                   DateTimeReceiverOut = Sys.time())
 
-  datacheckr::check_data3(deployment, values,
+  check_data3(deployment, values,
                           key = c("Station", "Receiver", "DateTimeReceiverIn"), select = TRUE)
   deployment %<>% dplyr::arrange_(~DateTimeReceiverIn, ~DateTimeReceiverOut, ~Station)
   invisible(deployment)
@@ -49,7 +49,7 @@ check_lex_capture <- function(capture) {
                  DateTimeTagExpire = Sys.time(),
                  DepthRangeTag = c(1L, NA))
 
-  datacheckr::check_data3(capture, values, key = "Capture", select = TRUE)
+  check_data3(capture, values, key = "Capture", select = TRUE)
   capture %<>% dplyr::arrange_(~DateTimeCapture, ~Capture)
   invisible(capture)
 }
@@ -64,7 +64,7 @@ check_lex_recapture <- function(recapture) {
                  Released = TRUE,
                  Public = TRUE)
 
-  datacheckr::check_data3(recapture, values, select = TRUE)
+  check_data3(recapture, values, select = TRUE)
   recapture %<>% dplyr::arrange_(~DateTimeRecapture, ~Capture)
   invisible(recapture)
 }
@@ -74,9 +74,9 @@ check_lex_detection <- function(detection) {
   values <- list(DateTimeDetection = Sys.time(),
                  Capture = factor(1),
                  Receiver = factor(1),
-                 Detections = c(3L, datacheckr::max_integer()))
+                 Detections = c(3L, max_integer()))
 
-  datacheckr::check_data3(detection, values, key = c("DateTimeDetection", "Capture", "Receiver"),
+  check_data3(detection, values, key = c("DateTimeDetection", "Capture", "Receiver"),
                           select = TRUE)
   detection %<>% dplyr::arrange_(~DateTimeDetection, ~Capture, ~Receiver)
   if (!identical(get_difftime(detection$DateTimeDetection),
@@ -93,7 +93,7 @@ check_lex_depth <- function(depth) {
     Receiver = factor(1),
     Depth = c(0, 340))
 
-  datacheckr::check_data3(depth, values, key = c("DateTimeDepth", "Capture", "Receiver"),
+  check_data3(depth, values, key = c("DateTimeDepth", "Capture", "Receiver"),
                           select = TRUE)
   depth %<>% dplyr::arrange_(~DateTimeDepth, ~Capture, ~Receiver)
   invisible(depth)
@@ -101,14 +101,14 @@ check_lex_depth <- function(depth) {
 
 check_lex_joins <- function(data) {
 
-  datacheckr::check_join(data$station, data$section@data, "Section")
-  datacheckr::check_join(data$deployment,  data$station, "Station")
-  datacheckr::check_join(data$capture,  data$section@data, c(SectionCapture = "Section"))
-  datacheckr::check_join(data$recapture,  data$capture, "Capture")
-  datacheckr::check_join(data$recapture,  data$section@data,
+  check_join(data$station, data$section@data, "Section")
+  check_join(data$deployment,  data$station, "Station")
+  check_join(data$capture,  data$section@data, c(SectionCapture = "Section"))
+  check_join(data$recapture,  data$capture, "Capture")
+  check_join(data$recapture,  data$section@data,
                          c(SectionRecapture = "Section"), ignore_nas = TRUE)
-  datacheckr::check_join(data$detection,  data$capture, "Capture")
-  datacheckr::check_join(data$depth,  data$capture, "Capture")
+  check_join(data$detection,  data$capture, "Capture")
+  check_join(data$depth,  data$capture, "Capture")
 
   stopifnot(all(data$detection$Receiver %in% data$deployment$Receiver))
   stopifnot(all(data$depth$Receiver %in% data$deployment$Receiver))
@@ -141,7 +141,7 @@ check_lex_deployment_detection <- function(deployment, detection) {
 #' @export
 check_lex_data <- function(data, all = FALSE) {
   if (!inherits(data, "lex_data")) error("data must be a lex_data object")
-  datacheckr::check_flag(all)
+  check_flag(all)
   if (!identical(names(data), lex_data_names())) error("data must have correct names")
   data %<>% purrr::lmap(fun_data_name, fun = "check_lex")
   check_lex_joins(data)

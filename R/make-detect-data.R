@@ -269,8 +269,8 @@ make_detection <- function(data) {
   capture <- dplyr::select_(data$capture, .dots = list(
     IntervalDetection = "IntervalCapture", Section = "SectionCapture", Capture = "Capture"))
 
-  capture %<>% dplyr::mutate_(.dots = list(Receivers = datacheckr::max_integer(),
-                                           Detections = datacheckr::max_integer()))
+  capture %<>% dplyr::mutate_(.dots = list(Receivers = max_integer(),
+                                           Detections = max_integer()))
 
   detection %<>% dplyr::bind_rows(capture)
 
@@ -279,7 +279,7 @@ make_detection <- function(data) {
   detection %<>% plyr::ddply("Capture", set_jumps, data$distance)
   detection %<>% dplyr::select_(~IntervalDetection, ~Section, ~Capture, ~Receivers,
                                 ~Detections, ~Sections, ~Jump)
-  detection %<>% dplyr::filter_(~Receivers <  datacheckr::max_integer())
+  detection %<>% dplyr::filter_(~Receivers < max_integer())
   data$detection <- dplyr::as.tbl(detection)
   data
 }

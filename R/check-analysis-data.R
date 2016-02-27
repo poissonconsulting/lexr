@@ -1,5 +1,5 @@
 check_analysis_section <- function(section) {
-  datacheckr::check_data3(
+  check_data3(
     section, list(Section = factor(1),
                   Habitat = factor(1),
                   Area = c(0, 100),
@@ -21,7 +21,7 @@ check_analysis_distance <- function(distance) {
 }
 
 check_analysis_period <- function(period) {
-  datacheckr::check_data3(
+  check_data3(
     period, list(Period = factor(1),
                    Date = as.Date("2000-01-01"),
                    Year = c(2000L, 2030L),
@@ -33,7 +33,7 @@ check_analysis_period <- function(period) {
 }
 
 check_analysis_interval <- function(interval) {
-  datacheckr::check_data3(
+  check_data3(
     interval, list(Interval = 1L,
                    Period = factor(1)),
     key = c("Interval"), select = TRUE)
@@ -50,7 +50,7 @@ check_analysis_coverage <- function(coverage) {
 }
 
 check_analysis_capture <- function(capture) {
-  datacheckr::check_data3(
+  check_data3(
     capture, list(Capture = factor(1),
                   Species = factor(1),
                   PeriodCapture = factor(1),
@@ -63,7 +63,7 @@ check_analysis_capture <- function(capture) {
 }
 
 check_analysis_recapture <- function(recapture) {
-  datacheckr::check_data3(
+  check_data3(
     recapture, list(PeriodRecapture = factor(1),
                   Capture = factor(1),
                   SectionRecapture = factor(c(1, NA)),

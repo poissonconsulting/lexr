@@ -126,7 +126,7 @@ plot_lex_receiver_detection <- function (deployment, detection) {
 
 #' @export
 plot.lex_data <- function(x, all = FALSE, ...) {
-  datacheckr::check_flag(all)
+  check_flag(all)
   y <- purrr::lmap(x, fun_data_name, fun = "plot_lex")
   lapply(y, print)
   if (all) {
