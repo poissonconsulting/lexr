@@ -80,7 +80,8 @@ make_analysis_interval <- function(data, interval_period) {
       if (interval_period %% difftime != 0)
         error("interval_period as a difftime must be a multiple of data's")
       interval_period <- interval_period / difftime
-      interval_period <- rep(1:(nrow(data$interval) / interval_period), each = interval_period)
+      interval_period <- rep(1:ceiling(nrow(data$interval) / interval_period), each = interval_period)
+      interval_period <- interval_period[1:nrow(data$interval)]
     }
   } else {
     if (length(interval_period) != nrow(data$interval))
