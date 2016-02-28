@@ -91,7 +91,8 @@ make_analysis_interval <- function(data, interval_period) {
   data$interval$Period <- interval_period
   data$interval %<>% dplyr::arrange_(~Interval)
   data$interval$Period %<>% factor(levels = unique(.))
-  data$period <- plyr::ddply(data$interval, "Period", dplyr::slice, 1)
+  data$period <- plyr::ddply(data$interval, "Period", function(x) {x$Intervals = nrow(x); x})
+  data$period %<>% plyr::ddply("Period", dplyr::slice, 1)
   data$period %<>% dplyr::select_(~-Interval)
   data$period %<>% dplyr::select_(~Period, ~everything())
   data$interval %<>% dplyr::select_(~Period, ~Interval)

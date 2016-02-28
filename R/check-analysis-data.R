@@ -28,7 +28,8 @@ check_analysis_period <- function(period) {
                    Month = c(1L, 12L),
                    Hour = c(0L, 23L),
                    DayteTime = Sys.time(),
-                   DateTime = Sys.time()),
+                   DateTime = Sys.time(),
+                   Intervals = c(1L, max_integer())),
     key = c("Period"), select = TRUE)
 }
 
