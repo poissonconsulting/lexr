@@ -2,6 +2,7 @@
 
 # ensure required packages are loaded
 library(ggplot2)
+library(lubridate)
 library(qlexdatr)
 library(lexr)
 
@@ -17,6 +18,7 @@ qdetect <- make_detect_data(qlex, hourly_interval = 6L, end_date = as.Date("2015
 summary(qdetect)
 
 qanalysis <- make_analysis_data(qdetect, interval_period = make_difftime(60 * 60 * 24 * 7 * 4))
+summary(qanalysis)
 
 plot_data_dir(qlex, all = TRUE)
 plot_data_dir(qdetect, all = TRUE)

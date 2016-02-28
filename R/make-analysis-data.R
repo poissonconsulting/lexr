@@ -4,7 +4,7 @@ filter_detect_captures_section <- function(data, capture, section) {
 
   data$distance %<>% dplyr::filter_(~SectionFrom %in% section@data$Section)
   data$distance %<>% dplyr::filter_(~SectionTo %in% section@data$Section)
-  data$coverage <- data$coverage[data$coverage$Section  %in% section@data$Section,]
+  data$coverage <- data$coverag[data$coverage$Section  %in% section@data$Section,]
   data$capture %<>% dplyr::filter_(~SectionCapture %in% section@data$Section)
   data$detection <- data$detection[data$detection$Section  %in% section@data$Section,]
 
@@ -52,7 +52,8 @@ make_analysis_distance <- function(data) {
 
   sections <- levels(data$distance$SectionFrom)
   data$distance %<>% dplyr::arrange_(~SectionFrom, ~SectionTo)
-  distance <- matrix(data$distance$Distance, nrow = length(sections), ncol = length(sections), dimnames = list(SectionFrom = sections, SectionTo = sections))
+  distance <- matrix(data$distance$Distance, nrow = length(sections), ncol = length(sections))
+  dimnames(distance) <- list(SectionFrom = sections, SectionTo = sections)
 
   data$distance <- distance
   data
@@ -68,6 +69,8 @@ rounded_hours <- function (x) {
 make_analysis_interval <- function(data, interval_period) {
   message("making analysis interval...")
 
+  diff_hours <- get_difftime(data) %>% rounded_hours()
+
   if (lubridate::is.difftime(interval_period)) {
     if (length(interval_period) != 1) error("interval_period as a difftime must be length 1")
     if (interval_period < get_difftime(data)) error("interval_period as a difftime must not be less than data's")
@@ -76,10 +79,9 @@ make_analysis_interval <- function(data, interval_period) {
       interval_period <- data$interval$Interval
     } else {
       interval_period %<>% rounded_hours()
-      difftime <- get_difftime(data) %>% rounded_hours()
-      if (interval_period %% difftime != 0)
+      if (interval_period %% diff_hours != 0)
         error("interval_period as a difftime must be a multiple of data's")
-      interval_period <- interval_period / difftime
+      interval_period <- interval_period / diff_hours
       interval_period <- rep(1:ceiling(nrow(data$interval) / interval_period), each = interval_period)
       interval_period <- interval_period[1:nrow(data$interval)]
     }
@@ -91,7 +93,7 @@ make_analysis_interval <- function(data, interval_period) {
   data$interval$Period <- interval_period
   data$interval %<>% dplyr::arrange_(~Interval)
   data$interval$Period %<>% factor(levels = unique(.))
-  data$period <- plyr::ddply(data$interval, "Period", function(x) {x$Intervals = nrow(x); x})
+  data$period <- plyr::ddply(data$interval, "Period", function(x) {x$Days = nrow(x) * diff_hours /24 ; x})
   data$period %<>% plyr::ddply("Period", dplyr::slice, 1)
   data$period %<>% dplyr::select_(~-Interval)
   data$period %<>% dplyr::select_(~Period, ~everything())
@@ -131,7 +133,7 @@ make_analysis_alive <- function(data) {
   intervals <- nrow(data$interval)
   captures <- nrow(data$capture)
   alive <- matrix(NA, nrow = captures, ncol = intervals)
-  dimnames(alive) <- list(Capture = data$capture$Capture, Interval = data$interval$Interval)
+  dimnames(alive) <- list(Capture = levels(data$capture$Capture), Interval = levels(data$interval$Interval))
 
   data$capture %<>% dplyr::arrange_(~Capture)
 
@@ -165,7 +167,7 @@ make_analysis_alive <- function(data) {
   alive %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
                                   plyr::as.quoted(~Period)),
                              drop = FALSE, value.var = "Alive")
-  dimnames(alive) <- list(Capture = data$capture$Capture, Period = data$period$Period)
+  dimnames(alive) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
   data$alive <- alive
   data
 }
@@ -186,7 +188,7 @@ make_analysis_length <- function(data) {
   periods <- nrow(data$period)
 
   length <- matrix(NA, nrow = captures, ncol = periods)
-  dimnames(length) <- list(Capture = data$capture$Capture, Period = data$period$Period)
+  dimnames(length) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
 
   for (i in 1:captures) {
     length[data$capture$Capture[i],] <- data$capture$Length[i]
@@ -227,7 +229,7 @@ make_analysis_reported <- function(data) {
   reported %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
                                      plyr::as.quoted(~PeriodRecapture)),
                                 fill = FALSE, drop = FALSE, value.var = "Reported")
-  dimnames(reported) <- list(Capture = data$capture$Capture, Period = data$period$Period)
+  dimnames(reported) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
   data$reported <- reported
   data
 }
@@ -239,7 +241,7 @@ make_analysis_released <- function(data) {
   released %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
                                      plyr::as.quoted(~PeriodRecapture)),
                                 fill = NA, drop = FALSE, value.var = "Released")
-  dimnames(released) <- list(Capture = data$capture$Capture, Period = data$period$Period)
+  dimnames(released) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
   data$released <- released
   data
 }
@@ -251,7 +253,7 @@ make_analysis_tags <- function(data) {
   periods <- nrow(data$period)
 
   tags <- array(NA, dim = c(captures, periods, 2))
-  dimnames(tags) <- list(Capture = data$capture$Capture, Period = data$period$Period,
+  dimnames(tags) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period),
                          Tag = c("TBarTag1","TBarTag2"))
 
   for (i in 1:nrow(data$capture)) {
@@ -293,7 +295,7 @@ make_analysis_reward <- function(data) {
   captures <- nrow(data$capture)
 
   reward <- matrix(nrow = captures, ncol = 2)
-  dimnames(reward) <- list(Captures = data$capture$Capture, Tag = c("TBarTag1","TBarTag2"))
+  dimnames(reward) <- list(Captures = levels(data$capture$Capture), Tag = c("TBarTag1","TBarTag2"))
 
   for (i in 1:nrow(data$capture)) {
     reward[data$capture$Capture[i],1] <- data$capture$Reward1[i]
@@ -320,10 +322,11 @@ make_analysis_coverage <- function(data) {
   coverage %<>% dplyr::group_by_(~Section, ~Period) %>%
     dplyr::summarise_(.dots = list(Coverage = ~mean(Coverage))) %>% dplyr::ungroup()
 
-  coverage %<>% tidyr::spread_("Period", "Coverage")
-  coverage$Section <- NULL
-  coverage %<>% as.matrix()
-  dimnames(coverage) <- list(Section = data$section$Section, Period = data$period$Period)
+  coverage %<>% reshape2::acast(list(plyr::as.quoted(~Section),
+                                      plyr::as.quoted(~Period)),
+                                 value.var = "Coverage")
+
+  dimnames(coverage) <- list(Section = levels(data$section$Section), Period = levels(data$period$Period))
   data$coverage <- coverage
   data
 }
@@ -350,9 +353,9 @@ make_analysis_detection <- function(data) {
                                       plyr::as.quoted(~PeriodDetection),
                                       plyr::as.quoted(~Section)),
                                  drop = FALSE, value.var = "Periods")
-  dimnames(detection) <- list(Capture = data$capture$Capture,
-                              Period = data$period$Period,
-                              Section = data$section$Section)
+  dimnames(detection) <- list(Capture = levels(data$capture$Capture),
+                              Period = levels(data$period$Period),
+                              Section = levels(data$section$Section))
   data$detection <- detection
   data
 }

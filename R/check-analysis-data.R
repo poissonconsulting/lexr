@@ -29,7 +29,7 @@ check_analysis_period <- function(period) {
                    Hour = c(0L, 23L),
                    DayteTime = Sys.time(),
                    DateTime = Sys.time(),
-                   Intervals = c(1L, max_integer())),
+                   Days = c(1/24, 366)),
     key = c("Period"), select = TRUE)
 }
 

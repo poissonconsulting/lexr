@@ -16,25 +16,37 @@ plot_analysis_coverage <- function (coverage, section, period) {
     ggplot2::scale_fill_identity()
 }
 
-plot_analysis_alive <- function (alive, capture, period) {
-  alive %<>% reshape2::melt(as.is = TRUE, value.name = "Alive")
-  alive$Capture %<>% factor(levels = levels(capture$Capture))
-  alive$Period %<>% factor(levels = levels(period$Period))
+plot_analysis_logical_matrix <- function(x, value, capture, period) {
+  x %<>% reshape2::melt(as.is = TRUE, value.name = value)
+  x$Capture %<>% factor(levels = levels(capture$Capture))
+  x$Period %<>% factor(levels = levels(period$Period))
 
-  alive %<>% dplyr::inner_join(capture, by = "Capture")
-  alive %<>% dplyr::inner_join(period, by = "Period")
+  x %<>% dplyr::inner_join(capture, by = "Capture")
+  x %<>% dplyr::inner_join(period, by = "Period")
 
-  ggplot2::ggplot(data = alive, ggplot2::aes_(x = ~DateTime, y = ~Capture)) +
+  ggplot2::ggplot(data = x, ggplot2::aes_(x = ~DateTime, y = ~Capture)) +
     ggplot2::facet_grid(Species~. , scales = "free_y", space = "free_y") +
-    ggplot2::geom_point(ggplot2::aes_(shape = ~Alive, color = ~Alive)) +
+    ggplot2::geom_point(ggplot2::aes_string(shape = value, color = value)) +
     ggplot2::scale_x_datetime(name = "Year", date_breaks = "1 year", date_labels = "%Y") +
     ggplot2::scale_color_manual(values = c("red", "black")) +
+    ggplot2::scale_shape_manual(values = c(17, 16)) +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.minor.y = ggplot2::element_blank(),
                    axis.text.y = ggplot2::element_blank(),
                    axis.ticks.y = ggplot2::element_blank())
 }
 
+plot_analysis_alive <- function (alive, capture, period) {
+  plot_analysis_logical_matrix(alive, "Alive", capture, period)
+}
+
+plot_analysis_reported <- function (reported, capture, period) {
+  plot_analysis_logical_matrix(reported, "Reported", capture, period)
+}
+
+plot_analysis_released <- function (released, capture, period) {
+  plot_analysis_logical_matrix(released, "Released", capture, period)
+}
 
 plot_fish <- function(detection, section, capture, recapture, period) {
   tz <- lubridate::tz(detection$DateTime)
@@ -116,6 +128,8 @@ plot_analysis_fish <- function(capture, recapture, detection, section, period) {
 #' @export
 plot.analysis_data <- function(x, all = FALSE, ...) {
   print(plot_analysis_coverage(x$coverage, x$section, x$period))
+  print(plot_analysis_reported(x$reported, x$capture, x$period))
+  print(plot_analysis_released(x$released, x$capture, x$period))
   print(plot_analysis_alive(x$alive, x$capture, x$period))
   if (all) {
     plot_analysis_fish(x$capture, x$recapture, x$detection, x$section, x$period)
