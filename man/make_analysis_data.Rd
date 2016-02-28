@@ -34,7 +34,8 @@ whether it was reported to have been recaught during the period.
 released is a logical matrix indicating for each individual-period whether it
 was released during the period.
 tags is a logical array indicating for each individual-period-tbartag whether
-it was attached to
+it was attached at the start of the period (note considered attached at the
+start of the period during which first caught).
 }
 \details{
 If a difftime element, interval_period cannot be greater than 28 days

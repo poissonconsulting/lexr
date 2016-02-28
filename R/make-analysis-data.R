@@ -149,7 +149,7 @@ group_recaptures <- function (recapture) {
   recapture$TBarTag1 <- any(recapture$TBarTag1)
   recapture$TBarTag2 <- any(recapture$TBarTag2)
   recapture$TagsRemoved <- any(recapture$TagsRemoved)
-  recapture$Released <- all(recapture$TagsRemoved)
+  recapture$Released <- all(recapture$Released)
   recapture$Public <- any(recapture$Public)
 
   dplyr::slice(recapture, 1)
@@ -198,7 +198,8 @@ make_analysis_tags <- function(data) {
   periods <- nrow(data$period)
 
   tags <- array(NA, dim = c(captures, periods, 2))
-  dimnames(tags) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period),
+  dimnames(tags) <- list(Capture = levels(data$capture$Capture),
+                         Period = levels(data$period$Period),
                          Tag = c("TBarTag1","TBarTag2"))
 
   for (i in 1:nrow(data$capture)) {
@@ -213,14 +214,13 @@ make_analysis_tags <- function(data) {
 
   if (nrow(data$recapture)) {
     for (i in 1:nrow(data$recapture)) {
+      period_capture <- data$capture$PeriodCapture[data$capture$Capture == data$recapture$Capture[i]]
       if (data$recapture$TBarTag1[i]) {
-        period_capture <- data$capture$PeriodCapture[data$capture$Capture == data$recapture$Capture[i]]
         tags[data$recapture$Capture[i],as.integer(period_capture):as.integer(data$recapture$PeriodRecapture[i]),1] <- TRUE
       } else {
         tags[data$recapture$Capture[i],as.integer(data$recapture$PeriodRecapture[i]),1] <- FALSE
       }
       if (data$recapture$TBarTag2[i]) {
-        period_capture <- data$capture$PeriodCapture[data$capture$Capture == data$recapture$Capture[i]]
         tags[data$recapture$Capture[i],as.integer(period_capture):as.integer(data$recapture$PeriodRecapture[i]),2] <- TRUE
       } else {
         tags[data$recapture$Capture[i],as.integer(data$recapture$PeriodRecapture[i]),2] <- FALSE
@@ -268,8 +268,8 @@ make_analysis_coverage <- function(data) {
     dplyr::summarise_(.dots = list(Coverage = ~mean(Coverage))) %>% dplyr::ungroup()
 
   coverage %<>% reshape2::acast(list(plyr::as.quoted(~Section),
-                                      plyr::as.quoted(~Period)),
-                                 value.var = "Coverage")
+                                     plyr::as.quoted(~Period)),
+                                value.var = "Coverage")
 
   dimnames(coverage) <- list(Section = levels(data$section$Section), Period = levels(data$period$Period))
   data$coverage <- coverage
@@ -344,7 +344,8 @@ cleanup_analysis_data <- function (data) {
 #' released is a logical matrix indicating for each individual-period whether it
 #' was released during the period.
 #' tags is a logical array indicating for each individual-period-tbartag whether
-#' it was attached to
+#' it was attached at the start of the period (note considered attached at the
+#' start of the period during which first caught).
 #'
 #' @details If a difftime element, interval_period cannot be greater than 28 days
 #' i.e. \code{lubridate::make_difftime(60 * 60 * 24 * 28)}.

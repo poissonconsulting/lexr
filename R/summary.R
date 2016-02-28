@@ -61,7 +61,7 @@ summary.analysis_data <- function(object, ...) {
   summary$number_captures <- nlevels(data$capture$Capture)
   summary$number_recaptures <- nrow(data$recapture)
   summary$number_periods <- nrow(data$period)
-  summary$time_difference <- get_difftime(data)
+  summary$mean_time_difference_days <- mean(data$period$Days)
   summary$start_datetime <- data$period$DateTime[1]
   summary$end_datetime <- data$period$DateTime[nrow(data$period)]
 

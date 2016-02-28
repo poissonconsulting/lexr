@@ -65,6 +65,8 @@ check_lex_recapture <- function(recapture) {
                  Public = TRUE)
 
   check_data3(recapture, values, select = TRUE)
+  if(any(!recapture$Released & !recapture$TagsRemoved))
+    error("all non-released recaptures must have had their tags removed!")
   recapture %<>% dplyr::arrange_(~DateTimeRecapture, ~Capture)
   invisible(recapture)
 }
