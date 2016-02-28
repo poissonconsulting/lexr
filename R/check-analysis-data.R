@@ -55,9 +55,16 @@ check_analysis_capture <- function(capture) {
                   Species = factor(1),
                   PeriodCapture = factor(1),
                   SectionCapture = factor(1),
-                  Length = c(200L, 1000L),
                   PeriodTagExpire = factor(1)),
     key = "Capture", select = TRUE)
+}
+
+check_analysis_length <- function(length) {
+  if (!is.matrix(length)) error("length must be a matrix")
+  if (!is.integer(length)) error("length must be an integer matrix")
+  if (any(is.na(length))) error("length must not have missing values")
+
+  length
 }
 
 check_analysis_recapture <- function(recapture) {
@@ -113,6 +120,7 @@ check_detect_dims <- function(data) {
   stopifnot(identical(dim(data$alive), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$reported), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$released), c(ncapture, nperiod)))
+  stopifnot(identical(dim(data$length), c(ncapture, nperiod)))
 
   stopifnot(all(!is.null(dimnames(data$distance))))
   stopifnot(all(!is.null(dimnames(data$coverage))))
@@ -120,6 +128,7 @@ check_detect_dims <- function(data) {
   stopifnot(all(!is.null(dimnames(data$alive))))
   stopifnot(all(!is.null(dimnames(data$reported))))
   stopifnot(all(!is.null(dimnames(data$released))))
+  stopifnot(all(!is.null(dimnames(data$length))))
 
   invisible(data)
 }

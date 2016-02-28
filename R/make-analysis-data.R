@@ -178,6 +178,22 @@ make_analysis_capture <- function(data) {
   data
 }
 
+make_analysis_length <- function(data) {
+  message("making analysis length...")
+
+  captures <- nrow(data$capture)
+  periods <- nrow(data$period)
+
+  length <- matrix(NA, nrow = captures, ncol = periods)
+  dimnames(length) <- list(Capture = data$capture$Capture, Period = data$period$Period)
+
+  for (i in 1:captures) {
+    length[data$capture$Capture[i],] <- data$capture$Length[i]
+  }
+  data$length <- length
+  data
+}
+
 group_recaptures <- function (recapture) {
   if (nrow(recapture) == 1)
     return(recapture)
@@ -370,6 +386,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_alive()
 
   data %<>% make_analysis_capture()
+  data %<>% make_analysis_length()
   data %<>% make_analysis_recapture()
   data %<>% make_analysis_reported()
   data %<>% make_analysis_released()
