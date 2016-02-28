@@ -225,7 +225,7 @@ make_analysis_reported <- function(data) {
   reported <- data$recapture
   reported$Reported <- TRUE
   reported %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
-                                  plyr::as.quoted(~PeriodRecapture)),
+                                     plyr::as.quoted(~PeriodRecapture)),
                                 fill = FALSE, drop = FALSE, value.var = "Reported")
   dimnames(reported) <- list(Capture = data$capture$Capture, Period = data$period$Period)
   data$reported <- reported
@@ -237,7 +237,7 @@ make_analysis_released <- function(data) {
 
   released <- data$recapture
   released %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
-                                  plyr::as.quoted(~PeriodRecapture)),
+                                     plyr::as.quoted(~PeriodRecapture)),
                                 fill = NA, drop = FALSE, value.var = "Released")
   dimnames(released) <- list(Capture = data$capture$Capture, Period = data$period$Period)
   data$released <- released
@@ -255,17 +255,19 @@ make_analysis_tags <- function(data) {
                          Tag = c("TBarTag1","TBarTag2"))
 
   for (i in 1:nrow(data$capture)) {
-    if (is.na(data$capture$Reward1[i])) {
-      tags[data$capture$Capture[i],,1] <- FALSE
-    } else {
-      tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],1] <- FALSE
-      tags[data$capture$Capture[i],data$capture$PeriodCapture[i],1] <- TRUE
-    }
-    if (is.na(data$capture$Reward2[i])) {
-      tags[data$capture$Capture[i],,2] <- FALSE
-    } else {
+    tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],1] <- FALSE
+    tags[data$capture$Capture[i],data$capture$PeriodCapture[i],1] <- TRUE
+    if (!is.na(data$capture$Reward2[i])) {
       tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],2] <- FALSE
       tags[data$capture$Capture[i],data$capture$PeriodCapture[i],2] <- TRUE
+    } else
+      tags[data$capture$Capture[i],,2] <- FALSE
+  }
+
+  if (nrow(data$recapture)) {
+    for (i in 1:nrow(data$recapture)) {
+      if (data$recapture$TagsRemoved[i])
+        tags[data$capture$Capture[i],data$recapture$PeriodRecapture[i],2] <- FALSE
     }
   }
 
@@ -289,10 +291,26 @@ make_analysis_tags <- function(data) {
   reported <- data$recapture
   reported$Reported <- TRUE
   reported %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
-                                  plyr::as.quoted(~PeriodRecapture)),
+                                     plyr::as.quoted(~PeriodRecapture)),
                                 fill = FALSE, drop = FALSE, value.var = "Reported")
   dimnames(reported) <- list(Capture = data$capture$Capture, Period = data$period$Period)
   data$tags <- tags
+  data
+}
+
+make_analysis_reward <- function(data) {
+  message("making analysis reward...")
+
+  captures <- nrow(data$capture)
+
+  reward <- matrix(nrow = captures, ncol = 2)
+  dimnames(reward) <- list(Captures = data$capture$Capture, Tag = c("TBarTag1","TBarTag2"))
+
+  for (i in 1:nrow(data$capture)) {
+    reward[data$capture$Capture[i],1] <- data$capture$Reward1[i]
+    reward[data$capture$Capture[i],2] <- data$capture$Reward2[i]
+  }
+  data$reward <- reward
   data
 }
 
@@ -391,6 +409,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_recapture()
   data %<>% make_analysis_reported()
   data %<>% make_analysis_released()
+  data %<>% make_analysis_reward()
 #  data %<>% make_analysis_tags()
   data %<>% make_analysis_coverage()
   data %<>% make_analysis_detection()
