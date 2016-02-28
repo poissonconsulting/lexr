@@ -94,6 +94,14 @@ check_analysis_alive <- function(alive) {
   alive
 }
 
+check_analysis_reported <- function(reported) {
+  if (!is.matrix(reported)) error("reported must be a matrix")
+  if (!is.logical(reported)) error("reported must be a logical matrix")
+  if (any(is.na(reported))) error("reported must not have missing values")
+
+  reported
+}
+
 check_detect_dims <- function(data) {
   nsection <- nrow(data$section)
   nperiod <- nrow(data$period)

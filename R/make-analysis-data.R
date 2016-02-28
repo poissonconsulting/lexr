@@ -162,7 +162,8 @@ make_analysis_alive <- function(data) {
   alive %<>% dplyr::group_by_(~Capture, ~Period) %>%
     dplyr::summarise_(.dots = list(Alive = ~any(Alive))) %>% dplyr::ungroup()
   alive %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
-                                  plyr::as.quoted(~Period)), value.var = "Alive")
+                                  plyr::as.quoted(~Period)),
+                             drop = FALSE, value.var = "Alive")
   dimnames(alive) <- list(Capture = data$capture$Capture, Period = data$period$Period)
   data$alive <- alive
   data
@@ -196,7 +197,21 @@ make_analysis_recapture <- function(data) {
   data$recapture %<>% replace_interval_with_period(data, "Recapture")
   data$recapture %<>% dplyr::mutate_(.dots = list(Recaptures = ~1L))
   data$recapture %<>% plyr::ddply(c("Capture", "PeriodRecapture"), group_recaptures)
+
   data$recapture %<>% dplyr::as.tbl()
+  data
+}
+
+make_analysis_reported <- function(data) {
+  message("making analysis reported...")
+
+  reported <- data$recapture
+  reported$Reported <- TRUE
+  reported %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
+                                  plyr::as.quoted(~PeriodRecapture)),
+                                fill = FALSE, drop = FALSE, value.var = "Reported")
+  dimnames(reported) <- list(Capture = data$capture$Capture, Period = data$period$Period)
+  data$reported <- reported
   data
 }
 
@@ -245,7 +260,8 @@ make_analysis_detection <- function(data) {
 
   detection %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
                                       plyr::as.quoted(~PeriodDetection),
-                                      plyr::as.quoted(~Section)), value.var = "Periods")
+                                      plyr::as.quoted(~Section)),
+                                 drop = FALSE, value.var = "Periods")
   dimnames(detection) <- list(Capture = data$capture$Capture,
                               Period = data$period$Period,
                               Section = data$section$Section)
@@ -291,6 +307,7 @@ make_analysis_data <-  function(
 
   data %<>% make_analysis_capture()
   data %<>% make_analysis_recapture()
+  data %<>% make_analysis_reported()
   data %<>% make_analysis_coverage()
   data %<>% make_analysis_detection()
   data %<>% cleanup_analysis_data()
