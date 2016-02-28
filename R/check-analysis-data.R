@@ -88,11 +88,12 @@ check_analysis_detection <- function(detection) {
   detection
 }
 
-check_analysis_alive <- function(alive) {
-  if (!is.matrix(alive)) error("alive must be a matrix")
-  if (!is.logical(alive)) error("alive must be a logical matrix")
+check_analysis_detected <- function(detected) {
+  if (!is.matrix(detected)) error("detected must be a matrix")
+  if (!is.logical(detected)) error("detected must be a logical matrix")
+  if (any(is.na(detected))) error("detection must not have missing values")
 
-  alive
+  detected
 }
 
 check_analysis_reported <- function(reported) {
@@ -132,7 +133,7 @@ check_detect_dims <- function(data) {
   stopifnot(identical(dim(data$distance), c(nsection, nsection)))
   stopifnot(identical(dim(data$coverage), c(nsection, nperiod)))
   stopifnot(identical(dim(data$detection), c(ncapture, nperiod, nsection)))
-  stopifnot(identical(dim(data$alive), c(ncapture, nperiod)))
+  stopifnot(identical(dim(data$detected), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$reported), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$released), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$length), c(ncapture, nperiod)))
@@ -142,7 +143,7 @@ check_detect_dims <- function(data) {
   stopifnot(all(!is.null(dimnames(data$distance))))
   stopifnot(all(!is.null(dimnames(data$coverage))))
   stopifnot(all(!is.null(dimnames(data$detection))))
-  stopifnot(all(!is.null(dimnames(data$alive))))
+  stopifnot(all(!is.null(dimnames(data$detected))))
   stopifnot(all(!is.null(dimnames(data$reported))))
   stopifnot(all(!is.null(dimnames(data$released))))
   stopifnot(all(!is.null(dimnames(data$length))))

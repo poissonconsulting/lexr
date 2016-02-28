@@ -127,51 +127,6 @@ replace_interval_with_period <- function(x, data, suffix = "") {
   x
 }
 
-make_analysis_alive <- function(data) {
-  message("making analysis alive...")
-
-  intervals <- nrow(data$interval)
-  captures <- nrow(data$capture)
-  alive <- matrix(NA, nrow = captures, ncol = intervals)
-  dimnames(alive) <- list(Capture = levels(data$capture$Capture), Interval = levels(data$interval$Interval))
-
-  data$capture %<>% dplyr::arrange_(~Capture)
-
-  for (i in 1:captures) {
-    alive[i, 1:data$capture$IntervalCapture[i]] <- TRUE
-  }
-  if (nrow(data$recapture)) {
-    for (i in 1:nrow(data$recapture)) {
-      alive[data$recapture$Capture[i], 1:data$recapture$IntervalRecapture[i]] <- TRUE
-    }
-    retained <- dplyr::filter_(data$recapture, ~!Released, ~IntervalRecapture < intervals)
-    if (nrow(retained)) {
-      for (i in 1:nrow(retained)) {
-        alive[retained$Capture[i], (retained$IntervalRecapture[i] + 1):intervals] <- FALSE
-      }
-    }
-  }
-  move <- plyr::ddply(data$detection, "Capture", last_movement)
-  move$Capture %<>% as.integer()
-  if (nrow(move)) {
-    for (i in 1:nrow(move)) {
-      alive[move$Capture[i], 1:move$Interval[i]] <- TRUE
-    }
-  }
-  alive %<>% reshape2::melt(as.is = TRUE, value.name = "Alive")
-  alive$Capture %<>% factor(levels = levels(data$capture$Capture))
-  alive$Interval %<>% as.integer()
-  alive %<>% replace_interval_with_period(data)
-  alive %<>% dplyr::group_by_(~Capture, ~Period) %>%
-    dplyr::summarise_(.dots = list(Alive = ~any(Alive))) %>% dplyr::ungroup()
-  alive %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
-                                  plyr::as.quoted(~Period)),
-                             drop = FALSE, value.var = "Alive")
-  dimnames(alive) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
-  data$alive <- alive
-  data
-}
-
 make_analysis_capture <- function(data) {
   message("making analysis capture...")
 
@@ -360,6 +315,15 @@ make_analysis_detection <- function(data) {
   data
 }
 
+make_analysis_detected <- function(data) {
+  message("making analysis detected...")
+
+  detected <- apply(data$detection, MARGIN = c(1,2), max)
+  detected <- detected > 0
+  data$detected <- detected
+  data
+}
+
 cleanup_analysis_data <- function (data) {
   data <- data[analysis_data_names()]
   class(data) <- "analysis_data"
@@ -394,7 +358,6 @@ make_analysis_data <-  function(
   data %<>% make_analysis_distance()
 
   data %<>% make_analysis_interval(interval_period)
-  data %<>% make_analysis_alive()
 
   data %<>% make_analysis_capture()
   data %<>% make_analysis_length()
@@ -405,6 +368,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_tags()
   data %<>% make_analysis_coverage()
   data %<>% make_analysis_detection()
+  data %<>% make_analysis_detected()
   data %<>% cleanup_analysis_data()
 
   data %<>% check_analysis_data()

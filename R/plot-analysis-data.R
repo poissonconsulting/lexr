@@ -36,8 +36,8 @@ plot_analysis_logical_matrix <- function(x, value, capture, period) {
                    axis.ticks.y = ggplot2::element_blank())
 }
 
-plot_analysis_alive <- function (alive, capture, period) {
-  plot_analysis_logical_matrix(alive, "Alive", capture, period)
+plot_analysis_detected <- function(detected, capture, period) {
+  plot_analysis_logical_matrix(detected, "Detected", capture, period)
 }
 
 plot_analysis_reported <- function (reported, capture, period) {
@@ -148,11 +148,11 @@ plot_analysis_fish <- function(capture, recapture, detection, section, period) {
 
 #' @export
 plot.analysis_data <- function(x, all = FALSE, ...) {
-  print(plot_analysis_tags(x$tags, x$capture, x$period))
   print(plot_analysis_coverage(x$coverage, x$section, x$period))
   print(plot_analysis_reported(x$reported, x$capture, x$period))
   print(plot_analysis_released(x$released, x$capture, x$period))
-  print(plot_analysis_alive(x$alive, x$capture, x$period))
+  print(plot_analysis_tags(x$tags, x$capture, x$period))
+  print(plot_analysis_detected(x$detected, x$capture, x$period))
   if (all) {
     plot_analysis_fish(x$capture, x$recapture, x$detection, x$section, x$period)
   }
