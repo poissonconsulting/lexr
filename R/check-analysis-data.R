@@ -110,6 +110,13 @@ check_analysis_reward <- function(reward) {
   reward
 }
 
+check_analysis_tags <- function(tags) {
+  if (!is.array(tags)) error("tags must be a matrix")
+  if (!is.logical(tags)) error("tags must be a logical array")
+
+  tags
+}
+
 check_analysis_released <- function(released) {
   if (!is.matrix(released)) error("released must be a matrix")
   if (!is.logical(released)) error("released must be a logical matrix")
@@ -130,6 +137,7 @@ check_detect_dims <- function(data) {
   stopifnot(identical(dim(data$released), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$length), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$reward), c(ncapture, 2L)))
+  stopifnot(identical(dim(data$tags), c(ncapture, nperiod, 2L)))
 
   stopifnot(all(!is.null(dimnames(data$distance))))
   stopifnot(all(!is.null(dimnames(data$coverage))))
@@ -139,6 +147,7 @@ check_detect_dims <- function(data) {
   stopifnot(all(!is.null(dimnames(data$released))))
   stopifnot(all(!is.null(dimnames(data$length))))
   stopifnot(all(!is.null(dimnames(data$reward))))
+  stopifnot(all(!is.null(dimnames(data$tags))))
 
   invisible(data)
 }

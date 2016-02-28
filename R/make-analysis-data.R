@@ -255,45 +255,34 @@ make_analysis_tags <- function(data) {
                          Tag = c("TBarTag1","TBarTag2"))
 
   for (i in 1:nrow(data$capture)) {
-    tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],1] <- FALSE
-    tags[data$capture$Capture[i],data$capture$PeriodCapture[i],1] <- TRUE
+    tags[data$capture$Capture[i],1:as.integer(data$capture$PeriodCapture[i]),1] <- FALSE
+    tags[data$capture$Capture[i],as.integer(data$capture$PeriodCapture[i]),1] <- TRUE
     if (!is.na(data$capture$Reward2[i])) {
-      tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],2] <- FALSE
-      tags[data$capture$Capture[i],data$capture$PeriodCapture[i],2] <- TRUE
+      tags[data$capture$Capture[i],1:as.integer(data$capture$PeriodCapture[i]),2] <- FALSE
+      tags[data$capture$Capture[i],as.integer(data$capture$PeriodCapture[i]),2] <- TRUE
     } else
       tags[data$capture$Capture[i],,2] <- FALSE
   }
 
   if (nrow(data$recapture)) {
     for (i in 1:nrow(data$recapture)) {
-      if (data$recapture$TagsRemoved[i])
-        tags[data$capture$Capture[i],data$recapture$PeriodRecapture[i],2] <- FALSE
+      if (data$recapture$TBarTag1[i]) {
+        period_capture <- data$capture$PeriodCapture[data$capture$Capture == data$recapture$Capture[i]]
+        tags[data$recapture$Capture[i],as.integer(period_capture):as.integer(data$recapture$PeriodRecapture[i]),1] <- TRUE
+      } else {
+        tags[data$recapture$Capture[i],as.integer(data$recapture$PeriodRecapture[i]),1] <- FALSE
+      }
+      if (data$recapture$TBarTag2[i]) {
+        period_capture <- data$capture$PeriodCapture[data$capture$Capture == data$recapture$Capture[i]]
+        tags[data$recapture$Capture[i],as.integer(period_capture):as.integer(data$recapture$PeriodRecapture[i]),2] <- TRUE
+      } else {
+        tags[data$recapture$Capture[i],as.integer(data$recapture$PeriodRecapture[i]),2] <- FALSE
+      }
+      if (data$recapture$TagsRemoved[i] && as.integer(data$recapture$PeriodRecapture[i]) < periods) {
+        tags[data$recapture$Capture[i],(as.integer(data$recapture$PeriodRecapture[i]) + 1):periods,] <- FALSE
+      }
     }
   }
-
-  data$recapture %<>% arrange(~Capture, ~PeriodRecapture)
-
-  for (i in 1:nrow(data$recapture)) {
-    if (is.na(data$capture$Reward1[i])) {
-      tags[data$capture$Capture[i],,1] <- FALSE
-    } else {
-      tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],1] <- FALSE
-      tags[data$capture$Capture[i],data$capture$PeriodCapture[i],1] <- TRUE
-    }
-    if (is.na(data$capture$Reward2[i])) {
-      tags[data$capture$Capture[i],,2] <- FALSE
-    } else {
-      tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],2] <- FALSE
-      tags[data$capture$Capture[i],data$capture$PeriodCapture[i],2] <- TRUE
-    }
-  }
-
-  reported <- data$recapture
-  reported$Reported <- TRUE
-  reported %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
-                                     plyr::as.quoted(~PeriodRecapture)),
-                                fill = FALSE, drop = FALSE, value.var = "Reported")
-  dimnames(reported) <- list(Capture = data$capture$Capture, Period = data$period$Period)
   data$tags <- tags
   data
 }
@@ -410,7 +399,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_reported()
   data %<>% make_analysis_released()
   data %<>% make_analysis_reward()
-#  data %<>% make_analysis_tags()
+  data %<>% make_analysis_tags()
   data %<>% make_analysis_coverage()
   data %<>% make_analysis_detection()
   data %<>% cleanup_analysis_data()
