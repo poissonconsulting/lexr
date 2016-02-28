@@ -48,6 +48,27 @@ plot_analysis_released <- function (released, capture, period) {
   plot_analysis_logical_matrix(released, "Released", capture, period)
 }
 
+plot_analysis_tags <- function(tags, capture, period) {
+  tags %<>% reshape2::melt(as.is = TRUE, value.name = "Tagged")
+  tags$Capture %<>% factor(levels = levels(capture$Capture))
+  tags$Period %<>% factor(levels = levels(period$Period))
+  tags$Tag %<>% factor(levels = c("TBarTag1", "TBarTag2"))
+
+  tags %<>% dplyr::inner_join(capture, by = "Capture")
+  tags %<>% dplyr::inner_join(period, by = "Period")
+
+  ggplot2::ggplot(data = tags, ggplot2::aes_(x = ~DateTime, y = ~Capture)) +
+    ggplot2::facet_grid(Species~Tag , scales = "free_y", space = "free_y") +
+    ggplot2::geom_point(ggplot2::aes_string(shape = "Tagged", color = "Tagged")) +
+    ggplot2::scale_x_datetime(name = "Year", date_breaks = "1 year", date_labels = "%Y") +
+    ggplot2::scale_color_manual(values = c("red", "black")) +
+    ggplot2::scale_shape_manual(values = c(17, 16)) +
+    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                   panel.grid.minor.y = ggplot2::element_blank(),
+                   axis.text.y = ggplot2::element_blank(),
+                   axis.ticks.y = ggplot2::element_blank())
+}
+
 plot_fish <- function(detection, section, capture, recapture, period) {
   tz <- lubridate::tz(detection$DateTime)
   message(paste("plotting fish", detection$Capture[1], "..."))
@@ -127,6 +148,7 @@ plot_analysis_fish <- function(capture, recapture, detection, section, period) {
 
 #' @export
 plot.analysis_data <- function(x, all = FALSE, ...) {
+  print(plot_analysis_tags(x$tags, x$capture, x$period))
   print(plot_analysis_coverage(x$coverage, x$section, x$period))
   print(plot_analysis_reported(x$reported, x$capture, x$period))
   print(plot_analysis_released(x$released, x$capture, x$period))
