@@ -1,3 +1,41 @@
+plot_analysis_coverage <- function (coverage, section, period) {
+  coverage %<>% reshape2::melt(as.is = TRUE, value.name = "Coverage")
+  coverage$Section %<>% factor(levels = levels(section$Section))
+  coverage$Period %<>% factor(levels = levels(period$Period))
+
+  coverage %<>% dplyr::inner_join(section, by = "Section")
+  coverage %<>% dplyr::inner_join(period, by = "Period")
+
+  coverage %<>% plyr::ddply("Section", function (x) {if(max(x$Coverage) == 0) return(NULL); x})
+
+  ggplot2::ggplot(data = coverage, ggplot2::aes_(x = ~DateTime, y = ~Coverage)) +
+    ggplot2::facet_grid(Section~.) +
+    ggplot2::geom_area(ggplot2::aes_(fill = ~ColorCode)) +
+    ggplot2::scale_x_datetime(name = "Date", date_breaks = "1 year", date_labels = "%Y") +
+    ggplot2::scale_y_continuous(name = "Coverage (%)", breaks = c(0.5,1), labels = scales::percent) +
+    ggplot2::scale_fill_identity()
+}
+
+plot_analysis_alive <- function (alive, capture, period) {
+  alive %<>% reshape2::melt(as.is = TRUE, value.name = "Alive")
+  alive$Capture %<>% factor(levels = levels(capture$Capture))
+  alive$Period %<>% factor(levels = levels(period$Period))
+
+  alive %<>% dplyr::inner_join(capture, by = "Capture")
+  alive %<>% dplyr::inner_join(period, by = "Period")
+
+  ggplot2::ggplot(data = alive, ggplot2::aes_(x = ~DateTime, y = ~Capture)) +
+    ggplot2::facet_grid(Species~. , scales = "free_y", space = "free_y") +
+    ggplot2::geom_point(ggplot2::aes_(shape = ~Alive, color = ~Alive)) +
+    ggplot2::scale_x_datetime(name = "Year", date_breaks = "1 year", date_labels = "%Y") +
+    ggplot2::scale_color_manual(values = c("red", "black")) +
+    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                   panel.grid.minor.y = ggplot2::element_blank(),
+                   axis.text.y = ggplot2::element_blank(),
+                   axis.ticks.y = ggplot2::element_blank())
+}
+
+
 plot_fish <- function(detection, section, capture, recapture, period) {
   tz <- lubridate::tz(detection$DateTime)
   message(paste("plotting fish", detection$Capture[1], "..."))
@@ -77,6 +115,8 @@ plot_analysis_fish <- function(capture, recapture, detection, section, period) {
 
 #' @export
 plot.analysis_data <- function(x, all = FALSE, ...) {
+  print(plot_analysis_coverage(x$coverage, x$section, x$period))
+  print(plot_analysis_alive(x$alive, x$capture, x$period))
   if (all) {
     plot_analysis_fish(x$capture, x$recapture, x$detection, x$section, x$period)
   }
