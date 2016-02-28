@@ -215,6 +215,70 @@ make_analysis_reported <- function(data) {
   data
 }
 
+make_analysis_released <- function(data) {
+  message("making analysis released...")
+
+  released <- data$recapture
+  released %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
+                                  plyr::as.quoted(~PeriodRecapture)),
+                                fill = NA, drop = FALSE, value.var = "Released")
+  dimnames(released) <- list(Capture = data$capture$Capture, Period = data$period$Period)
+  data$released <- released
+  data
+}
+
+make_analysis_tags <- function(data) {
+  message("making analysis tags...")
+
+  captures <- nrow(data$capture)
+  periods <- nrow(data$period)
+
+  tags <- array(NA, dim = c(captures, periods, 2))
+  dimnames(tags) <- list(Capture = data$capture$Capture, Period = data$period$Period,
+                         Tag = c("TBarTag1","TBarTag2"))
+
+  for (i in 1:nrow(data$capture)) {
+    if (is.na(data$capture$Reward1[i])) {
+      tags[data$capture$Capture[i],,1] <- FALSE
+    } else {
+      tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],1] <- FALSE
+      tags[data$capture$Capture[i],data$capture$PeriodCapture[i],1] <- TRUE
+    }
+    if (is.na(data$capture$Reward2[i])) {
+      tags[data$capture$Capture[i],,2] <- FALSE
+    } else {
+      tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],2] <- FALSE
+      tags[data$capture$Capture[i],data$capture$PeriodCapture[i],2] <- TRUE
+    }
+  }
+
+  data$recapture %<>% arrange(~Capture, ~PeriodRecapture)
+
+  for (i in 1:nrow(data$recapture)) {
+    if (is.na(data$capture$Reward1[i])) {
+      tags[data$capture$Capture[i],,1] <- FALSE
+    } else {
+      tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],1] <- FALSE
+      tags[data$capture$Capture[i],data$capture$PeriodCapture[i],1] <- TRUE
+    }
+    if (is.na(data$capture$Reward2[i])) {
+      tags[data$capture$Capture[i],,2] <- FALSE
+    } else {
+      tags[data$capture$Capture[i],1:data$capture$PeriodCapture[i],2] <- FALSE
+      tags[data$capture$Capture[i],data$capture$PeriodCapture[i],2] <- TRUE
+    }
+  }
+
+  reported <- data$recapture
+  reported$Reported <- TRUE
+  reported %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
+                                  plyr::as.quoted(~PeriodRecapture)),
+                                fill = FALSE, drop = FALSE, value.var = "Reported")
+  dimnames(reported) <- list(Capture = data$capture$Capture, Period = data$period$Period)
+  data$tags <- tags
+  data
+}
+
 make_analysis_coverage <- function(data) {
   message("making analysis coverage...")
 
@@ -308,6 +372,8 @@ make_analysis_data <-  function(
   data %<>% make_analysis_capture()
   data %<>% make_analysis_recapture()
   data %<>% make_analysis_reported()
+  data %<>% make_analysis_released()
+#  data %<>% make_analysis_tags()
   data %<>% make_analysis_coverage()
   data %<>% make_analysis_detection()
   data %<>% cleanup_analysis_data()

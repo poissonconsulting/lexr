@@ -56,8 +56,6 @@ check_analysis_capture <- function(capture) {
                   PeriodCapture = factor(1),
                   SectionCapture = factor(1),
                   Length = c(200L, 1000L),
-                  Reward1 = factor(rep("Low", 3), levels = c("Low", "High")),
-                  Reward2 = factor(c(rep("Low", 3), NA), levels = c("Low", "High")),
                   PeriodTagExpire = factor(1)),
     key = "Capture", select = TRUE)
 }
@@ -67,11 +65,6 @@ check_analysis_recapture <- function(recapture) {
     recapture, list(PeriodRecapture = factor(1),
                   Capture = factor(1),
                   SectionRecapture = factor(c(1, NA)),
-                  TBarTag1 = TRUE,
-                  TBarTag2 = TRUE,
-                  TagsRemoved = TRUE,
-                  Released = TRUE,
-                  Public = TRUE,
                   Recaptures = c(1L, 10L)),
     min_row = 0,
     key = c("PeriodRecapture", "Capture"), select = TRUE)
@@ -102,6 +95,13 @@ check_analysis_reported <- function(reported) {
   reported
 }
 
+check_analysis_released <- function(released) {
+  if (!is.matrix(released)) error("released must be a matrix")
+  if (!is.logical(released)) error("released must be a logical matrix")
+
+  released
+}
+
 check_detect_dims <- function(data) {
   nsection <- nrow(data$section)
   nperiod <- nrow(data$period)
@@ -111,11 +111,15 @@ check_detect_dims <- function(data) {
   stopifnot(identical(dim(data$coverage), c(nsection, nperiod)))
   stopifnot(identical(dim(data$detection), c(ncapture, nperiod, nsection)))
   stopifnot(identical(dim(data$alive), c(ncapture, nperiod)))
+  stopifnot(identical(dim(data$reported), c(ncapture, nperiod)))
+  stopifnot(identical(dim(data$released), c(ncapture, nperiod)))
 
   stopifnot(all(!is.null(dimnames(data$distance))))
   stopifnot(all(!is.null(dimnames(data$coverage))))
   stopifnot(all(!is.null(dimnames(data$detection))))
   stopifnot(all(!is.null(dimnames(data$alive))))
+  stopifnot(all(!is.null(dimnames(data$reported))))
+  stopifnot(all(!is.null(dimnames(data$released))))
 
   invisible(data)
 }
