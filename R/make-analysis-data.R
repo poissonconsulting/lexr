@@ -104,16 +104,6 @@ make_analysis_interval <- function(data, interval_period) {
   data
 }
 
-last_movement <- function(data) {
-  if (nrow(data) == 1)
-    return(NULL)
-  data %<>% dplyr::arrange_(~IntervalDetection)
-  # can only assume alive at the section it moved from
-  data$Move <- c(diff(as.integer(data$Section)) != 0, FALSE)
-  whch <- which(data$Move)
-  data.frame(Interval = data$IntervalDetection[whch[length(whch)]])
-}
-
 replace_interval_with_period <- function(x, data, suffix = "") {
   interval <- data$interval
   if (!identical(suffix, "")) {
@@ -324,6 +314,15 @@ make_analysis_detected <- function(data) {
   data
 }
 
+make_analysis_moved <- function(data) {
+  message("making analysis moved...")
+
+  moved <- apply(data$detection, MARGIN = c(1,2), function(x) sum(x > 0))
+  moved <- moved > 1
+  data$moved <- moved
+  data
+}
+
 cleanup_analysis_data <- function (data) {
   data <- data[analysis_data_names()]
   class(data) <- "analysis_data"
@@ -332,10 +331,24 @@ cleanup_analysis_data <- function (data) {
 
 #' Make Analysis Data
 #'
-#' If a difftime element, interval_period cannot be greater than 28 days
+#' Makes analysis_data object from a detect_data object.
+#' capture$PeriodCapture indicates the period during which the fish was caught.
+#' capture$PeriodTagExpire indicates the period during which the tag expired.
+#' detected is a logical matrix indicating for each individual-period whether it
+#' was detected during the period.
+#' moved is a logical matrix indicating for each individual-period whether it
+#' was detected to have moved during the period
+#' (based on being detected at multiple sections).
+#' reported is a logical matrix indicating for each individual-period
+#' whether it was reported to have been recaught during the period.
+#' released is a logical matrix indicating for each individual-period whether it
+#' was released during the period.
+#' tags is a logical array indicating for each individual-period-tbartag whether
+#' it was attached to
+#'
+#' @details If a difftime element, interval_period cannot be greater than 28 days
 #' i.e. \code{lubridate::make_difftime(60 * 60 * 24 * 28)}.
 #'
-#' Makes analysis_data object from a detect_data object.
 #' @param data A detect_data object to use.
 #' @param capture A data frame of the capture data to use.
 #' @param section A data frame of the section data to use.
@@ -369,6 +382,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_coverage()
   data %<>% make_analysis_detection()
   data %<>% make_analysis_detected()
+  data %<>% make_analysis_moved()
   data %<>% cleanup_analysis_data()
 
   data %<>% check_analysis_data()

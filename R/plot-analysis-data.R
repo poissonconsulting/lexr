@@ -40,6 +40,10 @@ plot_analysis_detected <- function(detected, capture, period) {
   plot_analysis_logical_matrix(detected, "Detected", capture, period)
 }
 
+plot_analysis_moved <- function(moved, capture, period) {
+  plot_analysis_logical_matrix(moved, "Moved", capture, period)
+}
+
 plot_analysis_reported <- function (reported, capture, period) {
   plot_analysis_logical_matrix(reported, "Reported", capture, period)
 }
@@ -153,6 +157,7 @@ plot.analysis_data <- function(x, all = FALSE, ...) {
   print(plot_analysis_released(x$released, x$capture, x$period))
   print(plot_analysis_tags(x$tags, x$capture, x$period))
   print(plot_analysis_detected(x$detected, x$capture, x$period))
+  print(plot_analysis_moved(x$moved, x$capture, x$period))
   if (all) {
     plot_analysis_fish(x$capture, x$recapture, x$detection, x$section, x$period)
   }

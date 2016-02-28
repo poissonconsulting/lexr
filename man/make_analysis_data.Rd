@@ -21,10 +21,23 @@ a vector indicating the actual interval groupings.}
 A detect_data object.
 }
 \description{
-If a difftime element, interval_period cannot be greater than 28 days
-i.e. \code{lubridate::make_difftime(60 * 60 * 24 * 28)}.
+Makes analysis_data object from a detect_data object.
+capture$PeriodCapture indicates the period during which the fish was caught.
+capture$PeriodTagExpire indicates the period during which the tag expired.
+detected is a logical matrix indicating for each individual-period whether it
+was detected during the period.
+moved is a logical matrix indicating for each individual-period whether it
+was detected to have moved during the period
+(based on being detected at multiple sections).
+reported is a logical matrix indicating for each individual-period
+whether it was reported to have been recaught during the period.
+released is a logical matrix indicating for each individual-period whether it
+was released during the period.
+tags is a logical array indicating for each individual-period-tbartag whether
+it was attached to
 }
 \details{
-Makes analysis_data object from a detect_data object.
+If a difftime element, interval_period cannot be greater than 28 days
+i.e. \code{lubridate::make_difftime(60 * 60 * 24 * 28)}.
 }
 
