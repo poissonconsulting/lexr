@@ -73,6 +73,7 @@ check_analysis_recapture <- function(recapture) {
     recapture, list(PeriodRecapture = factor(1),
                   Capture = factor(1),
                   SectionRecapture = factor(c(1, NA)),
+                  Released = TRUE,
                   Recaptures = c(1L, 10L)),
     min_row = 0,
     key = c("PeriodRecapture", "Capture"), select = TRUE)
