@@ -1,4 +1,4 @@
-plot_analysis_coverage <- function (coverage, section, period) {
+plot_analysis_coverage <- function(coverage, section, period) {
   coverage %<>% reshape2::melt(as.is = TRUE, value.name = "Coverage")
   coverage$Section %<>% factor(levels = levels(section$Section))
   coverage$Period %<>% factor(levels = levels(period$Period))
@@ -6,7 +6,7 @@ plot_analysis_coverage <- function (coverage, section, period) {
   coverage %<>% dplyr::inner_join(section, by = "Section")
   coverage %<>% dplyr::inner_join(period, by = "Period")
 
-  coverage %<>% plyr::ddply("Section", function (x) {if(max(x$Coverage) == 0) return(NULL); x})
+  coverage %<>% plyr::ddply("Section", function(x) {if (max(x$Coverage) == 0) return(NULL); x})
 
   ggplot2::ggplot(data = coverage, ggplot2::aes_(x = ~DateTime, y = ~Coverage)) +
     ggplot2::facet_grid(Section~.) +
@@ -44,11 +44,15 @@ plot_analysis_moved <- function(moved, capture, period) {
   plot_analysis_logical_matrix(moved, "Moved", capture, period)
 }
 
-plot_analysis_reported <- function (reported, capture, period) {
+plot_analysis_reported <- function(reported, capture, period) {
   plot_analysis_logical_matrix(reported, "Reported", capture, period)
 }
 
-plot_analysis_released <- function (released, capture, period) {
+plot_analysis_removed <- function(removed, capture, period) {
+  plot_analysis_logical_matrix(removed, "Removed", capture, period)
+}
+
+plot_analysis_released <- function(released, capture, period) {
   plot_analysis_logical_matrix(released, "Released", capture, period)
 }
 
@@ -154,6 +158,7 @@ plot_analysis_fish <- function(capture, recapture, detection, section, period) {
 plot.analysis_data <- function(x, all = FALSE, ...) {
   print(plot_analysis_coverage(x$coverage, x$section, x$period))
   print(plot_analysis_reported(x$reported, x$capture, x$period))
+  print(plot_analysis_removed(x$removed, x$capture, x$period))
   print(plot_analysis_released(x$released, x$capture, x$period))
   print(plot_analysis_tags(x$tags, x$capture, x$period))
   print(plot_analysis_detected(x$detected, x$capture, x$period))

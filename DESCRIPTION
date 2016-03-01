@@ -29,7 +29,7 @@ Imports:
     tidyr
 Suggests:
     klexdatr (>= 0.0.0.9010),
-    qlexdatr (>= 0.0.0.9013),
+    qlexdatr (>= 0.0.0.9014),
     testthat
 License: MIT + file LICENSE
 LazyData: true

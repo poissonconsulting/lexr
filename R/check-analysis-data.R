@@ -92,7 +92,7 @@ check_analysis_detection <- function(detection) {
 check_analysis_detected <- function(detected) {
   if (!is.matrix(detected)) error("detected must be a matrix")
   if (!is.logical(detected)) error("detected must be a logical matrix")
-  if (any(is.na(detected))) error("detection must not have missing values")
+  if (any(is.na(detected))) error("detected must not have missing values")
 
   detected
 }
@@ -134,6 +134,14 @@ check_analysis_released <- function(released) {
   released
 }
 
+check_analysis_removed <- function(removed) {
+  if (!is.matrix(removed)) error("removed must be a matrix")
+  if (!is.logical(removed)) error("removed must be a logical matrix")
+  if (any(is.na(removed))) error("removed must not have missing values")
+
+  removed
+}
+
 check_detect_dims <- function(data) {
   nsection <- nrow(data$section)
   nperiod <- nrow(data$period)
@@ -146,6 +154,7 @@ check_detect_dims <- function(data) {
   stopifnot(identical(dim(data$moved), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$reported), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$released), c(ncapture, nperiod)))
+  stopifnot(identical(dim(data$removed), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$length), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$reward), c(ncapture, 2L)))
   stopifnot(identical(dim(data$tags), c(ncapture, nperiod, 2L)))
@@ -157,6 +166,7 @@ check_detect_dims <- function(data) {
   stopifnot(all(!is.null(dimnames(data$moved))))
   stopifnot(all(!is.null(dimnames(data$reported))))
   stopifnot(all(!is.null(dimnames(data$released))))
+  stopifnot(all(!is.null(dimnames(data$removed))))
   stopifnot(all(!is.null(dimnames(data$length))))
   stopifnot(all(!is.null(dimnames(data$reward))))
   stopifnot(all(!is.null(dimnames(data$tags))))

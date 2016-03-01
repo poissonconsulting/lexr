@@ -191,6 +191,18 @@ make_analysis_released <- function(data) {
   data
 }
 
+make_analysis_removed <- function(data) {
+  message("making analysis removed...")
+
+  removed <- data$recapture
+  removed %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
+                                     plyr::as.quoted(~PeriodRecapture)),
+                                fill = FALSE, drop = FALSE, value.var = "TagsRemoved")
+  dimnames(removed) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
+  data$removed <- removed
+  data
+}
+
 make_analysis_tags <- function(data) {
   message("making analysis tags...")
 
@@ -378,6 +390,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_recapture()
   data %<>% make_analysis_reported()
   data %<>% make_analysis_released()
+  data %<>% make_analysis_removed()
   data %<>% make_analysis_reward()
   data %<>% make_analysis_tags()
   data %<>% make_analysis_coverage()
