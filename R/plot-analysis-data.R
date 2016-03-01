@@ -56,6 +56,10 @@ plot_analysis_released <- function(released, capture, period) {
   plot_analysis_logical_matrix(released, "Released", capture, period)
 }
 
+plot_analysis_public <- function(public, capture, period) {
+  plot_analysis_logical_matrix(public, "Public", capture, period)
+}
+
 plot_analysis_tags <- function(tags, capture, period) {
   tags %<>% reshape2::melt(as.is = TRUE, value.name = "Tagged")
   tags$Capture %<>% factor(levels = levels(capture$Capture))
@@ -160,6 +164,7 @@ plot.analysis_data <- function(x, all = FALSE, ...) {
   print(plot_analysis_reported(x$reported, x$capture, x$period))
   print(plot_analysis_removed(x$removed, x$capture, x$period))
   print(plot_analysis_released(x$released, x$capture, x$period))
+  print(plot_analysis_public(x$public, x$capture, x$period))
   print(plot_analysis_tags(x$tags, x$capture, x$period))
   print(plot_analysis_detected(x$detected, x$capture, x$period))
   print(plot_analysis_moved(x$moved, x$capture, x$period))

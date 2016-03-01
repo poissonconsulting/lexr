@@ -1,7 +1,7 @@
 Package: lexr
 Title: Lake Exploitation Study Data Plotting and Analysis
-Version: 0.0.0.9006
-Date: 2016-02-28
+Version: 0.0.1
+Date: 2016-02-29
 Authors@R: c(
     person("Joe", "Thorley", email = "joe@poissonconsulting.ca", role = c("aut", "cre")),
     person("Gary", "Pavan", role = "aut"),
@@ -29,7 +29,7 @@ Imports:
     tidyr
 Suggests:
     klexdatr (>= 0.0.0.9010),
-    qlexdatr (>= 0.0.0.9014),
+    qlexdatr (>= 0.0.1),
     testthat
 License: MIT + file LICENSE
 LazyData: true

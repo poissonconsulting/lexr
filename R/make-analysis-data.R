@@ -169,23 +169,46 @@ make_analysis_recapture <- function(data) {
 make_analysis_reported <- function(data) {
   message("making analysis reported...")
 
-  reported <- data$recapture
-  reported$Reported <- TRUE
-  reported %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
-                                     plyr::as.quoted(~PeriodRecapture)),
-                                fill = FALSE, drop = FALSE, value.var = "Reported")
+  if (nrow(data$recapture)) {
+    reported <- data$recapture
+    reported$Reported <- TRUE
+    reported %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
+                                       plyr::as.quoted(~PeriodRecapture)),
+                                  fill = FALSE, drop = FALSE, value.var = "Reported")
+  } else
+    reported <- matrix(FALSE, nrow = nrow(data$capture), ncol = nrow(data$period))
+
   dimnames(reported) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
   data$reported <- reported
+  data
+}
+
+make_analysis_public <- function(data) {
+  message("making analysis public...")
+
+  if (nrow(data$recapture)) {
+    public <- data$recapture
+    public %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
+                                     plyr::as.quoted(~PeriodRecapture)),
+                                fill = NA, drop = FALSE, value.var = "Public")
+  } else
+    public <- matrix(NA, nrow = nrow(data$capture), ncol = nrow(data$period))
+
+  dimnames(public) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
+  data$public <- public
   data
 }
 
 make_analysis_released <- function(data) {
   message("making analysis released...")
 
-  released <- data$recapture
-  released %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
-                                     plyr::as.quoted(~PeriodRecapture)),
-                                fill = NA, drop = FALSE, value.var = "Released")
+  if(nrow(data$recapture)) {
+    released <- data$recapture
+    released %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
+                                       plyr::as.quoted(~PeriodRecapture)),
+                                  fill = NA, drop = FALSE, value.var = "Released")
+  } else
+    released <- matrix(NA, nrow = nrow(data$capture), ncol = nrow(data$period))
   dimnames(released) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
   data$released <- released
   data
@@ -194,10 +217,14 @@ make_analysis_released <- function(data) {
 make_analysis_removed <- function(data) {
   message("making analysis removed...")
 
-  removed <- data$recapture
-  removed %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
-                                     plyr::as.quoted(~PeriodRecapture)),
-                                fill = FALSE, drop = FALSE, value.var = "TagsRemoved")
+  if (nrow(data$recapture)) {
+    removed <- data$recapture
+    removed %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
+                                      plyr::as.quoted(~PeriodRecapture)),
+                                 fill = FALSE, drop = FALSE, value.var = "TagsRemoved")
+  } else
+    removed <- matrix(FALSE, nrow = nrow(data$capture), ncol = nrow(data$period))
+
   dimnames(removed) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
   data$removed <- removed
   data
@@ -388,6 +415,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_capture()
   data %<>% make_analysis_length()
   data %<>% make_analysis_recapture()
+  data %<>% make_analysis_public()
   data %<>% make_analysis_reported()
   data %<>% make_analysis_released()
   data %<>% make_analysis_removed()

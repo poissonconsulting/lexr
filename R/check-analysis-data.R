@@ -134,6 +134,13 @@ check_analysis_released <- function(released) {
   released
 }
 
+check_analysis_public <- function(public) {
+  if (!is.matrix(public)) error("released must be a matrix")
+  if (!is.logical(public)) error("released must be a logical matrix")
+
+  public
+}
+
 check_analysis_removed <- function(removed) {
   if (!is.matrix(removed)) error("removed must be a matrix")
   if (!is.logical(removed)) error("removed must be a logical matrix")
@@ -154,6 +161,7 @@ check_detect_dims <- function(data) {
   stopifnot(identical(dim(data$moved), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$reported), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$released), c(ncapture, nperiod)))
+  stopifnot(identical(dim(data$public), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$removed), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$length), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$reward), c(ncapture, 2L)))
@@ -166,6 +174,7 @@ check_detect_dims <- function(data) {
   stopifnot(all(!is.null(dimnames(data$moved))))
   stopifnot(all(!is.null(dimnames(data$reported))))
   stopifnot(all(!is.null(dimnames(data$released))))
+  stopifnot(all(!is.null(dimnames(data$public))))
   stopifnot(all(!is.null(dimnames(data$removed))))
   stopifnot(all(!is.null(dimnames(data$length))))
   stopifnot(all(!is.null(dimnames(data$reward))))
@@ -174,6 +183,13 @@ check_detect_dims <- function(data) {
   invisible(data)
 }
 
+#' Check Lake Exploitation Analysis Data
+#'
+#' Checks lake exploitation analysis data and returns an invisible copy of the data.
+#' Otherwise stops with an informative error.
+#'
+#' @param data The analysis_data object to check.
+#' @export
 check_analysis_data <- function(data) {
   if (!inherits(data, "analysis_data")) error("data must be a analysis_data object")
   if (!identical(names(data), analysis_data_names())) error("data must have correct names")
