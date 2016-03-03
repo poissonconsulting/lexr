@@ -144,7 +144,6 @@ check_analysis_public <- function(public) {
 check_analysis_removed <- function(removed) {
   if (!is.matrix(removed)) error("removed must be a matrix")
   if (!is.logical(removed)) error("removed must be a logical matrix")
-  if (any(is.na(removed))) error("removed must not have missing values")
 
   removed
 }

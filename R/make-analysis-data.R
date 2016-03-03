@@ -221,9 +221,16 @@ make_analysis_removed <- function(data) {
     removed <- data$recapture
     removed %<>% reshape2::acast(list(plyr::as.quoted(~Capture),
                                       plyr::as.quoted(~PeriodRecapture)),
-                                 fill = FALSE, drop = FALSE, value.var = "TagsRemoved")
+                                 fill = NA, drop = FALSE, value.var = "TagsRemoved")
   } else
-    removed <- matrix(FALSE, nrow = nrow(data$capture), ncol = nrow(data$period))
+    removed <- matrix(NA, nrow = nrow(data$capture), ncol = nrow(data$period))
+
+  recaps <- dplyr::filter_(data$recapture, ~as.integer(PeriodRecapture) > 1)
+  if (nrow(recaps)) {
+    for (i in 1:nrow(recaps)) { # tags can only be removed once
+      removed[recaps$Capture[i],1:(as.integer(recaps$PeriodRecapture[i]) - 1)] <- FALSE
+    }
+  }
 
   dimnames(removed) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
   data$removed <- removed
@@ -257,7 +264,7 @@ make_analysis_tags <- function(data) {
       if (data$recapture$TBarTag1[i]) {
         tags[data$recapture$Capture[i],as.integer(period_capture):as.integer(data$recapture$PeriodRecapture[i]),1] <- TRUE
       } else {
-        tags[data$recapture$Capture[i],as.integer(data$recapture$PeriodRecapture[i]),1] <- FALSE
+        tags[data$recapture$Capture[i],as.integer(data$recapture$PeriodRecapture[i]):periods,1] <- FALSE
       }
       if (data$recapture$TBarTag2[i]) {
         tags[data$recapture$Capture[i],as.integer(period_capture):as.integer(data$recapture$PeriodRecapture[i]),2] <- TRUE
