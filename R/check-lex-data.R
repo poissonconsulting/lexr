@@ -32,7 +32,7 @@ check_lex_deployment <- function(deployment) {
                   DateTimeReceiverOut = Sys.time())
 
   check_data3(deployment, values,
-                          key = c("Station", "Receiver", "DateTimeReceiverIn"), select = TRUE)
+              key = c("Station", "Receiver", "DateTimeReceiverIn"), select = TRUE)
   deployment %<>% dplyr::arrange_(~DateTimeReceiverIn, ~DateTimeReceiverOut, ~Station)
   invisible(deployment)
 }
@@ -65,7 +65,15 @@ check_lex_recapture <- function(recapture) {
                  Public = TRUE)
 
   check_data3(recapture, values, select = TRUE)
-  if(any(!recapture$Released & !recapture$TagsRemoved))
+  if (any(!recapture$TBarTag1 & !recapture$TBarTag2))
+    error("recaptures must have at least one T-bar tag")
+  if (any(!recapture$Public & recapture$TagsRemoved))
+    error("crew should not have removed tags")
+  if (any(!recapture$Public & !recapture$Released))
+    error("crew should not have harvested a recapture")
+  if(anyDuplicated(dplyr::filter_(recapture, ~!Released)$Capture))
+    error("a capture can't be harvested twice!")
+  if (any(!recapture$Released & !recapture$TagsRemoved))
     error("all non-released recaptures must have had their tags removed!")
   recapture %<>% dplyr::arrange_(~DateTimeRecapture, ~Capture)
   invisible(recapture)
@@ -79,10 +87,10 @@ check_lex_detection <- function(detection) {
                  Detections = c(3L, max_integer()))
 
   check_data3(detection, values, key = c("DateTimeDetection", "Capture", "Receiver"),
-                          select = TRUE)
+              select = TRUE)
   detection %<>% dplyr::arrange_(~DateTimeDetection, ~Capture, ~Receiver)
   if (!identical(get_difftime(detection$DateTimeDetection),
-                lubridate:: make_difftime(num = 60 * 60, units = "hours")))
+                 lubridate:: make_difftime(num = 60 * 60, units = "hours")))
     error("detections should be hourly")
   invisible(detection)
 }
@@ -96,7 +104,7 @@ check_lex_depth <- function(depth) {
     Depth = c(0, 340))
 
   check_data3(depth, values, key = c("DateTimeDepth", "Capture", "Receiver"),
-                          select = TRUE)
+              select = TRUE)
   depth %<>% dplyr::arrange_(~DateTimeDepth, ~Capture, ~Receiver)
   invisible(depth)
 }
@@ -108,7 +116,7 @@ check_lex_joins <- function(data) {
   check_join(data$capture,  data$section@data, c(SectionCapture = "Section"))
   check_join(data$recapture,  data$capture, "Capture")
   check_join(data$recapture,  data$section@data,
-                         c(SectionRecapture = "Section"), ignore_nas = TRUE)
+             c(SectionRecapture = "Section"), ignore_nas = TRUE)
   check_join(data$detection,  data$capture, "Capture")
   check_join(data$depth,  data$capture, "Capture")
 
@@ -132,6 +140,10 @@ check_lex_deployment_detection <- function(deployment, detection) {
   invisible(deployment)
 }
 
+check_lex_consistent <- function(data) {
+  invisible(data)
+}
+
 #' Check Lake Exploitation Data
 #'
 #' Checks loaded lake exploitation data and returns a TRUE if passes all the tests.
@@ -147,6 +159,7 @@ check_lex_data <- function(data, all = FALSE) {
   if (!identical(names(data), lex_data_names())) error("data must have correct names")
   data %<>% purrr::lmap(fun_data_name, fun = "check_lex")
   check_lex_joins(data)
+  check_lex_consistent(data)
   if (all) {
     check_lex_deployment_detection(data$deployment, data$detection)
   }
