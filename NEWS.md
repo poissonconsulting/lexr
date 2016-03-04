@@ -1,3 +1,5 @@
+- Added growth function to `make_analysis_data` to calculate subsequent lengths
+
 ## v0.0.2
 
 - In analysis data removed matrix unknowns (not subsequently removed) or 

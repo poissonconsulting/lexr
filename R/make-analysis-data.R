@@ -126,8 +126,10 @@ make_analysis_capture <- function(data) {
   data
 }
 
-make_analysis_length <- function(data) {
+make_analysis_length <- function(data, growth) {
   message("making analysis length...")
+
+  if (!is.function(growth)) error("growth must be a function")
 
   captures <- nrow(data$capture)
   periods <- nrow(data$period)
@@ -136,7 +138,10 @@ make_analysis_length <- function(data) {
   dimnames(length) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
 
   for (i in 1:captures) {
-    length[data$capture$Capture[i],] <- data$capture$Length[i]
+    for (j in 1:periods) {
+      years <- as.numeric(difftime(data$period$DateTime[j], data$period$DateTime[data$capture$PeriodCapture[i]], units = "days")) / 365
+      length[data$capture$Capture[i],j] <- as.integer(round(growth(data$capture$Length[i], years)))
+    }
   }
   data$length <- length
   data
@@ -401,11 +406,14 @@ cleanup_analysis_data <- function (data) {
 #' @param section A data frame of the section data to use.
 #' @param interval_period A difftime element that will be used to group the interval or
 #' a vector indicating the actual interval groupings.
+#' @param growth A function that takes the length of a fish at capture and predicts
+#' its length after a number of years.
 #'
 #' @return A detect_data object.
 #' @export
 make_analysis_data <-  function(
-  data, capture = data$capture, section = data$section, interval_period = get_difftime(data)) {
+  data, capture = data$capture, section = data$section, interval_period = get_difftime(data),
+  growth = growth_no) {
 
   data %<>% check_detect_data()
   capture %<>% check_detect_capture()
@@ -420,7 +428,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_interval(interval_period)
 
   data %<>% make_analysis_capture()
-  data %<>% make_analysis_length()
+  data %<>% make_analysis_length(growth)
   data %<>% make_analysis_recapture()
   data %<>% make_analysis_public()
   data %<>% make_analysis_reported()
