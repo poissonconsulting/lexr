@@ -16,6 +16,25 @@ plot_analysis_coverage <- function(coverage, section, period) {
     ggplot2::scale_fill_identity()
 }
 
+plot_analysis_length <- function(length, capture, period) {
+  length %<>% reshape2::melt(as.is = TRUE, value.name = "Length")
+  length$Capture %<>% factor(levels = levels(capture$Capture))
+  length$Period %<>% factor(levels = levels(period$Period))
+
+  length %<>% dplyr::inner_join(capture, by = "Capture")
+  length %<>% dplyr::inner_join(period, by = "Period")
+  capture <- dplyr::filter_(length, ~Period == PeriodCapture) %>%
+    dplyr::select_(~Capture, ~Length, ~DateTime, ~Species) %>%
+    unique()
+
+  ggplot2::ggplot(data = length, ggplot2::aes_(x = ~DateTime, y = ~Length)) +
+    ggplot2::facet_grid(Species~.) +
+    ggplot2::geom_line(ggplot2::aes_(group = ~Capture)) +
+    ggplot2::geom_point(data = capture) +
+    ggplot2::scale_x_datetime(name = "Year", date_breaks = "1 year", date_labels = "%Y") +
+    ggplot2::scale_y_continuous(name = "Fork Length (mm)")
+}
+
 plot_analysis_logical_matrix <- function(x, value, capture, period) {
   x %<>% reshape2::melt(as.is = TRUE, value.name = value)
   x$Capture %<>% factor(levels = levels(capture$Capture))
@@ -168,6 +187,7 @@ plot.analysis_data <- function(x, all = FALSE, ...) {
   print(plot_analysis_tags(x$tags, x$capture, x$period))
   print(plot_analysis_detected(x$detected, x$capture, x$period))
   print(plot_analysis_moved(x$moved, x$capture, x$period))
+  print(plot_analysis_length(x$length, x$capture, x$period))
   if (all) {
     plot_analysis_fish(x$capture, x$recapture, x$detection, x$section, x$period)
   }
