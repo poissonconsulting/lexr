@@ -5,7 +5,7 @@
 \title{Make Analysis Data}
 \usage{
 make_analysis_data(data, capture = data$capture, section = data$section,
-  interval_period = get_difftime(data), growth = growth_no)
+  interval_period = get_difftime(data), growth = growth_no, ...)
 }
 \arguments{
 \item{data}{A detect_data object to use.}
@@ -19,6 +19,8 @@ a vector indicating the actual interval groupings.}
 
 \item{growth}{A function that takes the length of a fish at capture and predicts
 its length after a number of years.}
+
+\item{additional}{arguments passed to growth.}
 }
 \value{
 A detect_data object.
