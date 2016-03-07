@@ -5,7 +5,8 @@
 \title{Make Analysis Data}
 \usage{
 make_analysis_data(data, capture = data$capture, section = data$section,
-  interval_period = get_difftime(data), growth = growth_no, ...)
+  interval_period = get_difftime(data), growth = growth_no,
+  spawning = NULL, ...)
 }
 \arguments{
 \item{data}{A detect_data object to use.}

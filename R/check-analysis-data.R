@@ -89,6 +89,13 @@ check_analysis_detection <- function(detection) {
   detection
 }
 
+check_analysis_spawning <- function(spawning) {
+  if (!is.matrix(spawning)) error("spawning must be a matrix")
+  if (!is.logical(spawning)) error("spawning must be a logical matrix")
+
+  spawning
+}
+
 check_analysis_detected <- function(detected) {
   if (!is.matrix(detected)) error("detected must be a matrix")
   if (!is.logical(detected)) error("detected must be a logical matrix")
@@ -156,6 +163,7 @@ check_detect_dims <- function(data) {
   stopifnot(identical(dim(data$distance), c(nsection, nsection)))
   stopifnot(identical(dim(data$coverage), c(nsection, nperiod)))
   stopifnot(identical(dim(data$detection), c(ncapture, nperiod, nsection)))
+  stopifnot(identical(dim(data$spawning), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$detected), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$moved), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$reported), c(ncapture, nperiod)))
@@ -169,6 +177,7 @@ check_detect_dims <- function(data) {
   stopifnot(all(!is.null(dimnames(data$distance))))
   stopifnot(all(!is.null(dimnames(data$coverage))))
   stopifnot(all(!is.null(dimnames(data$detection))))
+  stopifnot(all(!is.null(dimnames(data$spawning))))
   stopifnot(all(!is.null(dimnames(data$detected))))
   stopifnot(all(!is.null(dimnames(data$moved))))
   stopifnot(all(!is.null(dimnames(data$reported))))

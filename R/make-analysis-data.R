@@ -29,16 +29,6 @@ filter_detect_captures_section <- function(data, capture, section) {
   data
 }
 
-# factors_to_integers <- function (data) {
-#   data[sapply(data, is.factor)] %<>% lapply(as.integer)
-#   data
-# }
-#
-# logicals_to_integers <- function (data) {
-#   data[sapply(data, is.logical)] %<>% lapply(as.integer)
-#   data
-# }
-
 make_analysis_section <- function(data) {
   message("making analysis section...")
 
@@ -115,6 +105,23 @@ replace_interval_with_period <- function(x, data, suffix = "") {
   x %<>% dplyr::left_join(interval, by = by)
   x[paste0("Interval", suffix)] <- NULL
   x
+}
+
+make_analysis_spawning <- function(data, spawning) {
+  message("making analysis spawning...")
+
+  captures <- nrow(data$capture)
+  periods <- nrow(data$period)
+
+  spawn <- matrix(NA, nrow = captures, ncol = periods)
+  dimnames(spawn) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
+  for(i in 1:nrow(data$capture)) {
+    capture <- data$capture$Capture[i]
+    detection <- dplyr::filter_(data$detection, Capture == capture)
+    spawn[capture,] <- spawning(detection, data$period)
+  }
+  data$spawning <- spawn
+  data
 }
 
 make_analysis_capture <- function(data) {
@@ -414,7 +421,7 @@ cleanup_analysis_data <- function (data) {
 #' @export
 make_analysis_data <-  function(
   data, capture = data$capture, section = data$section, interval_period = get_difftime(data),
-  growth = growth_no, ...) {
+  growth = growth_no, spawning = spawning_no, ...) {
 
   data %<>% check_detect_data()
   capture %<>% check_detect_capture()
@@ -427,7 +434,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_distance()
 
   data %<>% make_analysis_interval(interval_period)
-
+  data %<>% make_analysis_spawning(spawning)
   data %<>% make_analysis_capture()
   data %<>% make_analysis_length(growth, ...)
   data %<>% make_analysis_recapture()
