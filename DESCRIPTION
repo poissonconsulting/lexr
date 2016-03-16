@@ -28,7 +28,7 @@ Imports:
     spdep,
     tidyr
 Suggests:
-    klexdatr (>= 0.0.1),
+    klexdatr (>= 0.0.2),
     qlexdatr (>= 0.0.4),
     testthat
 License: MIT + file LICENSE

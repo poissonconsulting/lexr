@@ -117,7 +117,7 @@ make_analysis_spawning <- function(data, spawning) {
   dimnames(spawn) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
   for(i in 1:nrow(data$capture)) {
     capture <- data$capture$Capture[i]
-    detection <- dplyr::filter_(data$detection, Capture == capture)
+    detection <- dplyr::filter_(data$detection, ~Capture == capture)
     spawn[capture,] <- spawning(detection, data$period)
   }
   data$spawning <- spawn
