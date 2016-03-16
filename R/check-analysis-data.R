@@ -29,7 +29,8 @@ check_analysis_period <- function(period) {
                    Hour = c(0L, 23L),
                    DayteTime = Sys.time(),
                    DateTime = Sys.time(),
-                   Days = c(1/24, 366)),
+                   Days = c(1/24, 366),
+                   SpawningPeriod = TRUE),
     key = c("Period"), select = TRUE)
 }
 

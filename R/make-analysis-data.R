@@ -134,7 +134,10 @@ make_analysis_spawning <- function(data, spawning) {
     detection <- dplyr::filter_(detections, ~Capture == capture_id)
     spawn[capture_id,] <- spawning(detection, period)
   }
+  data$period$SpawningPeriod <- spawning(dplyr::slice(detection, 0), period)
+  data$period$SpawningPeriod <- is.na(data$period$SpawningPeriod) | data$period$SpawningPeriod
   data$spawning <- spawn
+
   data
 }
 
