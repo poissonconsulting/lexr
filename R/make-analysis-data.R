@@ -115,10 +115,15 @@ make_analysis_spawning <- function(data, spawning) {
 
   spawn <- matrix(NA, nrow = captures, ncol = periods)
   dimnames(spawn) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
-  for(i in 1:nrow(data$capture)) {
-    capture <- data$capture$Capture[i]
-    detection <- dplyr::filter_(data$detection, ~Capture == capture)
-    spawn[capture,] <- spawning(detection, data$period)
+  for (i in 1:nrow(data$capture)) {
+    if (data$capture$IntervalCapture[i] < data$capture$IntervalTagExpire[i]) {
+      capture_id <- as.character(data$capture$Capture[i])
+      detection <- dplyr::filter_(data$detection, ~Capture == capture_id)
+      capture <- dplyr::filter_(data$capture, ~Capture == capture_id)
+      if (nrow(detection)) {
+        spawn[capture_id,] <- spawning(detection, capture, data$period)
+      }
+    }
   }
   data$spawning <- spawn
   data
@@ -142,7 +147,7 @@ make_analysis_monitored <- function(data) {
   periods <- nrow(data$period)
 
   monitored <- matrix(FALSE, nrow = captures, ncol = periods)
-  dimnames(monitored) <- list(Capture = levels(data$capture$Capture), Period = data$period$Period)
+  dimnames(monitored) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
 
   for (i in 1:nrow(data$capture)) {
     if (data$capture$Tagged[i]) {

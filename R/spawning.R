@@ -10,6 +10,10 @@
 #' @param detection A data.frame of the detection data for the capture.
 #' @param years A data.frame of the period data.
 #' @export
-spawning_no <- function(detection, period) {
-    return(rep(FALSE, nrow(period)))
+spawning_no <- function(detection, capture, period) {
+  check_detect_detection(detection)
+  check_detect_capture(capture)
+  check_analysis_period(period)
+
+  return(rep(FALSE, nrow(period)))
 }
