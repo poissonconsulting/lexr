@@ -4,7 +4,7 @@
 \alias{spawning_no}
 \title{No Spawning}
 \usage{
-spawning_no(detection)
+spawning_no(detection, period)
 }
 \arguments{
 \item{detection}{A data.frame of the detection data for the capture.}
