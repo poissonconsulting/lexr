@@ -119,15 +119,20 @@ make_analysis_spawning <- function(data, spawning) {
 
   detections <- dplyr::inner_join(data$capture, data$detection, by = "Capture")
   detections %<>% dplyr::inner_join(data$interval, by = c(IntervalDetection = "Interval"))
-  detections %<>% dplyr::select_(~Capture, ~Species, ~DateTimeInterval, ~Section, ~Period)
-  detections %<>% dplyr::rename_(.dots = list(DateTimeDetection = ~DateTimeInterval))
 
-  period <- dplyr::select_(data$period, ~Period, ~DateTime)
+  detections %<>% dplyr::arrange_(~DateTimeInterval)
+  detections %<>% dplyr::mutate_(.dots = list(Date = ~date(DateTimeInterval)))
+
+  detections %<>% dplyr::select_(~Capture, ~Species, ~Date, ~Section, ~Period)
+
+  period <- dplyr::mutate_(data$period, .dots = list(Date = ~date(DateTime)))
+
+  period %<>% dplyr::select_(~Period, ~Date)
 
   for (i in 1:nrow(data$capture)) {
     capture_id <- as.character(data$capture$Capture[i])
     detection <- dplyr::filter_(detections, ~Capture == capture_id)
-      spawn[capture_id,] <- spawning(detection, period)
+    spawn[capture_id,] <- spawning(detection, period)
   }
   data$spawning <- spawn
   data
