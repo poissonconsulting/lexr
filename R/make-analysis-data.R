@@ -127,9 +127,31 @@ make_analysis_spawning <- function(data, spawning) {
 make_analysis_capture <- function(data) {
   message("making analysis capture...")
 
+  data$capture$Tagged <- data$capture$IntervalCapture < data$capture$IntervalTagExpire
+
   data$capture %<>% replace_interval_with_period(data, "Capture")
   data$capture %<>% replace_interval_with_period(data, "TagExpire")
   data$capture %<>% dplyr::as.tbl()
+  data
+}
+
+make_analysis_monitored <- function(data) {
+  message("making analysis monitored...")
+
+  captures <- nrow(data$capture)
+  periods <- nrow(data$period)
+
+  monitored <- matrix(FALSE, nrow = captures, ncol = periods)
+  dimnames(monitored) <- list(Capture = levels(data$capture$Capture), Period = data$period$Period)
+
+  for (i in 1:nrow(data$capture)) {
+    if (data$capture$Tagged[i]) {
+      monitored[data$capture$Capture[i],as.integer(data$capture$PeriodCapture[i]):as.integer(data$capture$PeriodTagExpire[i])] <- TRUE
+    }
+  }
+  data$capture$Tagged <- NULL
+  data$capture$PeriodTagExpire <- NULL
+  data$monitored <- monitored
   data
 }
 
@@ -298,7 +320,7 @@ make_analysis_reward <- function(data) {
   captures <- nrow(data$capture)
 
   reward <- matrix(nrow = captures, ncol = 2)
-  dimnames(reward) <- list(Captures = levels(data$capture$Capture), Tag = c("TBarTag1","TBarTag2"))
+  dimnames(reward) <- list(Capture = levels(data$capture$Capture), Tag = c("TBarTag1","TBarTag2"))
 
   for (i in 1:nrow(data$capture)) {
     reward[data$capture$Capture[i],1] <- data$capture$Reward1[i]
@@ -436,6 +458,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_interval(interval_period)
   data %<>% make_analysis_spawning(spawning)
   data %<>% make_analysis_capture()
+  data %<>% make_analysis_monitored()
   data %<>% make_analysis_length(growth, ...)
   data %<>% make_analysis_recapture()
   data %<>% make_analysis_public()

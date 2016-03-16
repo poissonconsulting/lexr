@@ -55,8 +55,7 @@ check_analysis_capture <- function(capture) {
     capture, list(Capture = factor(1),
                   Species = factor(1),
                   PeriodCapture = factor(1),
-                  SectionCapture = factor(1),
-                  PeriodTagExpire = factor(1)),
+                  SectionCapture = factor(1)),
     key = "Capture", select = TRUE)
 }
 
@@ -110,6 +109,14 @@ check_analysis_moved <- function(moved) {
   if (any(is.na(moved))) error("moved must not have missing values")
 
   moved
+}
+
+check_analysis_monitored <- function(monitored) {
+  if (!is.matrix(monitored)) error("monitored must be a matrix")
+  if (!is.logical(monitored)) error("monitored must be a logical matrix")
+  if (any(is.na(monitored))) error("monitored must not have missing values")
+
+  monitored
 }
 
 check_analysis_reported <- function(reported) {
@@ -166,6 +173,7 @@ check_detect_dims <- function(data) {
   stopifnot(identical(dim(data$spawning), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$detected), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$moved), c(ncapture, nperiod)))
+  stopifnot(identical(dim(data$monitored), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$reported), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$released), c(ncapture, nperiod)))
   stopifnot(identical(dim(data$public), c(ncapture, nperiod)))
@@ -179,6 +187,7 @@ check_detect_dims <- function(data) {
   stopifnot(all(!is.null(dimnames(data$detection))))
   stopifnot(all(!is.null(dimnames(data$spawning))))
   stopifnot(all(!is.null(dimnames(data$detected))))
+  stopifnot(all(!is.null(dimnames(data$monitored))))
   stopifnot(all(!is.null(dimnames(data$moved))))
   stopifnot(all(!is.null(dimnames(data$reported))))
   stopifnot(all(!is.null(dimnames(data$released))))
