@@ -12,16 +12,17 @@ spawning_no <- function(detection, period) {
   check_data3(detection, values = list(
     Capture = factor(1),
     Species = factor(1),
-    DateTimeInterval = lubridate::now(),
+    DateTimeDetection = lubridate::now(),
     Section = factor(1),
     Period = factor(1)
-  ), min_row = 0, key = "DateTimeInterval")
+  ), min_row = 0, key = "DateTimeDetection")
 
   check_data3(period, list(Period = factor(1),
                    DateTime = Sys.time()),
     key = c("Period"))
 
   check_join(detection, period, join = "Period")
+  stopifnot(length(unique(detection$Capture)) < 2)
 
   return(rep(FALSE, nlevels(detection$Period)))
 }
