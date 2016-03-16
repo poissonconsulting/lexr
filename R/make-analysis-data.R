@@ -87,7 +87,8 @@ make_analysis_interval <- function(data, interval_period) {
   data$period %<>% plyr::ddply("Period", dplyr::slice, 1)
   data$period %<>% dplyr::select_(~-Interval)
   data$period %<>% dplyr::select_(~Period, ~everything())
-  data$interval %<>% dplyr::select_(~Period, ~Interval)
+  data$interval %<>% dplyr::select_(~Period, ~Interval, ~DateTime)
+  data$interval %<>% dplyr::rename_(.dots = list(DateTimeInterval = ~DateTime))
 
   data$period %<>% dplyr::as.tbl()
   data$interval %<>% dplyr::as.tbl()
@@ -115,14 +116,18 @@ make_analysis_spawning <- function(data, spawning) {
 
   spawn <- matrix(NA, nrow = captures, ncol = periods)
   dimnames(spawn) <- list(Capture = levels(data$capture$Capture), Period = levels(data$period$Period))
+
+  detections <- dplyr::filter_(data$capture, ~IntervalCapture < IntervalTagExpire)
+  detections %<>% dplyr::inner_join(data$detection, by = "Capture")
+  detections %<>% dplyr::inner_join(data$interval, by = c(IntervalDetection = "Interval"))
+  detections %<>% dplyr::select_(~Capture, ~Species, ~DateTimeInterval, ~Section, ~Period)
+  detections %<>% dplyr::rename_(.dots = list(DateTime = ~DateTimeInterval))
+
   for (i in 1:nrow(data$capture)) {
-    if (data$capture$IntervalCapture[i] < data$capture$IntervalTagExpire[i]) {
-      capture_id <- as.character(data$capture$Capture[i])
-      detection <- dplyr::filter_(data$detection, ~Capture == capture_id)
-      capture <- dplyr::filter_(data$capture, ~Capture == capture_id)
-      if (nrow(detection)) {
-        spawn[capture_id,] <- spawning(detection, capture, data$period)
-      }
+    capture_id <- as.character(data$capture$Capture[i])
+    detection <- dplyr::filter_(detections, ~Capture == capture_id)
+    if (nrow(detection) > 1) {
+      spawn[capture_id,] <- spawning(detection)
     }
   }
   data$spawning <- spawn

@@ -4,19 +4,16 @@
 \alias{spawning_no}
 \title{No Spawning}
 \usage{
-spawning_no(detection, capture, period)
+spawning_no(detection)
 }
 \arguments{
 \item{detection}{A data.frame of the detection data for the capture.}
-
-\item{years}{A data.frame of the period data.}
 }
 \description{
 Function that simply returns FALSE for every time period.
 }
 \details{
-detection has the columns Section, DateTime and Interval while
-period has the columns Period and Interval for all period.
+detection has the columns Capture, Species, Section, DateTime and Period.
 Any replacement function has to use this information to return a logical
 vector indicating whether the individual was spawing in each period.
 }
