@@ -1,4 +1,11 @@
-- Added growth function to `make_analysis_data` to calculate subsequent lengths
+# lexr NEWS
+
+## v0.0.3
+ 
+- Added spawning function to `make_analysis_data` to identify spawning periods.
+- Added growth function to `make_analysis_data` to calculate subsequent lengths.
+- `analysis_data` object now includes a capture by period monitored matrix indicating 
+whether it has an active acoustic tag.
 
 ## v0.0.2
 
