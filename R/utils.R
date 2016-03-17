@@ -24,7 +24,7 @@ capture_output <- function(x) {
 }
 
 lex_data_names <- function() c("section", "station", "deployment", "capture",
-       "recapture", "detection", "depth")
+       "recapture", "detection")
 
 detect_data_names <- function() c("section", "distance", "interval", "coverage", "capture",
        "recapture", "detection")

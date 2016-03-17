@@ -5,8 +5,8 @@
 \title{Make Analysis Data}
 \usage{
 make_analysis_data(data, capture = data$capture, section = data$section,
-  interval_period = get_difftime(data), growth = growth_no,
-  spawning = spawning_no, ...)
+  interval_period = get_difftime(data), spawning = spawning_no,
+  growth = growth_no, ...)
 }
 \arguments{
 \item{data}{A detect_data object to use.}
@@ -18,10 +18,14 @@ make_analysis_data(data, capture = data$capture, section = data$section,
 \item{interval_period}{A difftime element that will be used to group the interval or
 a vector indicating the actual interval groupings.}
 
+\item{spawning}{A function that takes detections by date for a capture and period data
+and returns a logical vector indicating whether the individual spawned in each
+period.}
+
 \item{growth}{A function that takes the length of a fish at capture and predicts
 its length after a number of years.}
 
-\item{additional}{arguments passed to growth.}
+\item{...}{additional arguments passed to growth.}
 }
 \value{
 A detect_data object.

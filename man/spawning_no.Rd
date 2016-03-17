@@ -8,13 +8,21 @@ spawning_no(detection, period)
 }
 \arguments{
 \item{detection}{A data.frame of the detection data for the capture.}
+
+\item{period}{A data.frame of the periods.}
 }
 \description{
-Function that simply returns FALSE for every time period.
+A function that simply returns FALSE for every time period.
 }
 \details{
-detection has the columns Capture, Species, Section, DateTime and Period.
-Any replacement function has to use this information to return a logical
-vector indicating whether the individual was spawing in each period.
+To identify spawning events when making analysis data pass a custom
+function in place of spawning_no. The function has to take the same
+arguments and return a logical vector even if there are no detections
+for an individual. It should do this by returning FALSE for all
+periods outside the spawning window and NA for all periods inside
+the spawning window if no information is available.
+
+To see the columns and types in detection and period view
+the function definition for \code{spawning_no}.
 }
 

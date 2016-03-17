@@ -86,11 +86,9 @@ filter_lex_captures <- function(data, capture) {
 
   data$recapture %<>% dplyr::filter_(~Capture %in% capture$Capture)
   data$detection %<>% dplyr::filter_(~Capture %in% capture$Capture)
-  data$depth %<>% dplyr::filter_(~Capture %in% capture$Capture)
 
   data$recapture$Capture %<>% factor(levels = levels(capture$Capture))
   data$detection$Capture %<>% factor(levels = levels(capture$Capture))
-  data$depth$Capture %<>% factor(levels = levels(capture$Capture))
 
   data$capture <- capture
   data
@@ -143,12 +141,6 @@ adjust_datetime_detection <- function(detection, start_date, end_date) {
   detection %<>% dplyr::filter_(~DateTimeDetection >= start_date)
   detection %<>% dplyr::filter_(~DateTimeDetection <= end_date)
   detection
-}
-
-adjust_datetime_depth <- function(depth, start_date, end_date) {
-  depth %<>% dplyr::filter_(~DateTimeDepth >= start_date)
-  depth %<>% dplyr::filter_(~DateTimeDepth <= end_date)
-  depth
 }
 
 set_intervals <- function(data, interval) {

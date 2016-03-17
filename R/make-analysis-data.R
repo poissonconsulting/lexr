@@ -452,15 +452,18 @@ cleanup_analysis_data <- function (data) {
 #' @param section A data frame of the section data to use.
 #' @param interval_period A difftime element that will be used to group the interval or
 #' a vector indicating the actual interval groupings.
+#' @param spawning A function that takes detections by date for a capture and period data
+#' and returns a logical vector indicating whether the individual spawned in each
+#' period.
 #' @param growth A function that takes the length of a fish at capture and predicts
 #' its length after a number of years.
-#' @param additional arguments passed to growth.
+#' @param ... additional arguments passed to growth.
 #'
 #' @return A detect_data object.
 #' @export
 make_analysis_data <-  function(
   data, capture = data$capture, section = data$section, interval_period = get_difftime(data),
-  growth = growth_no, spawning = spawning_no, ...) {
+  spawning = spawning_no, growth = growth_no, ...) {
 
   data %<>% check_detect_data()
   capture %<>% check_detect_capture()

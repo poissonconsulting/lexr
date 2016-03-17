@@ -80,14 +80,6 @@ plot_lex_detection <- function(detection) {
     ggplot2::scale_y_continuous(name = "Total Daily Detections", labels = scales::comma)
 }
 
-plot_lex_depth <- function(depth) {
-  tz <- lubridate::tz(depth$DateTimeDepth)
-  ggplot2::ggplot(data = depth, ggplot2::aes_(x = ~DateTimeDepth, y = ~Depth * -1)) +
-    ggplot2::geom_point(alpha = 1/3) +
-    ggplot2::scale_x_datetime(name = "Date", labels = scales::date_format("%b %Y", tz)) +
-    ggplot2::scale_y_continuous(name = "Depth (m)")
-}
-
 plot_lex_deployment_detection <- function (deployment, detection, station) {
 
   deployment %<>% dplyr::inner_join(station, by = "Station")

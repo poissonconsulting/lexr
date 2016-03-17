@@ -46,8 +46,7 @@ check_lex_capture <- function(capture) {
                  Weight = c(0.5, 10, NA),
                  Reward1 = c(0L, 10L, 100L),
                  Reward2 = c(0L, 10L, 100L, NA),
-                 DateTimeTagExpire = Sys.time(),
-                 DepthRangeTag = c(1L, NA))
+                 DateTimeTagExpire = Sys.time())
 
   check_data3(capture, values, key = "Capture", select = TRUE)
   capture %<>% dplyr::arrange_(~DateTimeCapture, ~Capture)
@@ -95,20 +94,6 @@ check_lex_detection <- function(detection) {
   invisible(detection)
 }
 
-check_lex_depth <- function(depth) {
-
-  values <- list(
-    DateTimeDepth = Sys.time(),
-    Capture = factor(1),
-    Receiver = factor(1),
-    Depth = c(0, 340))
-
-  check_data3(depth, values, key = c("DateTimeDepth", "Capture", "Receiver"),
-              select = TRUE)
-  depth %<>% dplyr::arrange_(~DateTimeDepth, ~Capture, ~Receiver)
-  invisible(depth)
-}
-
 check_lex_joins <- function(data) {
 
   check_join(data$station, data$section@data, "Section")
@@ -118,10 +103,8 @@ check_lex_joins <- function(data) {
   check_join(data$recapture,  data$section@data,
              c(SectionRecapture = "Section"), ignore_nas = TRUE)
   check_join(data$detection,  data$capture, "Capture")
-  check_join(data$depth,  data$capture, "Capture")
 
   stopifnot(all(data$detection$Receiver %in% data$deployment$Receiver))
-  stopifnot(all(data$depth$Receiver %in% data$deployment$Receiver))
   invisible(data)
 }
 
