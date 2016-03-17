@@ -6,12 +6,14 @@
 \alias{lexr-package}
 \title{Lake Exploitation Study Data Plotting and Analysis}
 \description{
-Lake Exploitation Study Data Plotting and Analysis
+\code{lexr} is an R package to plot and analyse lake exploitation data.
+}
+\details{
+For an example run the demo below.
 }
 \examples{
 \dontrun{
 demo(klex, ask = FALSE)
-demo(qlex, ask = FALSE)
 }
 }
 

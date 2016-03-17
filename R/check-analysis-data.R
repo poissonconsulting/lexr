@@ -206,7 +206,7 @@ check_detect_dims <- function(data) {
 #' Checks lake exploitation analysis data and returns an invisible copy of the data.
 #' Otherwise stops with an informative error.
 #'
-#' @param data The analysis_data object to check.
+#' @param data The \code{analysis_data} object to check.
 #' @export
 check_analysis_data <- function(data) {
   if (!inherits(data, "analysis_data")) error("data must be a analysis_data object")

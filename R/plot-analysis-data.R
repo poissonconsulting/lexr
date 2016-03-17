@@ -1,4 +1,8 @@
-plot_analysis_coverage <- function(coverage, section, period) {
+plot_analysis_coverage <- function(data) {
+  coverage <- data$coverage
+  section <- data$section
+  period <- data$period
+
   coverage %<>% reshape2::melt(as.is = TRUE, value.name = "Coverage")
   coverage$Section %<>% factor(levels = levels(section$Section))
   coverage$Period %<>% factor(levels = levels(period$Period))
@@ -16,7 +20,11 @@ plot_analysis_coverage <- function(coverage, section, period) {
     ggplot2::scale_fill_identity()
 }
 
-plot_analysis_length <- function(length, capture, period) {
+plot_analysis_length <- function(data) {
+  length <- data$length
+  capture <- data$capture
+  period <- data$period
+
   length %<>% reshape2::melt(as.is = TRUE, value.name = "Length")
   length$Capture %<>% factor(levels = levels(capture$Capture))
   length$Period %<>% factor(levels = levels(period$Period))
@@ -55,35 +63,44 @@ plot_analysis_logical_matrix <- function(x, value, capture, period) {
                    axis.ticks.y = ggplot2::element_blank())
 }
 
-plot_analysis_spawning <- function(spawning, capture, period) {
-  plot_analysis_logical_matrix(spawning, "Spawning", capture, period)
+plot_analysis_spawning <- function(data) {
+  plot_analysis_logical_matrix(data$spawning, "Spawning", data$capture, data$period)
 }
 
-plot_analysis_detected <- function(detected, capture, period) {
-  plot_analysis_logical_matrix(detected, "Detected", capture, period)
+plot_analysis_detected <- function(data) {
+  plot_analysis_logical_matrix(data$detected, "Detected", data$capture, data$period)
 }
 
-plot_analysis_moved <- function(moved, capture, period) {
-  plot_analysis_logical_matrix(moved, "Moved", capture, period)
+plot_analysis_moved <- function(data) {
+  plot_analysis_logical_matrix(data$moved, "Moved", data$capture, data$period)
 }
 
-plot_analysis_reported <- function(reported, capture, period) {
-  plot_analysis_logical_matrix(reported, "Reported", capture, period)
+plot_analysis_reported <- function(data) {
+  plot_analysis_logical_matrix(data$reported, "Reported", data$capture, data$period)
 }
 
-plot_analysis_removed <- function(removed, capture, period) {
-  plot_analysis_logical_matrix(removed, "Removed", capture, period)
+plot_analysis_removed <- function(data) {
+  plot_analysis_logical_matrix(data$removed, "Removed", data$capture, data$period)
 }
 
-plot_analysis_released <- function(released, capture, period) {
-  plot_analysis_logical_matrix(released, "Released", capture, period)
+plot_analysis_released <- function(data) {
+  plot_analysis_logical_matrix(data$released, "Released", data$capture, data$period)
 }
 
-plot_analysis_public <- function(public, capture, period) {
-  plot_analysis_logical_matrix(public, "Public", capture, period)
+plot_analysis_public <- function(data) {
+  plot_analysis_logical_matrix(data$public, "Public", data$capture, data$period)
 }
 
-plot_analysis_tags <- function(tags, capture, period) {
+plot_analysis_monitored <- function(data) {
+  plot_analysis_logical_matrix(data$monitored, "Monitored", data$capture, data$period)
+}
+
+plot_analysis_tags <- function(data) {
+
+  tags <- data$tags
+  capture <- data$capture
+  period <- data$period
+
   tags %<>% reshape2::melt(as.is = TRUE, value.name = "Tagged")
   tags$Capture %<>% factor(levels = levels(capture$Capture))
   tags$Period %<>% factor(levels = levels(period$Period))
@@ -153,7 +170,22 @@ plot_fish <- function(detection, section, capture, recapture, period) {
   NULL
 }
 
-plot_analysis_fish <- function(capture, recapture, detection, section, period) {
+get_period_tagexpire <- function (x) {
+  x %<>% dplyr::arrange_(~Period)
+  x %<>% dplyr::rename_(.dots = list(PeriodTagExpire = "Period"))
+  x %<>% dplyr::filter_(~Monitored)
+  x %<>% dplyr::select_(~Capture, ~PeriodTagExpire)
+  dplyr::slice(x, 1)
+}
+
+plot_analysis_fish <- function(data) {
+
+  capture <- data$capture
+  recapture <- data$recapture
+  detection <- data$detection
+  section <- data$section
+  period <- data$period
+  monitored <- data$monitored
 
   detection %<>% reshape2::melt(varnames = c("Capture", "Period", "Section"),
                                 as.is = TRUE, value.name = "ProportionPeriod")
@@ -169,8 +201,18 @@ plot_analysis_fish <- function(capture, recapture, detection, section, period) {
   detection %<>% dplyr::inner_join(section, by = c(Section = "Section"))
 
   capture %<>% dplyr::inner_join(period, by = c(PeriodCapture = "Period"))
+
+  monitored %<>% reshape2::melt(as.is = TRUE, value.name = "Monitored")
+  monitored$Capture %<>% factor(levels = levels(capture$Capture))
+  monitored$Period %<>% factor(levels = levels(period$Period))
+  monitored %<>% plyr::ddply("Capture", get_period_tagexpire)
+
+  capture %<>% dplyr::left_join(monitored, by = "Capture")
+  capture$PeriodTagExpire[is.na(capture$PeriodTagExpire)] <- capture$PeriodCapture[is.na(capture$PeriodTagExpire)]
+
   capture %<>% dplyr::inner_join(dplyr::select_(period, .dots = list(Period = "Period", DateTimeTagExpire = "DateTime")),
                                  by = c(PeriodTagExpire = "Period"))
+
   recapture %<>% dplyr::inner_join(period, by = c(PeriodRecapture = "Period"))
   detection %<>% dplyr::inner_join(period, by = c(Period = "Period"))
 
@@ -183,19 +225,19 @@ plot_analysis_fish <- function(capture, recapture, detection, section, period) {
 
 #' @export
 plot.analysis_data <- function(x, all = FALSE, ...) {
-  print(plot_analysis_spawning(x$released, x$capture, x$period))
-  stop()
-  print(plot_analysis_coverage(x$coverage, x$section, x$period))
-  print(plot_analysis_reported(x$reported, x$capture, x$period))
-  print(plot_analysis_removed(x$removed, x$capture, x$period))
-  print(plot_analysis_released(x$released, x$capture, x$period))
-  print(plot_analysis_public(x$public, x$capture, x$period))
-  print(plot_analysis_tags(x$tags, x$capture, x$period))
-  print(plot_analysis_detected(x$detected, x$capture, x$period))
-  print(plot_analysis_moved(x$moved, x$capture, x$period))
-  print(plot_analysis_length(x$length, x$capture, x$period))
+  print(plot_analysis_coverage(x))
+  print(plot_analysis_reported(x))
+  print(plot_analysis_removed(x))
+  print(plot_analysis_released(x))
+  print(plot_analysis_public(x))
+  print(plot_analysis_tags(x))
+  print(plot_analysis_monitored(x))
+  print(plot_analysis_detected(x))
+  print(plot_analysis_moved(x))
+  print(plot_analysis_spawning(x))
+  print(plot_analysis_length(x))
   if (all) {
-    plot_analysis_fish(x$capture, x$recapture, x$detection, x$section, x$period)
+    plot_analysis_fish(x)
   }
   invisible(NULL)
 }

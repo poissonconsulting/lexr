@@ -1,5 +1,9 @@
 #' Lake Exploitation Study Data Plotting and Analysis
 #'
+#' \code{lexr} is an R package to plot and analyse lake exploitation data.
+#'
+#' For an example run the demo below.
+#'
 #' @docType package
 #' @name lexr
 #' @import datacheckr
@@ -9,6 +13,5 @@
 #' @examples
 #' \dontrun{
 #' demo(klex, ask = FALSE)
-#' demo(qlex, ask = FALSE)
 #' }
 NULL

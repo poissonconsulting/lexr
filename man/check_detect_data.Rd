@@ -7,10 +7,10 @@
 check_detect_data(data)
 }
 \arguments{
-\item{data}{The detect_data object to check.}
+\item{data}{The \code{detect_data} object to check.}
 }
 \description{
-Checks loaded lake exploitation data and returns an invisible copy of the data.
+Checks lake exploitation data and returns an invisible copy of the data.
 Otherwise stops with an informative error.
 }
 

@@ -7,7 +7,7 @@
 check_analysis_data(data)
 }
 \arguments{
-\item{data}{The analysis_data object to check.}
+\item{data}{The \code{analysis_data} object to check.}
 }
 \description{
 Checks lake exploitation analysis data and returns an invisible copy of the data.

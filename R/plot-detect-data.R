@@ -7,7 +7,15 @@ section_polygon <- function(section) {
   polygon
 }
 
-plot_detect_section <- function(section) {
+#' Plot Section
+#'
+#' Plots the color-coded sections for a \code{detect_data} object
+#' produced by the \code{\link{make_detect_data}} function.
+#'
+#' @param data The \code{detect_data} object to plot.
+#' @export
+plot_detect_section <- function(data) {
+  section <- data$section
 
   polygon <- section_polygon(section)
 
@@ -30,7 +38,18 @@ plot_detect_section <- function(section) {
     ggplot2::scale_fill_identity()
 }
 
-plot_detect_coverage <- function(coverage, section, interval) {
+#' Plot Coverage
+#'
+#' Plots the color-coded percent receiver coverage for a \code{detect_data} object
+#' produced by the \code{\link{make_detect_data}} function.
+#'
+#' @param data The \code{detect_data} object to plot.
+#' @export
+plot_detect_coverage <- function(data) {
+  coverage <- data$coverage
+  section <- data$section
+  interval <- data$interval
+
   tz <- lubridate::tz(interval$DateTime)
   first_year <- lubridate::year(interval$DateTime[1])
   last_year <- lubridate::year(interval$DateTime[nrow(interval)])
@@ -53,7 +72,16 @@ plot_detect_coverage <- function(coverage, section, interval) {
                            y = c(0,1))
 }
 
-plot_detect_distance <- function(distance, section) {
+#' Plot Detection Distance
+#'
+#' Plots the color-coded distances between sections for a \code{detect_data} object
+#' produced by the \code{\link{make_detect_data}} function.
+#'
+#' @param data The \code{detect_data} object to plot.
+#' @export
+plot_detect_distance <- function(data) {
+  distance <- data$distance
+  section <- data$section
   distance %<>% dplyr::filter_(~Distance == 1L)
   from <- dplyr::inner_join(distance, section@data, by = c(SectionFrom = "Section"))
   to <- dplyr::inner_join(distance, section@data, by = c(SectionTo = "Section"))
@@ -80,7 +108,20 @@ plot_detect_distance <- function(distance, section) {
 
 }
 
-plot_detect_overview <- function(capture, recapture, detection, section, interval) {
+#' Plot Detection Overview
+#'
+#' Plots the color-coded detection overview plot for a \code{detect_data} object
+#' produced by the \code{\link{make_detect_data}} function.
+#'
+#' @param data The \code{detect_data} object to plot.
+#' @export
+plot_detect_overview <- function(data) {
+
+  capture <- data$capture
+  recapture <- data$recapture
+  detection <- data$detection
+  section <- data$section
+  interval <- data$interval
 
   tz <- lubridate::tz(interval$DateTime)
   first_year <- lubridate::year(interval$DateTime[1])
@@ -171,7 +212,13 @@ plot_fish_year <- function(detection, section, capture, recapture) {
   NULL
 }
 
-plot_detect_fish_year <- function(capture, recapture, detection, section, interval) {
+plot_detect_fish_year <- function(data) {
+
+  capture <- data$capture
+  recapture <- data$recapture
+  detection <- data$detection
+  section <- data$section
+  interval <- data$interval
 
   tz <- lubridate::tz(interval$DateTime)
   first_year <- lubridate::year(interval$DateTime[1])
@@ -201,12 +248,12 @@ plot_detect_fish_year <- function(capture, recapture, detection, section, interv
 
 #' @export
 plot.detect_data <- function(x, all = FALSE, ...) {
-  print(plot_detect_section(x$section))
-  print(plot_detect_coverage(x$coverage, x$section, x$interval))
-  print(plot_detect_distance(x$distance, x$section))
-  print(plot_detect_overview(x$capture, x$recapture, x$detection, x$section, x$interval))
+  print(plot_detect_section(x))
+  print(plot_detect_coverage(x))
+  print(plot_detect_distance(x))
+  print(plot_detect_overview(x))
   if (all) {
-    plot_detect_fish_year(x$capture, x$recapture, x$detection, x$section, x$interval)
+    plot_detect_fish_year(x)
   }
   invisible(NULL)
 }
