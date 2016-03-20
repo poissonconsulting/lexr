@@ -53,6 +53,7 @@ check_detect_capture <- function(capture) {
                   IntervalCapture = 1L,
                   SectionCapture = factor(1),
                   Length = c(200L, 1000L),
+                  Weight = c(0.5, 10, NA),
                   Reward1 = factor(rep("Low", 3), levels = c("Low", "High")),
                   Reward2 = factor(c(rep("Low", 3), NA), levels = c("Low", "High")),
                   IntervalTagExpire = 1L),

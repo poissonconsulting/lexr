@@ -188,7 +188,7 @@ make_capture <- function(data) {
   levels(capture$Reward1) <- list("Low" = c("0", "10"), "High" = "100")
   levels(capture$Reward2) <- list("Low" = c("0", "10"), "High" = "100")
   capture %<>% dplyr::select_(~Capture, ~IntervalCapture, ~SectionCapture,
-                              ~IntervalTagExpire, ~Length,
+                              ~IntervalTagExpire, ~Length, ~Weight,
                               ~Reward1, ~Reward2, ~Species)
   data$capture <- capture
   data
