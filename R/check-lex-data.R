@@ -63,7 +63,7 @@ check_lex_recapture <- function(recapture) {
                  Released = TRUE,
                  Public = TRUE)
 
-  check_data3(recapture, values, select = TRUE)
+  check_data3(recapture, values, select = TRUE, min_row = 0)
   if (any(!recapture$TBarTag1 & !recapture$TBarTag2))
     error("recaptures must have at least one T-bar tag")
   if (any(!recapture$Public & recapture$TagsRemoved))

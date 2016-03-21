@@ -82,7 +82,7 @@ make_coverage <- function(data) {
 }
 
 drop_recaptures_after_harvest <- function(recapture) {
-  if (nrow(recapture) == 1 || all(recapture$Released))
+  if (all(recapture$Released))
     return(recapture)
   recapture %<>% dplyr::arrange_(~DateTimeRecapture)
   recapture %<>% dplyr::slice(1:min(which(!recapture$Released)))
@@ -411,6 +411,9 @@ make_detect_data <-  function(
                               ~date(DateTimeRecapture) <= end_date)
 
   data %<>% filter_lex_captures_recaptures(capture, recapture)
+
+  data$recapture %<>% check_lex_recapture()
+
 
   data %<>% make_interval(start_date = start_date, end_date = end_date,
                           hourly_interval = hourly_interval)
