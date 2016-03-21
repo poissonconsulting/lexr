@@ -63,8 +63,8 @@ plot_analysis_logical_matrix <- function(x, value, capture, period) {
                    axis.ticks.y = ggplot2::element_blank())
 }
 
-plot_analysis_spawning <- function(data) {
-  plot_analysis_logical_matrix(data$spawning, "Spawning", data$capture, data$period)
+plot_analysis_spawned <- function(data) {
+  plot_analysis_logical_matrix(data$spawned, "Spawned", data$capture, data$period)
 }
 
 plot_analysis_detected <- function(data) {
@@ -234,7 +234,7 @@ plot.analysis_data <- function(x, all = FALSE, ...) {
   print(plot_analysis_monitored(x))
   print(plot_analysis_detected(x))
   print(plot_analysis_moved(x))
-  print(plot_analysis_spawning(x))
+  print(plot_analysis_spawned(x))
   print(plot_analysis_length(x))
   if (all) {
     plot_analysis_fish(x)
