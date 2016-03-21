@@ -108,8 +108,8 @@ replace_interval_with_period <- function(x, data, suffix = "") {
   x
 }
 
-make_analysis_spawning <- function(data, spawning) {
-  message("making analysis spawning...")
+make_analysis_spawned <- function(data, spawning) {
+  message("making analysis spawned...")
 
   captures <- nrow(data$capture)
   periods <- nrow(data$period)
@@ -136,7 +136,7 @@ make_analysis_spawning <- function(data, spawning) {
   }
   data$period$SpawningPeriod <- spawning(dplyr::slice(detection, 0), period)
   data$period$SpawningPeriod <- is.na(data$period$SpawningPeriod) | data$period$SpawningPeriod
-  data$spawning <- spawn
+  data$spawned <- spawn
 
   data
 }
@@ -476,7 +476,7 @@ make_analysis_data <-  function(
   data %<>% make_analysis_distance()
 
   data %<>% make_analysis_interval(interval_period)
-  data %<>% make_analysis_spawning(spawning)
+  data %<>% make_analysis_spawned(spawning)
   data %<>% make_analysis_capture()
   data %<>% make_analysis_monitored()
   data %<>% make_analysis_length(growth, ...)
