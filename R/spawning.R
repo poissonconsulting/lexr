@@ -25,7 +25,8 @@ spawning_no <- function(detection, period) {
     Period = factor(1)), min_row = 0)
 
   check_data3(period, list(Period = factor(1),
-                           Date = lubridate::today()),
+                           Date = lubridate::today(),
+                           Days = c(1, 366)),
               key = c("Period"))
 
   stopifnot(length(unique(detection$Capture)) < 2)

@@ -127,7 +127,7 @@ make_analysis_spawning <- function(data, spawning) {
 
   period <- dplyr::mutate_(data$period, .dots = list(Date = ~date(DateTime)))
 
-  period %<>% dplyr::select_(~Period, ~Date)
+  period %<>% dplyr::select_(~Period, ~Date, ~Days)
 
   for (i in 1:nrow(data$capture)) {
     capture_id <- as.character(data$capture$Capture[i])
