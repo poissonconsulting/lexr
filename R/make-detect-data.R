@@ -288,29 +288,74 @@ make_section <- function(data) {
   data
 }
 
+keep_morts <- function (x) {
+  x %<>% dplyr::arrange_(~DateDetection)
+  x %<>% dplyr::filter_(~DateDetection > DateRecovery)
+  sections <- length(unique(x$Section))
+  if (sections > 1) # two or more sections after date recovery
+    return(NULL)
+  return(dplyr::data_frame(Mortality = TRUE)) # so data row
+}
+
+filter_recovery_days <- function (data, recovery_days) {
+  if (recovery_days == 0) {
+    return(data)
+  }
+  morts <- data$capture
+  morts %<>% dplyr::inner_join(dplyr::select_(data$interval, .dots = list(
+    IntervalCapture = ~Interval, DateCapture = ~Date)), by = c("IntervalCapture"))
+  morts %<>% dplyr::inner_join(dplyr::select_(data$interval, .dots = list(
+    IntervalTagExpire = ~Interval, DateTagExpire = ~Date)), by = c("IntervalTagExpire"))
+  morts %<>% dplyr::mutate_(.dots = list(TagDays = ~as.integer(DateTagExpire) - as.integer(DateCapture)))
+  morts %<>% dplyr::mutate_(.dots = list(DateRecovery = ~DateCapture + recovery_days))
+# assume no morts among fish without acoustic tags
+  morts %<>% dplyr::filter_(~TagDays > 0)
+  recaps <- dplyr::group_by_(data$recapture, ~Capture) %>% dplyr::summarise_(.dots = list(IntervalRecapture = ~max(IntervalRecapture))) %>% dplyr::ungroup()
+  recaps %<>% dplyr::inner_join(dplyr::select_(data$interval, .dots = list(
+    IntervalRecapture = ~Interval, DateRecapture = ~Date)), by = c("IntervalRecapture"))
+  morts %<>% dplyr::left_join(recaps, by = "Capture")
+  # recaptured after recovery are not morts
+  morts %<>% dplyr::filter_(~is.na(DateRecapture) | DateRecapture <= DateRecovery)
+  detection <- data$detection
+  detection %<>% dplyr::inner_join(dplyr::select_(data$interval, .dots = list(
+    IntervalDetection = ~Interval, DateDetection = ~Date)), by = c("IntervalDetection"))
+  morts %<>% dplyr::left_join(detection, by = "Capture")
+  morts %<>% plyr::ddply("Capture", keep_morts)
+  capture <- dplyr::filter_(data$capture, ~!Capture %in% morts$Capture)
+
+  filter_lex_captures(data, capture)
+}
+
+
 #' Make Detect Data
 #'
 #' Makes detect_data object from a lex_data object. The hourly interval can be
 #' 1, 2, 3, 4, 6, 12 or 24.
+#'
+#' If the individual has an active
+#' transmitter and no movement is detected after the recovery_days and it is not recaptured
+#' then it is considered a handling mortality and removed from the data set.
 #'
 #' @param data The lex_data object.
 #' @param capture A data frame of the capture data to use.
 #' @param start_date A date of the start.
 #' @param end_date A date of the end.
 #' @param hourly_interval A count indicating the hourly interval.
-#'
+#' @param recovery_days A count indicating the number of days during which
+#' fish are recovering from acoustic tagging.
 #' @return A detect_data object.
 #' @export
 make_detect_data <-  function(
   data, capture = data$capture,
   start_date = min(lexr::date(capture$DateTimeCapture)),
   end_date = max(lexr::date(capture$DateTimeTagExpire)),
-  hourly_interval = 1L) {
+  hourly_interval = 1L, recovery_days = 0L) {
 
   check_data2(capture)
   check_date(start_date)
   check_date(end_date)
   check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
+  check_scalar(recovery_days, c(0L, 365L))
 
   if (end_date <= start_date) error("start_date must be before end_date")
 
@@ -329,6 +374,7 @@ make_detect_data <-  function(
   data %<>% make_distance()
   data %<>% make_detection()
   data %<>% make_section()
+  data %<>% filter_recovery_days(recovery_days)
   data <- data[detect_data_names()]
   class(data) <- "detect_data"
   check_detect_data(data)

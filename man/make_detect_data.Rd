@@ -7,7 +7,7 @@
 make_detect_data(data, capture = data$capture,
   start_date = min(lexr::date(capture$DateTimeCapture)),
   end_date = max(lexr::date(capture$DateTimeTagExpire)),
-  hourly_interval = 1L)
+  hourly_interval = 1L, recovery_days = 0L)
 }
 \arguments{
 \item{data}{The lex_data object.}
@@ -19,6 +19,9 @@ make_detect_data(data, capture = data$capture,
 \item{end_date}{A date of the end.}
 
 \item{hourly_interval}{A count indicating the hourly interval.}
+
+\item{recovery_days}{A count indicating the number of days during which
+fish are recovering from acoustic tagging.}
 }
 \value{
 A detect_data object.
@@ -26,5 +29,10 @@ A detect_data object.
 \description{
 Makes detect_data object from a lex_data object. The hourly interval can be
 1, 2, 3, 4, 6, 12 or 24.
+}
+\details{
+If the individual has an active
+transmitter and no movement is detected after the recovery_days and it is not recaptured
+then it is considered a handling mortality and removed from the data set.
 }
 
