@@ -4,7 +4,7 @@
 \alias{make_detect_data}
 \title{Make Detect Data}
 \usage{
-make_detect_data(data, capture = data$capture,
+make_detect_data(data, capture = data$capture, recapture = data$recapture,
   start_date = min(lexr::date(capture$DateTimeCapture)),
   end_date = max(lexr::date(capture$DateTimeTagExpire)),
   hourly_interval = 1L, recovery_days = 0L)
@@ -13,6 +13,8 @@ make_detect_data(data, capture = data$capture,
 \item{data}{The lex_data object.}
 
 \item{capture}{A data frame of the capture data to use.}
+
+\item{recapture}{A data frame of the recapture data to use}
 
 \item{start_date}{A date of the start.}
 
