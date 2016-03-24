@@ -54,8 +54,8 @@ check_detect_capture <- function(capture) {
                   SectionCapture = factor(1),
                   Length = c(200L, 1000L),
                   Weight = c(0.5, 10, NA),
-                  Reward1 = factor(rep("Low", 3), levels = c("Low", "High")),
-                  Reward2 = factor(c(rep("Low", 3), NA), levels = c("Low", "High")),
+                  Reward1 = c(0L, 200L),
+                  Reward2 = c(0L, 200L, NA),
                   IntervalTagExpire = 1L),
     key = "Capture", select = TRUE)
 }

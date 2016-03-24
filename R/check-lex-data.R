@@ -44,8 +44,8 @@ check_lex_capture <- function(capture) {
                  Species = factor(1),
                  Length = c(200L, 1000L),
                  Weight = c(0.5, 10, NA),
-                 Reward1 = c(0L, 10L, 100L),
-                 Reward2 = c(0L, 10L, 100L, NA),
+                 Reward1 = c(0L, 200L),
+                 Reward2 = c(0L, 200L, NA),
                  DateTimeTagExpire = Sys.time())
 
   check_data3(capture, values, key = "Capture", select = TRUE)

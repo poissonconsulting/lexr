@@ -223,10 +223,6 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
 make_capture <- function(data) {
   message("making capture...")
   capture <- data$capture
-  capture$Reward1 %<>% factor(levels = c(0, 10, 100))
-  capture$Reward2 %<>% factor(levels = c(0, 10, 100))
-  levels(capture$Reward1) <- list("Low" = c("0", "10"), "High" = "100")
-  levels(capture$Reward2) <- list("Low" = c("0", "10"), "High" = "100")
   capture %<>% dplyr::select_(~Capture, ~IntervalCapture, ~SectionCapture,
                               ~IntervalTagExpire, ~Length, ~Weight,
                               ~Reward1, ~Reward2, ~Species)
@@ -390,7 +386,7 @@ make_detect_data <-  function(
   data, capture = data$capture, recapture = data$recapture,
   start_date = min(lexr::date(capture$DateTimeCapture)),
   end_date = max(lexr::date(capture$DateTimeTagExpire)),
-  hourly_interval = 1L, recovery_days = 0L) {
+  hourly_interval = 24L, recovery_days = 0L) {
 
   check_data2(capture)
   check_date(start_date)

@@ -1,5 +1,13 @@
 # lexr NEWS
 
+## v0.0.4
+
+- Passes reward tag values through to analysis data.
+- Passes weights through to analysis data.
+- Added `recovery_days` argument to `make_detect_data` to filter out handling mortalities.
+- Added `as.data.frame` function to convert analysis_data object to a data frame.
+- Renamed logical matrix `Spawning` in analysis data as `Spawned`.
+
 ## v0.0.3
  
 - Added spawning function to `make_analysis_data` to identify spawning periods.

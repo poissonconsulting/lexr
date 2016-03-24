@@ -19,4 +19,6 @@ test_that("qlexdatr", {
   expect_is(check_detect_data(detect), "detect_data")
   analysis <- make_analysis_data(detect, interval_period = lubridate::make_difftime(60 * 60 * 24 * 7))
   expect_is(check_analysis_data(analysis), "analysis_data")
+  data <- as.data.frame(analysis)
+  expect_is(data, "data.frame")
 })

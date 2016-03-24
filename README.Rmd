@@ -32,11 +32,11 @@ theme_set(theme_bw(base_size = 10))
 klex <- input_lex_data("klexdatr")
 
 # select only those capture with a fork length greater than or equal to 500 mm
-capture <- filter(klex$capture, Length >= 500)
+capture <- filter(klex$capture, Length >= 500, Reward1 == 100)
 
-# combine hourly data into 6 hour intervals
+# combine hourly data into 24 hour intervals
 kdetect <- make_detect_data(klex, capture = capture, start_date = as.Date("2008-04-01"),
-                           end_date = as.Date("2013-12-31"), hourly_interval = 6L)
+                           end_date = as.Date("2013-12-31"))
 
 # plot Kootenay Lake by color-coded section
 plot_detect_section(kdetect)
