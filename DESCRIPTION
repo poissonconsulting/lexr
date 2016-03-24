@@ -1,6 +1,6 @@
 Package: lexr
 Title: Lake Exploitation Study Data Plotting and Analysis
-Version: 0.0.4
+Version: 0.0.4.9000
 Date: 2016-03-24
 Authors@R: c(
     person("Joe", "Thorley", email = "joe@poissonconsulting.ca", role = c("aut", "cre")),

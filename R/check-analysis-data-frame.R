@@ -10,7 +10,7 @@ check_analysis_data_frame <- function(data) {
       Date = lubridate::today(),
       Year = 1L,
       Month = c(1L, 12L),
-      Length = c(200L, 1000L),
+      Length = c(0L, 1000L),
       Weight = c(0.5, 10, NA),
       Reward1 = c(0L, 200L),
       Reward2 = c(0L, 200L, NA),

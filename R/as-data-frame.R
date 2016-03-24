@@ -1,5 +1,6 @@
 #' @method as.data.frame analysis_data
-as.data.frame.analysis_data <- function(x) {
+#' @export
+as.data.frame.analysis_data <- function(x, ...) {
   analysis <- x
   stopifnot(inherits(analysis, "analysis_data"))
 
