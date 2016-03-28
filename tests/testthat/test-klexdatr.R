@@ -7,6 +7,7 @@ test_that("klexdatr", {
 
   lex <- input_lex_data("klexdatr")
   expect_is(check_lex_data(lex), "lex_data")
+  expect_true(is.lex_data(lex))
 
   capture <- filter(lex$capture, year(DateTimeCapture) == 2008)
   start_date <- as.Date("2008-01-01")
@@ -16,8 +17,10 @@ test_that("klexdatr", {
   expect_is(check_detect_data(detect), "detect_data")
   expect_identical(get_difftime(detect), lubridate::make_difftime(num = 60 * 60 * 24, units = "days"))
   expect_is(check_detect_data(detect), "detect_data")
+  expect_true(is.detect_data(detect))
   analysis <- make_analysis_data(detect, interval_period = lubridate::make_difftime(60 * 60 * 24 * 7 * 4), growth = growth_vb, k = 0.234)
   expect_is(check_analysis_data(analysis), "analysis_data")
+  expect_true(is.analysis_data(analysis))
   data <- as.data.frame(analysis)
   expect_is(data, "data.frame")
 })
