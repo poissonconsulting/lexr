@@ -150,7 +150,7 @@ plot_detect_overview <- function(data) {
     ggplot2::geom_point(data = recapture, ggplot2::aes_string(shape = "Released"), color = "black") +
     ggplot2::scale_x_datetime(name = "Date", expand = c(0,0), date_breaks = "1 year", date_labels = "%Y") +
     ggplot2::scale_color_identity() +
-    ggplot2::scale_shape_manual(values = c(17,15)) +
+    ggplot2::scale_shape_manual(values = c(17,15), drop = FALSE) +
     ggplot2::expand_limits(x = as.POSIXct(paste0(c(first_year, last_year + 1), "-01-01"), tz = tz)) +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.minor.y = ggplot2::element_blank(),
