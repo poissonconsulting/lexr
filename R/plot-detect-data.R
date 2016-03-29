@@ -140,7 +140,7 @@ plot_detect_overview <- function(data) {
   detection %<>% dplyr::inner_join(dplyr::select_(capture, ~Capture, ~Species), by = "Capture")
 
   recapture$Released %<>% factor()
-  levels(recapture$Released) %<>% list(Released = "TRUE", Retained = "FALSE")
+  levels(recapture$Released) <- list(Released = "TRUE", Retained = "FALSE")
 
   ggplot2::ggplot(data = detection, ggplot2::aes_string(x = "DateTime", y = "Capture")) +
     ggplot2::facet_grid(Species~. , scales = "free_y", space = "free_y") +
@@ -184,7 +184,7 @@ plot_fish_year <- function(detection, section, capture, recapture) {
   levels(recapture$XY) <- list(Northing = "NorthingSection", Easting = "EastingSection")
 
   recapture$Released %<>% factor()
-  levels(recapture$Released) %<>% list(Released = "TRUE", Retained = "FALSE")
+  levels(recapture$Released) <- list(Released = "TRUE", Retained = "FALSE")
 
   section$DayteTime <- detection$DayteTime[1]
   detection$Jump <- detection$Jump > 0
@@ -237,7 +237,7 @@ plot_detect_fish_year <- function(data) {
   detection %<>% dplyr::inner_join(dplyr::select_(capture, ~Capture, ~Species), by = "Capture")
 
   recapture$Released %<>% factor()
-  levels(recapture$Released) %<>% list(Released = "TRUE", Retained = "FALSE")
+  levels(recapture$Released) <- list(Released = "TRUE", Retained = "FALSE")
 
   detection$Year <- lubridate::year(detection$DateTime)
 
