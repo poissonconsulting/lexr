@@ -128,7 +128,6 @@ plot_detect_overview <- function(data) {
   last_year <- lubridate::year(interval$DateTime[nrow(interval)])
 
   capture %<>% dplyr::inner_join(section@data, by = c(SectionCapture = "Section"))
-  recapture %<>% dplyr::inner_join(section@data, by = c(SectionRecapture = "Section"))
   detection %<>% dplyr::inner_join(section@data, by = c(Section = "Section"))
 
   capture %<>% dplyr::inner_join(interval, by = c(IntervalCapture = "Interval"))
