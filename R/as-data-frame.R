@@ -68,7 +68,6 @@ as.data.frame.analysis_data <- function(x, ...) {
   data %<>% dplyr::mutate_(.dots = list(Capture = ~droplevels(Capture)))
   data %<>% dplyr::mutate_(.dots = list(Species = ~droplevels(Species)))
   data %<>% check_analysis_data_frame()
-  data %<>% dplyr::filter_(~as.integer(Period) >= as.integer(PeriodCapture))
   data %<>% dplyr::as.tbl()
   data
 }
