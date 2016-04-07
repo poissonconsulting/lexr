@@ -12,7 +12,35 @@ test_that("klexdatr", {
   capture <- filter(lex$capture, year(DateTimeCapture) == 2008)
   start_date <- as.Date("2008-01-01")
   end_date <- as.Date("2008-12-31")
-  detect <- make_detect_data(lex, capture = capture, start_date = start_date,
+  sections <- list(
+    "S02" = "S02", "S03" = "S03",
+    "S04" = "S04", "S01" = c("S01", "S05", "S06"), "S07" = "S07",
+                   "S08" = "S08",
+                   "S09" = "S09",
+                   "S10" = "S10",
+                   "S11" = "S11",
+                   "S12" = "S12",
+                   "S13" = "S13",
+                   "S14" = "S14",
+                   "S15" = "S15",
+                   "S16" = "S16",
+                   "S17" = "S17",
+                   "S18" = "S18",
+                   "S23" = "S23",
+                   "S24" = "S24",
+                   "S21" = "S21",
+                   "S22" = "S22",
+                   "S25" = "S25",
+                   "S26" = "S26",
+                   "S27" = "S27",
+                   "S28" = "S28",
+                   "S29" = "S29",
+                   "S30" = "S30",
+                   "S31" = "S31",
+                   "S32" = "S32",
+                   "S33" = "S33")
+  lex <- filter_lex_data(lex, capture = capture, sections = sections)
+  detect <- make_detect_data(lex, start_date = start_date,
                              end_date = end_date, recovery_days = 30L)
   expect_is(check_detect_data(detect), "detect_data")
   expect_identical(get_difftime(detect), lubridate::make_difftime(num = 60 * 60 * 24, units = "days"))

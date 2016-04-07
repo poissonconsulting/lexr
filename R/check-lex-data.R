@@ -6,7 +6,7 @@ check_lex_section <- function(section) {
     error("section row names must be identical to section@data$Section")
 
   values <- list(Section = factor(1),
-                 Habitat = factor(1),
+                 Habitat = factor(c(1, NA)),
                  Bounded = TRUE,
                  EastingSection = 1,
                  NorthingSection = 1)

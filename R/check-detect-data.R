@@ -5,7 +5,7 @@ check_detect_section <- function(section) {
 
   section@data %<>% check_data3(
     list(Section = factor(1),
-                  Habitat = factor(1),
+                  Habitat = factor(c(1, NA)),
                   Area = c(0, 100),
                   Bounded = TRUE,
                   EastingSection = 1,

@@ -51,26 +51,77 @@ filter_lex_captures_recaptures <- function(data, capture, recapture) {
   data
 }
 
-filter_lex_sections <- function(data, section) {
+agg_hab <- function (x) {
+  if (length(unique(x)) > 1) {
+    is.na(x[1]) <- TRUE
+  }
+  x[1]
+}
 
-  assert_that(is.list(section) && !is.null(names(section)))
+combine_sections <- function(section) {
+  section <- section[!is.na(section@data$Section),]
+  if (!nrow(section)) stop("section must have at least one remaining section")
+  if (!all(levels(section@data$Section) %in% section@data$Section))
+    stop("section must have all levels")
 
-#  levels(data$capture$SectionCapture) <- section
-#  levels(data$capture$SectionCapture) <- section
+  # because raster::aggregate drops columns if no section to aggregate
+  if (!anyDuplicated(section@data$Section))
+    return(section)
+
+#  require("raster") # otherwise aggregate throws error
+
+ section <- raster::aggregate(section, by = "Section", sums = list(
+    list(agg_hab, "Habitat"), list(all, "Bounded")))
+
+  section@data <- as.data.frame(dplyr::bind_cols(
+  section@data, dplyr::select_(as.data.frame(rgeos::gCentroid(section, byid = TRUE)),
+                       EastingSection = ~x, NorthingSection = ~y)))
+  row.names(section) <- as.character(section@data$Section)
+  row.names(section@data) <- as.character(section@data$Section)
+
+  section <- section[order(section@data$Section),]
+
+  section
+}
+
+filter_lex_sections <- function(data, sections) {
+  assert_that(is.list(sections) && !is.null(names(sections)))
 
   station <- data$station
   deployment <- data$deployment
   detection <- data$detection
   capture <- data$capture
   recapture <- data$recapture
+  section <- data$section
 
+  levels(section@data$Section) <- sections
+  levels(capture$SectionCapture) <- sections
+  levels(recapture$SectionRecapture) <- sections
+  levels(station$Section) <- sections
 
-#  data$section <- section
+  section <- combine_sections(section)
+
+  capture %<>% dplyr::filter_(~!is.na(SectionCapture))
+  station %<>% dplyr::filter_(~!is.na(Section))
+
+  deployment %<>% dplyr::filter_(~Station %in% station$Station)
+  detection %<>% dplyr::inner_join(deployment, by = "Receiver")
+  detection %<>% dplyr::filter_(~DateTimeDetection > DateTimeReceiverIn, ~DateTimeDetection < DateTimeReceiverOut)
+  detection %<>% dplyr::select_(~DateTimeDetection, ~Capture, ~Receiver, ~Detections)
+
+  station$Station %<>% droplevels()
+  deployment$Station %<>% factor(levels = levels(station$Station))
+  deployment$Receiver %<>% droplevels()
+  detection$Receiver %<>% factor(levels = levels(deployment$Receiver))
+
+  data$section <- section
   data$recapture <- recapture
   data$capture <- capture
   data$detection <- detection
   data$deployment <- deployment
   data$station <- station
+  data$section <- section
+  data
 }
 
 #' Filter Lex Data
@@ -81,17 +132,16 @@ filter_lex_sections <- function(data, section) {
 #' harvest and ensures coded as tags removed.
 #'
 #' @inheritParams make_detect_data
-# #' @param section A named list of sections (musth be adjoining) to combine.
+#' @param sections A named list of sections to combine (or drop if excluded).
 #' @return A lex_data object.
 #' @export
 filter_lex_data <-  function(
   data, capture = data$capture, recapture = data$recapture,
-#  section = stats::setNames(as.list(levels(data$section@data$Section)), levels(data$section@data$Section)),
+  sections = stats::setNames(as.list(levels(data$section@data$Section)), levels(data$section@data$Section)),
     start_date = min(lubridate::date(capture$DateTimeCapture)),
   end_date = max(lubridate::date(capture$DateTimeTagExpire))) {
 
-#  assert_that(is.list(section) && !is.null(names(section)))
-
+  force(sections)
   check_date(start_date)
   check_date(end_date)
 
@@ -109,7 +159,8 @@ filter_lex_data <-  function(
                               ~lubridate::date(DateTimeRecapture) <= end_date)
 
   data %<>% filter_lex_captures_recaptures(capture, recapture)
-#  data %<>% filter_lex_sections(section)
+  data %<>% filter_lex_sections(sections)
+  data %<>% filter_lex_captures_recaptures(data$capture, data$recapture)
 
   data$recapture %<>% check_lex_recapture()
 

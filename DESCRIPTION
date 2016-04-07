@@ -8,7 +8,8 @@ Authors@R: c(
     person("Bernhard", "Konrad", role = "aut"))
 Description: An R package to plot and analyse lake exploitation data.
 Depends:
-    R (>= 3.1.0)
+    R (>= 3.1.0),
+    raster
 Imports:
     assertthat,
     broom,
@@ -27,7 +28,6 @@ Imports:
     sp,
     spa,
     spdep,
-    stats,
     tidyr
 Suggests:
     klexdatr (>= 0.0.5),
