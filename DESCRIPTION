@@ -10,6 +10,7 @@ Description: An R package to plot and analyse lake exploitation data.
 Depends:
     R (>= 3.1.0)
 Imports:
+    assertthat,
     broom,
     datacheckr (>= 0.1.0),
     dplyr,
@@ -26,6 +27,7 @@ Imports:
     sp,
     spa,
     spdep,
+    stats,
     tidyr
 Suggests:
     klexdatr (>= 0.0.5),

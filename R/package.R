@@ -6,7 +6,7 @@
 #'
 #' @docType package
 #' @name lexr
-#' @import datacheckr
+#' @import assertthat datacheckr
 #' @importFrom magrittr %<>% %>%
 #' @importFrom plyr .
 #' @importFrom sp %over%

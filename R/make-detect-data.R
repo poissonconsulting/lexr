@@ -81,59 +81,6 @@ make_coverage <- function(data) {
   data
 }
 
-drop_recaptures_after_harvest <- function(recapture) {
-  if (all(recapture$Released))
-    return(recapture)
-  recapture %<>% dplyr::arrange_(~DateTimeRecapture)
-  recapture %<>% dplyr::slice(1:min(which(!recapture$Released)))
-  recapture$TagsRemoved[nrow(recapture)] <- TRUE
-  recapture
-}
-
-filter_lex_captures <- function(data, capture) {
-  detection <- data$detection
-  recapture <- data$recapture
-
-  capture$Capture %<>% droplevels()
-
-  recapture %<>% dplyr::filter_(~Capture %in% capture$Capture)
-  detection %<>% dplyr::filter_(~Capture %in% capture$Capture)
-
-  recapture$Capture %<>% factor(levels = levels(capture$Capture))
-  detection$Capture %<>% factor(levels = levels(capture$Capture))
-
-  data$capture <- capture
-  data$recapture <- recapture
-  data$detection <- detection
-  data
-}
-
-filter_lex_captures_recaptures <- function(data, capture, recapture) {
-  detection <- data$detection
-
-  capture$Capture %<>% droplevels()
-
-  recapture %<>% dplyr::filter_(~Capture %in% capture$Capture)
-  detection %<>% dplyr::filter_(~Capture %in% capture$Capture)
-
-  recapture$Capture %<>% factor(levels = levels(capture$Capture))
-  detection$Capture %<>% factor(levels = levels(capture$Capture))
-
-  recapture %<>% plyr::ddply("Capture", drop_recaptures_after_harvest)
-
-  harvest <- dplyr::filter_(recapture, ~!Released)
-  if (nrow(harvest)) { # drop detections after harvest
-    detection %<>% dplyr::left_join(dplyr::select_(harvest, ~Capture, ~DateTimeRecapture), by = "Capture")
-    detection %<>% dplyr::filter_(~is.na(DateTimeRecapture) | DateTimeDetection < DateTimeRecapture)
-    detection$DateTimeRecapture <- NULL
-  }
-
-  data$capture <- capture
-  data$recapture <- recapture
-  data$detection <- detection
-  data
-}
-
 set_interval <- function(col, interval) {
   if (!length(col))
     return(integer(0))
@@ -374,7 +321,7 @@ filter_recovery_days <- function (data, recovery_days) {
 #'
 #' @param data The lex_data object.
 #' @param capture A data frame of the capture data to use.
-#' @param recapture A data frame of the recapture data to use
+#' @param recapture A data frame of the recapture data to use.
 #' @param start_date A date of the start.
 #' @param end_date A date of the end.
 #' @param hourly_interval A count indicating the hourly interval.
@@ -388,28 +335,17 @@ make_detect_data <-  function(
   end_date = max(lubridate::date(capture$DateTimeTagExpire)),
   hourly_interval = 24L, recovery_days = 0L) {
 
-  check_data2(capture)
-  check_date(start_date)
-  check_date(end_date)
   check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
   check_scalar(recovery_days, c(0L, 365L))
 
+  check_date(start_date)
+  check_date(end_date)
+
   if (end_date <= start_date) error("start_date must be before end_date")
 
-  capture %<>% check_lex_capture()
-  data %<>% check_lex_data()
-  capture %<>% dplyr::filter_(~lubridate::date(DateTimeCapture) >= start_date,
-                              ~lubridate::date(DateTimeCapture) <= end_date)
-
-  if (!nrow(capture)) error("no captures fall within the specified dates")
-
-  recapture %<>% dplyr::filter_(~lubridate::date(DateTimeRecapture) >= start_date,
-                              ~lubridate::date(DateTimeRecapture) <= end_date)
-
-  data %<>% filter_lex_captures_recaptures(capture, recapture)
-
-  data$recapture %<>% check_lex_recapture()
-
+  data %<>% filter_lex_data(capture = capture, recapture = recapture,
+                            start_date = start_date,
+                            end_date = end_date)
 
   data %<>% make_interval(start_date = start_date, end_date = end_date,
                           hourly_interval = hourly_interval)

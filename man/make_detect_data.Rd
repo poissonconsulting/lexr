@@ -14,7 +14,7 @@ make_detect_data(data, capture = data$capture, recapture = data$recapture,
 
 \item{capture}{A data frame of the capture data to use.}
 
-\item{recapture}{A data frame of the recapture data to use}
+\item{recapture}{A data frame of the recapture data to use.}
 
 \item{start_date}{A date of the start.}
 
