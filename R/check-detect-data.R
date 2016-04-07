@@ -6,7 +6,7 @@ check_detect_section <- function(section) {
   section@data %<>% check_data3(
     list(Section = factor(1),
                   Habitat = factor(c(1, NA)),
-                  Area = c(0, 100),
+                  Area = c(0, 1000),
                   Bounded = TRUE,
                   EastingSection = 1,
                   NorthingSection = 1,
@@ -41,7 +41,7 @@ check_detect_coverage <- function(coverage) {
   check_data3(
     coverage, list(Interval = c(1L, max_integer()),
                    Section = factor(1),
-                   Stations = c(1L, 9L),
+                   Stations = c(1L, 50L),
                    Coverage = c(0, 1)),
   key = c("Interval", "Section"), select = TRUE)
 }

@@ -245,6 +245,13 @@ plot_detect_fish_year <- function(data) {
 }
 
 
+#' Plot Detect Data
+#'
+#' @param x The detect_data object to plot.
+#'
+#' @param all A flag indicating whether to produce all plots.
+#' @param ... unused.
+#' @method plot detect_data
 #' @export
 plot.detect_data <- function(x, all = FALSE, ...) {
   print(plot_detect_section(x))

@@ -50,7 +50,6 @@ check_consecutive_dups <- function(duplicates) {
 calc_coverage <- function(data, section) {
   section <- section[section@data$Section == data$Section[1],]
   data$Station %<>% droplevels() %>% as.integer()
-  stopifnot(max(data$Station) < 10)
 
   if (anyDuplicated(data[c("IntervalDeployment", "Station")])) {
     duplicates <- data[c("IntervalDeployment", "Station")]

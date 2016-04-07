@@ -222,6 +222,13 @@ plot_analysis_fish <- function(data) {
   plyr::ddply(detection, c("Capture"), plot_fish, section, capture, recapture, period)
 }
 
+#' Plot Analysis Data
+#'
+#' @param x The analysis_data object to plot.
+#'
+#' @param all A flag indicating whether to produce all plots.
+#' @param ... unused.
+#' @method plot analysis_data
 #' @export
 plot.analysis_data <- function(x, all = FALSE, ...) {
   print(plot_analysis_coverage(x))

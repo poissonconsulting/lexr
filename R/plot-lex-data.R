@@ -116,6 +116,13 @@ plot_lex_receiver_detection <- function (deployment, detection) {
     ggplot2::scale_y_discrete()
 }
 
+#' Plot Lex Data
+#'
+#' @param x The lex_data object to plot.
+#'
+#' @param all A flag indicating whether to produce all plots.
+#' @param ... unused.
+#' @method plot lex_data
 #' @export
 plot.lex_data <- function(x, all = FALSE, ...) {
   check_flag(all)
