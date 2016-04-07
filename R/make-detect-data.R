@@ -280,6 +280,25 @@ keep_morts <- function (x) {
   return(dplyr::data_frame(Mortality = TRUE)) # so data row
 }
 
+filter_lex_captures <- function(data, capture) {
+  detection <- data$detection
+  recapture <- data$recapture
+
+  capture$Capture %<>% droplevels()
+  capture$Species %<>% droplevels()
+
+  recapture %<>% dplyr::filter_(~Capture %in% capture$Capture)
+  detection %<>% dplyr::filter_(~Capture %in% capture$Capture)
+
+  recapture$Capture %<>% factor(levels = levels(capture$Capture))
+  detection$Capture %<>% factor(levels = levels(capture$Capture))
+
+  data$capture <- capture
+  data$recapture <- recapture
+  data$detection <- detection
+  data
+}
+
 filter_recovery_days <- function (data, recovery_days) {
   if (recovery_days == 0) {
     return(data)
