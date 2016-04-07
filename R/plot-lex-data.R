@@ -68,7 +68,7 @@ plot_lex_recapture <- function(recapture) {
 }
 
 plot_lex_detection <- function(detection) {
-  detection %<>% dplyr::mutate_(.dots = list("Date" = ~date(DateTimeDetection)))
+  detection %<>% dplyr::mutate_(.dots = list("Date" = ~lubridate::date(DateTimeDetection)))
 
   detection %<>% dplyr::group_by_(~Date) %>%
     dplyr::summarise_(.dots = list("Detections" = ~sum(Detections))) %>%

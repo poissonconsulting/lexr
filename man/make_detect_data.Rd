@@ -5,8 +5,8 @@
 \title{Make Detect Data}
 \usage{
 make_detect_data(data, capture = data$capture, recapture = data$recapture,
-  start_date = min(lexr::date(capture$DateTimeCapture)),
-  end_date = max(lexr::date(capture$DateTimeTagExpire)),
+  start_date = min(lubridate::date(capture$DateTimeCapture)),
+  end_date = max(lubridate::date(capture$DateTimeTagExpire)),
   hourly_interval = 24L, recovery_days = 0L)
 }
 \arguments{

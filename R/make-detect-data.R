@@ -208,7 +208,7 @@ make_interval <- function(data, start_date, end_date, hourly_interval) {
 
   interval <- dplyr::data_frame(DateTime = seq(start_date, end_date, by = paste(hourly_interval,"hours")))
   interval %<>% dplyr::mutate_(.dots = list(Interval = ~1:nrow(.),
-                                            Date = ~date(DateTime),
+                                            Date = ~lubridate::date(DateTime),
                                             DayteTime = ~DateTime,
                                             Year = ~as.integer(lubridate::year(DateTime)),
                                             Month = ~as.integer(lubridate::month(DateTime)),
@@ -384,8 +384,8 @@ filter_recovery_days <- function (data, recovery_days) {
 #' @export
 make_detect_data <-  function(
   data, capture = data$capture, recapture = data$recapture,
-  start_date = min(lexr::date(capture$DateTimeCapture)),
-  end_date = max(lexr::date(capture$DateTimeTagExpire)),
+  start_date = min(lubridate::date(capture$DateTimeCapture)),
+  end_date = max(lubridate::date(capture$DateTimeTagExpire)),
   hourly_interval = 24L, recovery_days = 0L) {
 
   check_data2(capture)
@@ -398,13 +398,13 @@ make_detect_data <-  function(
 
   capture %<>% check_lex_capture()
   data %<>% check_lex_data()
-  capture %<>% dplyr::filter_(~date(DateTimeCapture) >= start_date,
-                              ~date(DateTimeCapture) <= end_date)
+  capture %<>% dplyr::filter_(~lubridate::date(DateTimeCapture) >= start_date,
+                              ~lubridate::date(DateTimeCapture) <= end_date)
 
   if (!nrow(capture)) error("no captures fall within the specified dates")
 
-  recapture %<>% dplyr::filter_(~date(DateTimeRecapture) >= start_date,
-                              ~date(DateTimeRecapture) <= end_date)
+  recapture %<>% dplyr::filter_(~lubridate::date(DateTimeRecapture) >= start_date,
+                              ~lubridate::date(DateTimeRecapture) <= end_date)
 
   data %<>% filter_lex_captures_recaptures(capture, recapture)
 

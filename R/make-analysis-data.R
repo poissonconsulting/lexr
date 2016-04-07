@@ -121,11 +121,11 @@ make_analysis_spawned <- function(data, spawning) {
   detections %<>% dplyr::inner_join(data$interval, by = c(IntervalDetection = "Interval"))
 
   detections %<>% dplyr::arrange_(~DateTimeInterval)
-  detections %<>% dplyr::mutate_(.dots = list(Date = ~date(DateTimeInterval)))
+  detections %<>% dplyr::mutate_(.dots = list(Date = ~lubridate::date(DateTimeInterval)))
 
   detections %<>% dplyr::select_(~Capture, ~Species, ~Date, ~Section, ~Period)
 
-  period <- dplyr::mutate_(data$period, .dots = list(Date = ~date(DateTime)))
+  period <- dplyr::mutate_(data$period, .dots = list(Date = ~lubridate::date(DateTime)))
 
   period %<>% dplyr::select_(~Period, ~Date, ~Days)
 

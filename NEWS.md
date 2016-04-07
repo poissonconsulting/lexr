@@ -1,5 +1,7 @@
 # lexr NEWS
 
+- Now uses `lubridate::date` for conversion times to dates.
+
 ## v0.0.4
 
 - Passes reward tag values through to analysis data.
