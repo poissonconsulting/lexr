@@ -1,4 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+[![Travis-CI Build Status](https://travis-ci.org/poissonconsulting/lexr.svg?branch=master)](https://travis-ci.org/poissonconsulting/lexr)
+
 Lake Exploitation Study Data Plotting and Analysis
 ==================================================
 
@@ -8,7 +10,6 @@ An R package to plot and analyse lake exploitation data.
 # ensure required packages are loaded
 library(dplyr)
 library(ggplot2)
-#> Warning: package 'ggplot2' was built under R version 3.2.4
 library(klexdatr)
 library(lexr)
 

@@ -222,7 +222,6 @@ plot_analysis_fish <- function(data) {
   plyr::ddply(detection, c("Capture"), plot_fish, section, capture, recapture, period)
 }
 
-
 #' @export
 plot.analysis_data <- function(x, all = FALSE, ...) {
   print(plot_analysis_coverage(x))
