@@ -10,7 +10,7 @@ check_detect_section <- function(section) {
                   Bounded = TRUE,
                   EastingSection = 1,
                   NorthingSection = 1,
-                  ColorCode = rep("[#].{6,6}", 2)),
+                  ColorCode = ""),
     key = "Section", select = TRUE)
   check_key(section@data, "Area") # unique key for tiebreaks
   check_key(section@data, c("EastingSection", "NorthingSection"))
