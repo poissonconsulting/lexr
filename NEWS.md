@@ -1,5 +1,9 @@
 # lexr NEWS
 
+## v0.0.7
+
+- Add `plot_lex_coverage` function to produce plot of spatial coverage based on receiver locations.
+
 ## v0.0.6
 
 - Calculate section coverage spatially.
