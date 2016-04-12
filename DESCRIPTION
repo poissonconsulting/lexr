@@ -24,6 +24,7 @@ Imports:
     magrittr,
     rgeos,
     reshape2,
+    sampSurf,
     scales,
     sp,
     spa,

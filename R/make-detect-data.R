@@ -22,29 +22,30 @@ add_coverage_code <- function(x) {
   x
 }
 
-circles_intersection <- function (x) {
+circles_intersection <- function (x, section) {
+  radius <- 500
   circles <- sampSurf::spCircle(
-    radius = 0.5, spUnits = sp::CRS(sp::proj4string(section)),
+    radius = radius, spUnits = sp::CRS(sp::proj4string(section)),
     centerPoint = c(x = x$EastingStation[1], y = x$NorthingStation[1]),
     spID = x$Station[1])$spCircle
 
   if (nrow(x) > 1) {
     for (i in 2:nrow(x)) {
       circle <- sampSurf::spCircle(
-        radius = 500, spUnits = sp::CRS(sp::proj4string(section)),
+        radius = radius, spUnits = sp::CRS(sp::proj4string(section)),
         centerPoint = c(x = x$EastingStation[i], y = x$NorthingStation[i]),
         spID = x$Station[i])$spCircle
       circles <- rgeos::gUnion(circles, circle)
     }
   }
-  proj4string(circles) <- proj4string(section)
+  sp::proj4string(circles) <- sp::proj4string(section)
   circles
 }
 
 calc_coverage_code_interval <- function(y, section) {
   stopifnot(nrow(section@data) == 1)
 
-  circles <- circles_intersection(y)
+  circles <- circles_intersection(y, section)
   circles <- rgeos::gIntersection(circles, section)
 
   coverage <- (rgeos::gArea(circles) / 10 ^ 6) / section@data$Area
