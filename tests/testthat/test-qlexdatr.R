@@ -17,6 +17,7 @@ test_that("qlexdatr", {
   lex <- filter_lex_data(lex, capture = capture, recapture = recapture)
 
   detect <- make_detect_data(lex, capture = capture, recapture = recapture, start_date = start_date, end_date = end_date, hourly_interval = hourly_interval)
+
   expect_identical(get_difftime(detect), lubridate::make_difftime(num = 60 * 60 * hourly_interval, units = "hours"))
   expect_is(check_detect_data(detect), "detect_data")
   analysis <- make_analysis_data(detect, interval_period = lubridate::make_difftime(60 * 60 * 24 * 7))

@@ -22,12 +22,33 @@ add_coverage_code <- function(x) {
   x
 }
 
+circles_intersection <- function (x) {
+  circles <- sampSurf::spCircle(
+    radius = 0.5, spUnits = sp::CRS(sp::proj4string(section)),
+    centerPoint = c(x = x$EastingStation[1], y = x$NorthingStation[1]),
+    spID = x$Station[1])$spCircle
+
+  if (nrow(x) > 1) {
+    for (i in 2:nrow(x)) {
+      circle <- sampSurf::spCircle(
+        radius = 500, spUnits = sp::CRS(sp::proj4string(section)),
+        centerPoint = c(x = x$EastingStation[i], y = x$NorthingStation[i]),
+        spID = x$Station[i])$spCircle
+      circles <- rgeos::gUnion(circles, circle)
+    }
+  }
+  proj4string(circles) <- proj4string(section)
+  circles
+}
+
 calc_coverage_code_interval <- function(y, section) {
-  . <- NULL
   stopifnot(nrow(section@data) == 1)
-  cov <- (nrow(y) * pi * 0.5 ^ 2) / section@data$Area[1]
-  cov %<>% ifelse(. > 1, 1, .)
-  cov
+
+  circles <- circles_intersection(y)
+  circles <- rgeos::gIntersection(circles, section)
+
+  coverage <- (rgeos::gArea(circles) / 10 ^ 6) / section@data$Area
+  coverage
 }
 
 calc_coverage_code <- function(x, section) {
@@ -309,7 +330,7 @@ filter_recovery_days <- function (data, recovery_days) {
     IntervalTagExpire = ~Interval, DateTagExpire = ~Date)), by = c("IntervalTagExpire"))
   morts %<>% dplyr::mutate_(.dots = list(TagDays = ~as.integer(DateTagExpire) - as.integer(DateCapture)))
   morts %<>% dplyr::mutate_(.dots = list(DateRecovery = ~DateCapture + recovery_days))
-# assume no morts among fish without acoustic tags
+  # assume no morts among fish without acoustic tags
   morts %<>% dplyr::filter_(~TagDays > 0)
   recaps <- dplyr::group_by_(data$recapture, ~Capture) %>% dplyr::summarise_(.dots = list(IntervalRecapture = ~max(IntervalRecapture))) %>% dplyr::ungroup()
   recaps %<>% dplyr::inner_join(dplyr::select_(data$interval, .dots = list(
