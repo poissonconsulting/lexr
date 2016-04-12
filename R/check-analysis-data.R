@@ -57,7 +57,8 @@ check_analysis_capture <- function(capture) {
                   Species = factor(1),
                   Weight = c(0.5, 10, NA),
                   PeriodCapture = factor(1),
-                  SectionCapture = factor(1)),
+                  SectionCapture = factor(1),
+                  PeriodTagExpire = factor(1)),
     key = "Capture", select = TRUE)
 }
 

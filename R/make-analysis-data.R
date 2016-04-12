@@ -167,7 +167,6 @@ make_analysis_monitored <- function(data) {
     }
   }
   data$capture$Tagged <- NULL
-  data$capture$PeriodTagExpire <- NULL
   data$monitored <- monitored
   data
 }
