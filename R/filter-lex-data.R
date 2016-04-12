@@ -107,6 +107,28 @@ filter_lex_sections <- function(data, sections) {
   data
 }
 
+filter_lex_station <- function (data, station) {
+  deployment <- data$deployment
+  detection <- data$detection
+
+  station$Station %<>% droplevels()
+  deployment %<>% dplyr::filter_(~Station %in% levels(station$Station))
+  deployment$Station %<>% factor(levels = levels(station$Station))
+
+  detection %<>% dplyr::inner_join(deployment, by = "Receiver")
+  detection %<>% dplyr::filter_(~DateTimeDetection > DateTimeReceiverIn, ~DateTimeDetection < DateTimeReceiverOut)
+  detection %<>% dplyr::select_(~DateTimeDetection, ~Capture,  ~Receiver, ~Detections)
+
+  deployment$Receiver %<>% droplevels()
+ detection$Receiver %<>% factor(levels = levels(deployment$Receiver))
+
+  data$deployment <- deployment
+  data$detection <- detection
+
+  data$station <- station
+  data
+}
+
 #' Filter Lex Data
 #'
 #' Filters lex data by capture and recapture.
@@ -116,11 +138,13 @@ filter_lex_sections <- function(data, sections) {
 #'
 #' @inheritParams make_detect_data
 #' @param sections A named list of sections to combine (or drop if excluded).
+#' @param station A data frame of stations.
 #' @return A lex_data object.
 #' @export
 filter_lex_data <-  function(
   data, capture = data$capture, recapture = data$recapture,
   sections = stats::setNames(as.list(levels(data$section@data$Section)), levels(data$section@data$Section)),
+  station = data$station,
     start_date = min(lubridate::date(capture$DateTimeCapture)),
   end_date = max(lubridate::date(capture$DateTimeTagExpire))) {
 
@@ -131,6 +155,7 @@ filter_lex_data <-  function(
   if (end_date <= start_date) error("start_date must be before end_date")
 
   capture %<>% check_lex_capture()
+  station %<>% check_lex_station()
   data %<>% check_lex_data()
 
   capture %<>% dplyr::filter_(~lubridate::date(DateTimeCapture) >= start_date,
@@ -141,9 +166,11 @@ filter_lex_data <-  function(
   recapture %<>% dplyr::filter_(~lubridate::date(DateTimeRecapture) >= start_date,
                               ~lubridate::date(DateTimeRecapture) <= end_date)
 
+  data$station <- station
   data %<>% filter_lex_captures_recaptures(capture, recapture)
   data %<>% filter_lex_sections(sections)
   data %<>% filter_lex_captures_recaptures(data$capture, data$recapture)
+  data %<>% filter_lex_station(data$station)
 
   data$recapture %<>% check_lex_recapture()
 

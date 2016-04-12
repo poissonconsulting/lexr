@@ -14,7 +14,10 @@ test_that("qlexdatr", {
   start_date <- as.Date("2014-01-01")
   end_date <- as.Date("2014-12-31")
   hourly_interval <- 6L # klexdatr tests 24L
-  lex <- filter_lex_data(lex, capture = capture, recapture = recapture)
+
+  station <- filter(lex$station, !Station %in% c("Horsefly Bay North", "Horsefly Bay South", "Horsefly Bay"))
+
+  lex <- filter_lex_data(lex, capture = capture, recapture = recapture, station = station)
 
   detect <- make_detect_data(lex, capture = capture, recapture = recapture, start_date = start_date, end_date = end_date, hourly_interval = hourly_interval)
 

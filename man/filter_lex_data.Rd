@@ -6,7 +6,7 @@
 \usage{
 filter_lex_data(data, capture = data$capture, recapture = data$recapture,
   sections = stats::setNames(as.list(levels(data$section@data$Section)),
-  levels(data$section@data$Section)),
+  levels(data$section@data$Section)), station = data$station,
   start_date = min(lubridate::date(capture$DateTimeCapture)),
   end_date = max(lubridate::date(capture$DateTimeTagExpire)))
 }
@@ -18,6 +18,8 @@ filter_lex_data(data, capture = data$capture, recapture = data$recapture,
 \item{recapture}{A data frame of the recapture data to use.}
 
 \item{sections}{A named list of sections to combine (or drop if excluded).}
+
+\item{station}{A data frame of stations.}
 
 \item{start_date}{A date of the start.}
 
