@@ -1,5 +1,9 @@
 # lexr NEWS
 
+## v0.0.6
+
+- Calculate section coverage spatially.
+
 ## v0.0.5
 
 - Add `filter_lex_data` function.
