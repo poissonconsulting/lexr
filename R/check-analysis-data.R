@@ -2,7 +2,7 @@ check_analysis_section <- function(section) {
   check_data3(
     section, list(Section = factor(1),
                   Habitat = factor(c(1, NA)),
-                  Area = c(0, 100),
+                  Area = c(0, 1000),
                   Bounded = TRUE,
                   EastingSection = 1,
                   NorthingSection = 1,
