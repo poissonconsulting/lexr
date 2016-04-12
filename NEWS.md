@@ -1,6 +1,9 @@
 # lexr NEWS
 
-- Now uses `lubridate::date` for conversion times to dates.
+## v0.0.5
+
+- Add `filter_lex_data` function.
+- Use `lubridate::date` for conversion times to dates.
 
 ## v0.0.4
 
