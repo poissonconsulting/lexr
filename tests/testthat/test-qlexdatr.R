@@ -25,6 +25,7 @@ test_that("qlexdatr", {
   expect_is(check_detect_data(detect), "detect_data")
   capture <- filter(detect$capture, Species == "Rainbow Trout")
   detect <- filter_detect_data(detect, capture)
+  expect_is(merge_detect_data(detect), "data.frame")
   analysis <- make_analysis_data(detect, interval_period = lubridate::make_difftime(60 * 60 * 24 * 7))
   expect_is(check_analysis_data(analysis), "analysis_data")
   data <- as.data.frame(analysis)
