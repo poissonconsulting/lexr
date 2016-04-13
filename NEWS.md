@@ -1,5 +1,7 @@
 # lexr NEWS
 
+- Add `filter_detect_data` for filtering out captures.
+
 ## v0.0.7
 
 - Add `plot_lex_coverage` function to produce plot of spatial coverage based on receiver locations.
