@@ -1,4 +1,12 @@
+#' Section Polygon
+#'
+#' Converts section SpatialPolygonsDataFrame into data frame for plotting.
+#'
+#' @param section The SpatialPolygonsDataFrame object to convert
+#' @return
+#' @export
 section_polygon <- function(section) {
+  stopifnot(inherits(section, "SpatialPolygonsDataFrame"))
   suppressMessages(polygon <- broom::tidy(section))
   polygon %<>% dplyr::rename_(.dots = list(Section = "id", EastingSection = "long",
                                            NorthingSection = "lat"))
