@@ -3,7 +3,7 @@
 #' Converts section SpatialPolygonsDataFrame into data frame for plotting.
 #'
 #' @param section The SpatialPolygonsDataFrame object to convert
-#' @return
+#' @return A data frame.
 #' @export
 section_polygon <- function(section) {
   stopifnot(inherits(section, "SpatialPolygonsDataFrame"))
