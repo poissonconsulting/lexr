@@ -13,6 +13,7 @@ tidy_section <- function(section) {
 }
 
 circles_polygons <- function (x, section) {
+  x %<>% dplyr::arrange_(~Station)
   radius <- 500
   circles <- sampSurf::spCircle(
     radius = radius, spUnits = sp::CRS(sp::proj4string(section)),
@@ -25,22 +26,21 @@ circles_polygons <- function (x, section) {
         radius = radius, spUnits = sp::CRS(sp::proj4string(section)),
         centerPoint = c(x = x$EastingStation[i], y = x$NorthingStation[i]),
         spID = x$Station[i])$spCircle
-      circles <- raster::bind(circles, circle)
+      circles <- raster::bind(circles, circle, keepnames = TRUE)
     }
   }
   sp::proj4string(circles) <- sp::proj4string(section)
-  circles <- rgeos::gIntersection(circles, section)
+  section %<>% rgeos::gUnionCascaded()
+  circles <- rgeos::gIntersection(circles, section, byid = TRUE, id = row.names(circles))
+  suppressMessages(circles %<>% broom::tidy())
 
+  x %<>% dplyr::mutate_(.dots = list(id = ~as.character(Station)))
+  circles %<>% dplyr::inner_join(x, by = "id")
   circles
 }
 
 tidy_station_coverage <- function(station, section) {
   circles <- circles_polygons(station, section)
-
-  suppressMessages(circles %<>% broom::tidy())
-  station %<>% dplyr::mutate_(.dots = list(Station = ~as.integer(Station)))
-  circles %<>% dplyr::mutate_(.dots = list(Station = ~as.integer(piece)))
-  circles %<>% dplyr::inner_join(station, by = "Station")
 
   list(ggplot2::geom_polygon(data = dplyr::filter_(circles, ~!hole),
                              ggplot2::aes_(x = ~long / 1000, y = ~lat / 1000, group = ~group,
