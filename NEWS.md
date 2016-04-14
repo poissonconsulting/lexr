@@ -1,7 +1,9 @@
 # lexr NEWS
 
+## v0.0.8
+
 - Add `merge_detect_data` function for looking at habitat use.
-- Add `filter_detect_data` function for filtering out captures.
+- Add `filter_detect_data` function for filtering out captures and static fish.
 
 ## v0.0.7
 
