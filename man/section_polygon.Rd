@@ -9,6 +9,9 @@ section_polygon(section)
 \arguments{
 \item{section}{The SpatialPolygonsDataFrame object to convert}
 }
+\value{
+A data frame.
+}
 \description{
 Converts section SpatialPolygonsDataFrame into data frame for plotting.
 }
