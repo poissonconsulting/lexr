@@ -1,5 +1,7 @@
 # lexr NEWS
 
+- Add `combine_sections_lex_data` function for simpler interface for combining sections.
+
 ## v0.0.8
 
 - Add `merge_detect_data` function for looking at habitat use.
