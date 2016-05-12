@@ -34,11 +34,11 @@ plot_use_detect <- function(data, alive_only = TRUE) {
   polygon <- section_polygon(data$section)
 
   data %<>% use_detect_data(alive_only = alive_only)
-  ggplot2::ggplot(data = data, ggplot2::aes_(x = ~EastingSection / 1000, y = ~NorthingSection / 1000)) +
+  ggplot2::ggplot(data = data, ggplot2::aes_(x = ~EastingSection / 1000, y = ~NorthingSection / 1000, group = ~Section)) +
     ggplot2::geom_polygon(data = dplyr::filter_(polygon, ~!hole), ggplot2::aes_(
-      x = ~EastingSection / 1000, y = ~NorthingSection / 1000, group = ~Section), color = "grey25", fill = "transparent") +
+      x = ~EastingSection / 1000, y = ~NorthingSection / 1000), color = "grey25", fill = "transparent") +
     ggplot2::geom_polygon(data = dplyr::filter_(polygon, ~hole), ggplot2::aes_(
-      x = ~EastingSection / 1000, y = ~NorthingSection / 1000, group = ~Section), color = "grey25", fill = "transparent") +
+      x = ~EastingSection / 1000, y = ~NorthingSection / 1000, group = ~group), color = "grey25", fill = "transparent") +
       ggplot2::geom_point(ggplot2::aes_(color = ~ColorCode, size = ~Use), alpha = 0.75) +
    ggplot2::coord_equal() +
    ggplot2::scale_x_continuous(name = "Easting (km)", labels = scales::comma) +
