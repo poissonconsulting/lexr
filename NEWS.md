@@ -1,5 +1,6 @@
 # lexr NEWS
 
+- Add `use_detect_data` and `plot_use_detect` functions for habitat use.
 - Add `combine_sections_lex_data` function for simpler interface for combining sections.
 
 ## v0.0.8

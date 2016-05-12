@@ -46,6 +46,7 @@ test_that("klexdatr", {
   expect_identical(get_difftime(detect), lubridate::make_difftime(num = 60 * 60 * 24, units = "days"))
   expect_is(check_detect_data(detect), "detect_data")
   expect_true(is.detect_data(detect))
+  expect_is(use_detect_data(detect), "data.frame")
   analysis <- make_analysis_data(detect, interval_period = lubridate::make_difftime(60 * 60 * 24 * 7 * 4), growth = growth_vb, k = 0.234)
   expect_is(check_analysis_data(analysis), "analysis_data")
   expect_true(is.analysis_data(analysis))

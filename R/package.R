@@ -10,6 +10,9 @@
 #' @importFrom magrittr %<>% %>%
 #' @importFrom plyr .
 #' @importFrom sp %over%
+#' @importFrom grDevices dev.off png
+#' @importFrom stats na.omit
+#' @importFrom utils capture.output
 #' @examples
 #' \dontrun{
 #' demo(klex, ask = FALSE)
