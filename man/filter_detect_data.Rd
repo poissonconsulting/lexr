@@ -4,12 +4,15 @@
 \alias{filter_detect_data}
 \title{Filter Detect Data}
 \usage{
-filter_detect_data(data, capture = data$capture, alive_only = FALSE)
+filter_detect_data(data, capture = data$capture, section = data$section,
+  alive_only = FALSE)
 }
 \arguments{
 \item{data}{The detect_data object.}
 
 \item{capture}{A data frame of the capture data to use.}
+
+\item{section}{A data frame of the section data to use.}
 
 \item{alive_only}{A flag indicating wether to discard detections after last movement.}
 }
