@@ -5,13 +5,13 @@ filter_detect_captures_section <- function(data, capture, section) {
   data$distance %<>% dplyr::filter_(~SectionFrom %in% section@data$Section)
   data$distance %<>% dplyr::filter_(~SectionTo %in% section@data$Section)
   data$coverage <- data$coverag[data$coverage$Section  %in% section@data$Section,]
-  data$capture %<>% dplyr::filter_(~SectionCapture %in% section@data$Section)
+  capture %<>% dplyr::filter_(~SectionCapture %in% section@data$Section)
   data$detection <- data$detection[data$detection$Section  %in% section@data$Section,]
 
   data$distance$SectionFrom %<>% factor(levels = levels(section@data$Section))
   data$distance$SectionTo %<>% factor(levels = levels(section@data$Section))
   data$coverage$Section %<>% factor(levels = levels(section@data$Section))
-  data$capture$SectionCapture %<>% factor(levels = levels(section@data$Section))
+  capture$SectionCapture %<>% factor(levels = levels(section@data$Section))
   # sets missing recapture sections to NA
   data$recapture$SectionRecapture %<>% factor(levels = levels(section@data$Section))
   data$detection$Section %<>% factor(levels = levels(section@data$Section))
