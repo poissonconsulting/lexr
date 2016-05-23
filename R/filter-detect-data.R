@@ -20,12 +20,10 @@ filter_detect_captures <- function(data, capture) {
 filter_detect_alive_only_capture <- function (x) {
   x %<>% dplyr::arrange_(~IntervalDetection)
   x %<>% dplyr::mutate_(.dots = list(Move = ~as.integer(Section),
-                                     Move = ~c(diff(Move), 0),
+                                     Move = ~c(1, diff(Move)),
                                      Move = ~Move != 0))
   last_move <- which(x$Move)
   x$Move <- NULL
-  if (!length(last_move))
-    return(dplyr::slice_(x, ~0))
   dplyr::slice_(x, ~1:last_move[length(last_move)])
 }
 

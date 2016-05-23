@@ -7,6 +7,7 @@
 #' @export
 last_section_data <-  function(data) {
   data %<>% check_detect_data()
+  data %<>% filter_detect_data(alive_only = TRUE)
 
   lex <- data
   data <- merge(lex$section@data, lex$interval)
