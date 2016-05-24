@@ -4,15 +4,17 @@
 \alias{last_section_data}
 \title{Last Section Data}
 \usage{
-last_section_data(data)
+last_section_data(data, delay_days = 30L)
 }
 \arguments{
 \item{data}{The detect_data object to merge.}
+
+\item{delay_days}{A count of the minimum number of days between final movement and tag expiration.}
 }
 \value{
 A tbl data frame.
 }
 \description{
-Calculates number of fish last detected at each section.
+Gives captures and date of final movement by last section moved to excluding fish that subsequently recaptured.
 }
 

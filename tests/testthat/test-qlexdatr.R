@@ -23,6 +23,7 @@ test_that("qlexdatr", {
 
   expect_identical(get_difftime(detect), lubridate::make_difftime(num = 60 * 60 * hourly_interval, units = "hours"))
   expect_is(check_detect_data(detect), "detect_data")
+  expect_is(last_section_data(detect), "tbl")
   capture <- filter(detect$capture, Species == "Rainbow Trout")
   detect <- filter_detect_data(detect, capture, alive_only = TRUE)
   expect_is(merge_detect_data(detect), "data.frame")
