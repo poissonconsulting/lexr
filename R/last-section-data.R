@@ -8,7 +8,6 @@
 #' @export
 last_section_data <-  function(data, delay_days = 30L) {
   data %<>% check_detect_data()
-  data %<>% filter_detect_data(alive_only = TRUE)
   check_count(delay_days)
 
   lex <- data
