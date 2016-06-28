@@ -9,7 +9,7 @@ expand_deployment_row <- function(x) {
 }
 
 expand_deployment <- function(deployment) {
-  if (any(deployment$IntervalDateTimeIn < deployment$IntervalDateTimeOut))
+  if (any(deployment$IntervalReceiverOut < deployment$IntervalReceiverIn))
     error("receiver deployed before retrieved")
   deployment %<>% plyr::adply(1, expand_deployment_row)
   stopifnot(!anyDuplicated(deployment))
@@ -57,7 +57,8 @@ calc_coverage_code <- function(x, section) {
   y <- dplyr::filter_(x, ~IntervalDeployment == x$IntervalDeployment[1]) %>% dplyr::as.tbl()
   x$Coverage <- calc_coverage_code_interval(y, section)
   x %<>% dplyr::group_by_(~IntervalDeployment, ~Section) %>%
-    dplyr::summarise_(.dots = list(Stations = "n()", Coverage = "first(Coverage)"))
+    dplyr::summarise_(.dots = list(Stations = "n()", Coverage = "first(Coverage)")) %>%
+    dplyr::ungroup()
   x
 }
 
