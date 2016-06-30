@@ -1,5 +1,6 @@
 # lexr NEWS
 
+- Add `plot_capture` and `plot_recapture` functions for distribution of captures and recaptures.
 - Add `use_detect_data` and `plot_use_detect` functions for habitat use.
 - Add `combine_sections_lex_data` function for simpler interface for combining sections.
 - Add `last_section_data` to get number of fish last detected at each section.

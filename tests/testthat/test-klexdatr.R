@@ -47,6 +47,7 @@ test_that("klexdatr", {
   expect_is(check_detect_data(detect), "detect_data")
   expect_true(is.detect_data(detect))
   expect_is(plot_use_detect(filter_detect_data(detect, section = detect$section[-1,])), "ggplot")
+  expect_is(plot_capture(detect), "ggplot")
   expect_is(last_section_data(detect), "tbl")
 
   analysis <- make_analysis_data(detect, interval_period = lubridate::make_difftime(60 * 60 * 24 * 7 * 4), growth = growth_vb, k = 0.234)
