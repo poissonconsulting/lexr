@@ -1,4 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+[![Travis-CI Build Status](https://travis-ci.org/poissonconsulting/lexr.svg?branch=master)](https://travis-ci.org/poissonconsulting/lexr)
+
 Lake Exploitation Study Data Plotting and Analysis
 ==================================================
 
@@ -28,7 +30,7 @@ kdetect <- make_detect_data(klex, capture = capture, start_date = as.Date("2008-
 plot_detect_section(kdetect)
 ```
 
-![](README-unnamed-chunk-2-1.png)<!-- -->
+![](README-unnamed-chunk-2-1.png)
 
 ``` r
 
@@ -36,7 +38,7 @@ plot_detect_section(kdetect)
 plot_detect_coverage(kdetect)
 ```
 
-![](README-unnamed-chunk-2-2.png)<!-- -->
+![](README-unnamed-chunk-2-2.png)
 
 ``` r
 
@@ -44,7 +46,7 @@ plot_detect_coverage(kdetect)
 plot_detect_overview(kdetect)
 ```
 
-![](README-unnamed-chunk-2-3.png)<!-- -->
+![](README-unnamed-chunk-2-3.png)
 
 Installation
 ------------
