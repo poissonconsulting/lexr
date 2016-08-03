@@ -34,7 +34,6 @@ Imports:
     utils
 Suggests:
     klexdatr (>= 0.0.6),
-    qlexdatr (>= 0.0.5),
     testthat
 License: MIT + file LICENSE
 LazyData: true
