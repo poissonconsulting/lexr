@@ -14,6 +14,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+**Note: Development has now moved to [lexr2](https://github.com/poissonconsulting/lexr2)**
+
 # Lake Exploitation Study Data Plotting and Analysis
 
 An R package to plot and analyse lake exploitation data.
@@ -70,3 +72,4 @@ The project was primarily funded by the Habitat Conservation Trust Foundation.
 
 The Habitat Conservation Trust Foundation was created by an act of the legislature to preserve, restore and enhance key areas of habitat for fish and wildlife throughout British Columbia.
 Anglers, hunters, trappers and guides contribute to the projects of the Foundation through licence surcharges.  Tax deductible donations to assist in the work of the Foundation are also welcomed.
+

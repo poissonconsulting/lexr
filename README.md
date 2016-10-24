@@ -1,4 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+**Note: Development has now moved to [lexr2](https://github.com/poissonconsulting/lexr2)**
+
 Lake Exploitation Study Data Plotting and Analysis
 ==================================================
 
