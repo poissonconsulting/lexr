@@ -15,8 +15,8 @@ Imports:
     broom,
     datacheckr (>= 0.1.0),
     dplyr,
-    ggplot2 (>= 2.0.0),
-    ggrepel (>= 0.4),
+    ggplot2 (>= 2.1.0.9001),
+    ggrepel (>= 0.6.3),
     grDevices,
     lubridate (>= 1.5.6),
     plyr,
@@ -35,7 +35,10 @@ Imports:
 Suggests:
     klexdatr (>= 0.0.7),
     testthat
-Remotes: poissonconsulting/klexdatr@v0.0.7
+Remotes:
+    hadley/ggplot2,
+    slowkow/ggrepel,
+    poissonconsulting/klexdatr@v0.0.7
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 5.0.1
