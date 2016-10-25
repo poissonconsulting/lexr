@@ -1,8 +1,13 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
 language: R
-cache: packages
+sudo: required
+dist: trusty
 
 r_binary_packages:
  - rgeos
 
+addons:
+  apt:
+    packages:
+      - libgdal-dev
+      - libproj-dev
+      - libv8-dev
