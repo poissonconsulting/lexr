@@ -1,5 +1,5 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-[![Build Status](https://travis-ci.org/poissonconsulting/lexr.svg?branch=master)](https://travis-ci.org/poissonconsulting/lexr) [![DOI](https://zenodo.org/badge/48457451.svg)](https://zenodo.org/badge/latestdoi/48457451)
+[![DOI](https://zenodo.org/badge/48457451.svg)](https://zenodo.org/badge/latestdoi/48457451)
 
 **Note: Development has now moved to [lexr2](https://github.com/poissonconsulting/lexr2)**
 
