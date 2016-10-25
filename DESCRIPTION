@@ -15,10 +15,10 @@ Imports:
     broom,
     datacheckr (>= 0.1.0),
     dplyr,
-    ggplot2 (>= 2.1.0.9001),
-    ggrepel (>= 0.6.3),
+    ggplot2,
+    ggrepel,
     grDevices,
-    lubridate (>= 1.5.6),
+    lubridate,
     plyr,
     purrr,
     magrittr,
@@ -36,8 +36,6 @@ Suggests:
     klexdatr (>= 0.0.7),
     testthat
 Remotes:
-    hadley/ggplot2,
-    slowkow/ggrepel,
     poissonconsulting/klexdatr@v0.0.7
 License: MIT + file LICENSE
 LazyData: true
