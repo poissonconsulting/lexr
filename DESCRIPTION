@@ -35,7 +35,7 @@ Imports:
 Suggests:
     klexdatr (>= 0.0.7),
     testthat
-Remotes: poissonconsulting/klexdatr
+Remotes: poissonconsulting/klexdatr@v0.0.7
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 5.0.1
