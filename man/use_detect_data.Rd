@@ -17,4 +17,3 @@ A tbl data frame.
 \description{
 Calculates Percent Use from Detect data.
 }
-

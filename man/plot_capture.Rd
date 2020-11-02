@@ -12,4 +12,3 @@ plot_capture(data)
 \description{
 Plots captures for a \code{detect_data} object.
 }
-

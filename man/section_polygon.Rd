@@ -15,4 +15,3 @@ A data frame.
 \description{
 Converts section SpatialPolygonsDataFrame into data frame for plotting.
 }
-

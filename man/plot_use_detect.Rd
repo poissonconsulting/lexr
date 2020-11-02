@@ -14,4 +14,3 @@ plot_use_detect(data, alive_only = TRUE)
 \description{
 Plots habitat use for a \code{detect_data} object.
 }
-

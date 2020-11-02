@@ -227,7 +227,7 @@ plot_lex_coverage <- function(data, start_date = min(lubridate::date(data$captur
 #' @method plot lex_data
 #' @export
 plot.lex_data <- function(x, all = FALSE, ...) {
-  check_flag(all)
+  chk_flag(all)
   y <- purrr::lmap(x, fun_data_name, fun = "plot_lex")
   lapply(y, print)
   if (all) {

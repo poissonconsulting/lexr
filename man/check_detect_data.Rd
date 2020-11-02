@@ -13,4 +13,3 @@ check_detect_data(data)
 Checks lake exploitation data and returns an invisible copy of the data.
 Otherwise stops with an informative error.
 }
-

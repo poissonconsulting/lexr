@@ -14,4 +14,3 @@ plot_data_dir(data, all = FALSE)
 \description{
 Plot Data to Directory
 }
-

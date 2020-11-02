@@ -1,151 +1,144 @@
 check_lex_section <- function(section) {
-  if (!inherits(section, "SpatialPolygonsDataFrame"))
-    error("section must be a spatial polygons data frame")
+  chk_is(section, "sf")
 
-  if (!identical(row.names(section), as.character(section@data$Section)))
-    error("section row names must be identical to section@data$Section")
-
-  values <- list(Section = factor(1),
-                 Habitat = factor(c(1, NA)),
-                 Bounded = TRUE,
-                 EastingSection = 1,
-                 NorthingSection = 1)
-
-  check_data3(section@data, values, key = "Section", select = TRUE)
-  invisible(section)
+  check_data(section, values = list(
+    Section = factor(1),
+    Habitat = factor(1),
+    Bounded = TRUE), key = "Section", nrow = TRUE)
 }
 
 check_lex_station <- function(station) {
-  values <- list(Station = factor(1),
-                 Section = factor(1),
-                 EastingStation = 1,
-                 NorthingStation = 1)
+  chk_is(station, "sf")
 
-  check_data3(station, values, key = "Station", select = TRUE)
+  check_data(station, values = list(
+    Station = factor(1),
+    Section = factor(1)), key = "Station", nrow = TRUE)
 }
 
 check_lex_deployment <- function(deployment) {
 
-  values <-  list(Station = factor(1),
-                  Receiver = factor(1),
-                  DateTimeReceiverIn = Sys.time(),
-                  DateTimeReceiverOut = Sys.time())
+  check_data(deployment, values = list(
+    Station = factor(1),
+    Receiver = factor(1),
+    DateTimeReceiverIn = Sys.time(),
+    DateTimeReceiverOut = Sys.time()),
+    key = c("Station", "Receiver", "DateTimeReceiverIn"), nrow = TRUE)
 
-  check_data3(deployment, values,
-              key = c("Station", "Receiver", "DateTimeReceiverIn"), select = TRUE)
-  deployment %<>% dplyr::arrange_(~DateTimeReceiverIn, ~DateTimeReceiverOut, ~Station)
-  invisible(deployment)
+  if (any(deployment$DateTimeReceiverIn >= deployment$DateTimeReceiverOut))
+    error("All deployment DateTimeReceiveIn must be before DateTimeReceiverOut.")
+
+  invisible(NULL)
 }
 
 check_lex_capture <- function(capture) {
-  values <- list(Capture = factor(1),
-                 DateTimeCapture = Sys.time(),
-                 SectionCapture = factor(1),
-                 Species = factor(1),
-                 Length = c(200L, 1000L),
-                 Weight = c(0.5, 10, NA),
-                 Reward1 = c(0L, 200L),
-                 Reward2 = c(0L, 200L, NA),
-                 DateTimeTagExpire = Sys.time())
 
-  check_data3(capture, values, key = "Capture", select = TRUE)
-  capture %<>% dplyr::arrange_(~DateTimeCapture, ~Capture)
-  invisible(capture)
+  check_data(capture, values = list(
+    Capture = factor(1),
+    DateTimeCapture = Sys.time(),
+    SectionCapture = factor(1),
+    Species = factor(1),
+    Length = c(200L, 1000L),
+    Weight = c(0.5, 15, NA),
+    Reward1 = c(0L, 500L),
+    Reward2 = c(0L, 500L, NA),
+    DateTimeTagExpire = Sys.time()),
+    key = "Capture", nrow = TRUE)
 }
 
 check_lex_recapture <- function(recapture) {
-  values <- list(DateTimeRecapture = Sys.time(),
-                 Capture = factor(1),
-                 SectionRecapture = factor(c(1, NA)),
-                 TBarTag1 = TRUE,
-                 TBarTag2 = TRUE,
-                 TagsRemoved = TRUE,
-                 Released = TRUE,
-                 Public = TRUE)
 
-  check_data3(recapture, values, select = TRUE, min_row = 0)
+  check_data(recapture, values = list(
+    DateTimeRecapture = Sys.time(),
+         Capture = factor(1),
+         SectionRecapture = factor(c(1, NA)),
+         TBarTag1 = TRUE,
+         TBarTag2 = TRUE,
+         TagsRemoved = TRUE,
+         Released = TRUE,
+         Public = TRUE))
+
   if (any(!recapture$TBarTag1 & !recapture$TBarTag2))
-    error("recaptures must have at least one T-bar tag")
+    error("Each recapture must have at least one T-bar tag.")
   if (any(!recapture$Public & recapture$TagsRemoved))
-    error("crew should not have removed tags")
+    error("Crew should not have removed tags on recapture.")
   if (any(!recapture$Public & !recapture$Released))
-    error("crew should not have harvested a recapture")
-  if(anyDuplicated(dplyr::filter_(recapture, ~!Released)$Capture))
-    error("a capture can't be harvested twice!")
+    error("Crew should not have harvested recapture.")
+  if(anyDuplicated(recapture$Capture[!recapture$Released]))
+    error("A recapture can't be harvested twice!")
   if (any(!recapture$Released & !recapture$TagsRemoved))
-    error("all non-released recaptures must have had their tags removed!")
-  recapture %<>% dplyr::arrange_(~DateTimeRecapture, ~Capture)
-  invisible(recapture)
+    error("All non-released recaptures must have had their tags removed!")
+
+  invisible(NULL)
 }
 
 check_lex_detection <- function(detection) {
 
-  values <- list(DateTimeDetection = Sys.time(),
-                 Capture = factor(1),
-                 Receiver = factor(1),
-                 Detections = c(3L, max_integer()))
+  check_data(detection, values = list(
+    DateTimeDetection = Sys.time(),
+    Capture = factor(1),
+    Receiver = factor(1),
+    Detections = c(3L, 100000L)),
+    key = c("DateTimeDetection", "Capture", "Receiver"))
 
-  check_data3(detection, values, key = c("DateTimeDetection", "Capture", "Receiver"),
-              select = TRUE)
-  detection %<>% dplyr::arrange_(~DateTimeDetection, ~Capture, ~Receiver)
-  if (!identical(get_difftime(detection$DateTimeDetection),
-                 lubridate:: make_difftime(num = 60 * 60, units = "hours")))
-    error("detections should be hourly")
-  invisible(detection)
+  if(any(dttr2::dtt_second(detection$DateTimeDetection) != 0) ||
+     any(dttr2::dtt_minute(detection$DateTimeDetection) != 0)) {
+    error("All detections must be be hourly.")
+  }
+  invisible(NULL)
 }
 
 check_lex_joins <- function(data) {
+  chk_join(data$station, tibble::as_tibble(data$section), "Section")
+  chk_join(data$deployment,  tibble::as_tibble(data$station), "Station")
+  chk_join(data$capture, tibble::as_tibble(data$section), c(SectionCapture = "Section"))
+  chk_join(data$recapture,  data$capture, "Capture")
+  chk_join(data$recapture[!is.na(data$recapture$SectionRecapture),],
+           tibble::as_tibble(data$section),
+           c(SectionRecapture = "Section"))
+  chk_join(data$detection, data$capture, "Capture")
 
-  check_join(data$station, data$section@data, "Section")
-  check_join(data$deployment,  data$station, "Station")
-  check_join(data$capture,  data$section@data, c(SectionCapture = "Section"))
-  check_join(data$recapture,  data$capture, "Capture")
-  check_join(data$recapture,  data$section@data,
-             c(SectionRecapture = "Section"), ignore_nas = TRUE)
-  check_join(data$detection,  data$capture, "Capture")
-
-  stopifnot(all(data$detection$Receiver %in% data$deployment$Receiver))
-  invisible(data)
+  chk_subset(data$detection$Receiver, data$deployment$Receiver)
+  invisible(NULL)
 }
 
 check_lex_deployment_detection <- function(deployment, detection) {
+
   deployment$DeploymentID <- 1:nrow(deployment)
-  detection %<>% dplyr::inner_join(deployment, by = "Receiver")
-  detection %<>% dplyr::filter_(~DateTimeDetection >= DateTimeReceiverIn)
-  detection %<>% dplyr::filter_(~DateTimeDetection <= DateTimeReceiverOut)
-
-  deployment %<>% dplyr::filter_(~!DeploymentID %in% unique(detection$DeploymentID))
-  deployment$DeploymentID <- NULL
-  if (nrow(deployment)) {
-    warning(nrow(deployment), " deployments with no detections")
-    print(as.data.frame(deployment))
+  detection <- dplyr::inner_join(detection, deployment, by = "Receiver")
+  ndetection <- nrow(detection)
+  detection <- detection[detection$DateTimeDetection >= detection$DateTimeReceiverIn,]
+  detection <- detection[detection$DateTimeDetection <= detection$DateTimeReceiverOut,]
+  if(ndetection != nrow(detection)){
+    error("There are detections without deployments.")
   }
-  invisible(deployment)
-}
 
-check_lex_consistent <- function(data) {
-  invisible(data)
+  deployment <- deployment[!deployment$DeploymentID %in% unique(detection$DeploymentID),]
+  if(nrow(deployment)) {
+    warning("There are ", nrow(deployment), " deployments with no detections.")
+  }
+  invisible(NULL)
 }
 
 #' Check Lake Exploitation Data
 #'
-#' Checks loaded lake exploitation data and returns a TRUE if passes all the tests.
+#' Checks loaded lake exploitation data and returns an invisible NULL if passes
+#' all the tests.
 #' Otherwise stops with an informative error.
 #'
 #' @param data The lex_data object to check.
-#' @param all A flag indicating whether to run all checks.
-#' @return A flag indicating whether the package data passes the checks.
+#' @param all A flag indicating whether to run deployment/detection checks.
+#' @return An invisible NULL if passes checks otherwise throws an informative error.
+#' @seealso input_lex_data
 #' @export
 check_lex_data <- function(data, all = FALSE) {
-  if (!inherits(data, "lex_data")) error("data must be a lex_data object")
-  check_flag(all)
-  if (!identical(names(data), lex_data_names())) error("data must have correct names")
-  data %<>% purrr::lmap(fun_data_name, fun = "check_lex")
+  chk_is(data, "lex_data")
+  chk_flag(all)
+  chk_identical(names(data), lex_data_names())
+
+  purrr::lmap(data, fun_data_name, fun = "check_lex")
   check_lex_joins(data)
-  check_lex_consistent(data)
   if (all) {
     check_lex_deployment_detection(data$deployment, data$detection)
   }
-  class(data) <- "lex_data"
-  invisible(data)
+  invisible(NULL)
 }

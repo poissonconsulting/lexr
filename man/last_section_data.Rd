@@ -17,4 +17,3 @@ A tbl data frame.
 \description{
 Gives captures and date of final movement by last section moved to excluding fish that subsequently recaptured.
 }
-

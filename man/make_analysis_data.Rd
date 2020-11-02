@@ -4,9 +4,15 @@
 \alias{make_analysis_data}
 \title{Make Analysis Data}
 \usage{
-make_analysis_data(data, capture = data$capture, section = data$section,
-  interval_period = get_difftime(data), spawning = spawning_no,
-  growth = growth_no, ...)
+make_analysis_data(
+  data,
+  capture = data$capture,
+  section = data$section,
+  interval_period = get_difftime(data),
+  spawning = spawning_no,
+  growth = growth_no,
+  ...
+)
 }
 \arguments{
 \item{data}{A detect_data object to use.}
@@ -51,4 +57,3 @@ start of the period during which first caught).
 If a difftime element, interval_period cannot be greater than 28 days
 i.e. \code{lubridate::make_difftime(60 * 60 * 24 * 28)}.
 }
-

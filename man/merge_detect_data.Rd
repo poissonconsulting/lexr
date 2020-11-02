@@ -16,4 +16,3 @@ A tbl data frame.
 Merges Detect data into a single data frame which is useful for
 calculating habitat use.
 }
-

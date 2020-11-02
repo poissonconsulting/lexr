@@ -15,4 +15,3 @@ A difftime object
 \description{
 Get Difftime
 }
-

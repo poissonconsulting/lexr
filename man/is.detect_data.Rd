@@ -15,4 +15,3 @@ A flag indicating whether x is detect data.
 \description{
 Is Detect Data
 }
-

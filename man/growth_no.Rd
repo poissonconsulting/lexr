@@ -19,4 +19,3 @@ growth_no(100L, 0)
 growth_no(100L, 1)
 growth_no(100L, -1)
 }
-

@@ -1,19 +1,20 @@
 Package: lexr
 Title: Lake Exploitation Study Data Plotting and Analysis
 Version: 0.0.11
-Date: 2016-10-24
 Authors@R: c(
     person("Joe", "Thorley", email = "joe@poissonconsulting.ca", role = c("aut", "cre")),
     person("Gary", "Pavan", role = "aut"),
     person("Bernhard", "Konrad", role = "aut"))
 Description: An R package to plot and analyse lake exploitation data.
 Depends:
-    R (>= 3.1.0),
+    R (>= 3.6),
     raster
 Imports:
+    sf,
     assertthat,
+    chk,
+    dttr2,
     broom,
-    datacheckr (>= 0.1.0),
     dplyr,
     ggplot2,
     ggrepel,
@@ -24,19 +25,14 @@ Imports:
     magrittr,
     rgeos,
     reshape2,
-    sampSurf,
     scales,
-    sp,
-    spa,
-    spdep,
     stats,
     tidyr,
     utils
 Suggests:
-    klexdatr (>= 0.0.7),
     testthat
 Remotes:
-    poissonconsulting/klexdatr@v0.0.7
+    poissonconsulting/klexdatr
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 7.1.1

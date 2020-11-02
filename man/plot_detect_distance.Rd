@@ -13,4 +13,3 @@ plot_detect_distance(data)
 Plots the color-coded distances between sections for a \code{detect_data} object
 produced by the \code{\link{make_detect_data}} function.
 }
-

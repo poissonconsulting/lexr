@@ -15,4 +15,3 @@ A flag indicating whether x is analysis data.
 \description{
 Is Analysis Data
 }
-

@@ -24,4 +24,3 @@ growth_vb(100L, 1)
 growth_vb(100L, -1)
 growth_vb(2000L, 1)
 }
-

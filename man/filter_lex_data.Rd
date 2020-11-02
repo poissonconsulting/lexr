@@ -4,11 +4,16 @@
 \alias{filter_lex_data}
 \title{Filter Lex Data}
 \usage{
-filter_lex_data(data, capture = data$capture, recapture = data$recapture,
+filter_lex_data(
+  data,
+  capture = data$capture,
+  recapture = data$recapture,
   sections = stats::setNames(as.list(levels(data$section@data$Section)),
-  levels(data$section@data$Section)), station = data$station,
+    levels(data$section@data$Section)),
+  station = data$station,
   start_date = min(lubridate::date(capture$DateTimeCapture)),
-  end_date = max(lubridate::date(capture$DateTimeTagExpire)))
+  end_date = max(lubridate::date(capture$DateTimeTagExpire))
+)
 }
 \arguments{
 \item{data}{The lex_data object.}
@@ -33,4 +38,3 @@ Filters lex data by capture and recapture.
 Drops all recaptures and detections after first coded
 harvest and ensures coded as tags removed.
 }
-

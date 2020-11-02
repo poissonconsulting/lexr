@@ -4,13 +4,12 @@
 \alias{input_lex_data}
 \title{Inputs Lake Exploitation Data}
 \usage{
-input_lex_data(package = "qlexdatr")
+input_lex_data(package = "klexdatr")
 }
 \arguments{
 \item{package}{A string of the data package.}
 }
 \description{
 Inputs lake exploitation
-data from an R data package structured like \code{qlexdatr}.
+data from an R data package structured like \code{klexdatr}.
 }
-

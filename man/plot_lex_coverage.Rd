@@ -4,9 +4,11 @@
 \alias{plot_lex_coverage}
 \title{Plot Coverage}
 \usage{
-plot_lex_coverage(data,
+plot_lex_coverage(
+  data,
   start_date = min(lubridate::date(data$capture$DateTimeCapture)),
-  end_date = max(lubridate::date(data$capture$DateTimeTagExpire)))
+  end_date = max(lubridate::date(data$capture$DateTimeTagExpire))
+)
 }
 \arguments{
 \item{data}{The \code{lex_data} object to plot.}
@@ -19,4 +21,3 @@ plot_lex_coverage(data,
 Plots the sections with receivers and coverage areas with alpha equivalent to
 deployment during period of interest.
 }
-

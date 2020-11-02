@@ -1,15 +1,11 @@
 context("klexdatr")
 
 test_that("klexdatr", {
-  require(klexdatr)
-  require(dplyr)
-  require(lubridate)
-
   lex <- input_lex_data("klexdatr")
-  expect_is(check_lex_data(lex), "lex_data")
+  expect_null(check_lex_data(lex))
   expect_true(is.lex_data(lex))
 
-  capture <- filter(lex$capture, year(DateTimeCapture) == 2008)
+  capture <- filter(lex$capture, dttr2::dtt_year(DateTimeCapture) == 2008)
   start_date <- as.Date("2008-01-01")
   end_date <- as.Date("2008-12-31")
   sections <- list(

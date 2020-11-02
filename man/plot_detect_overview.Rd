@@ -13,4 +13,3 @@ plot_detect_overview(data)
 Plots the color-coded detection overview plot for a \code{detect_data} object
 produced by the \code{\link{make_detect_data}} function.
 }
-

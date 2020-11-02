@@ -25,4 +25,3 @@ the spawning window if no information is available.
 To see the columns and types in detection and period view
 the function definition for \code{spawning_no}.
 }
-

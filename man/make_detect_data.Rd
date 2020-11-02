@@ -4,10 +4,15 @@
 \alias{make_detect_data}
 \title{Make Detect Data}
 \usage{
-make_detect_data(data, capture = data$capture, recapture = data$recapture,
+make_detect_data(
+  data,
+  capture = data$capture,
+  recapture = data$recapture,
   start_date = min(lubridate::date(capture$DateTimeCapture)),
   end_date = max(lubridate::date(capture$DateTimeTagExpire)),
-  hourly_interval = 24L, recovery_days = 0L)
+  hourly_interval = 24L,
+  recovery_days = 0L
+)
 }
 \arguments{
 \item{data}{The lex_data object.}
@@ -37,4 +42,3 @@ If the individual has an active
 transmitter and no movement is detected after the recovery_days and it is not recaptured
 then it is considered a handling mortality and removed from the data set.
 }
-

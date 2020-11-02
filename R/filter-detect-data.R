@@ -45,7 +45,7 @@ filter_detect_alive_only <- function (data) {
 #' @return A lex_data object.
 #' @export
 filter_detect_data <-  function(data, capture = data$capture, section = data$section, alive_only = FALSE) {
-  check_flag(alive_only)
+  chk_flag(alive_only)
 
   capture %<>% check_detect_capture()
   data %<>% check_detect_data()

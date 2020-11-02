@@ -9,13 +9,16 @@ check_lex_data(data, all = FALSE)
 \arguments{
 \item{data}{The lex_data object to check.}
 
-\item{all}{A flag indicating whether to run all checks.}
+\item{all}{A flag indicating whether to run deployment/detection checks.}
 }
 \value{
-A flag indicating whether the package data passes the checks.
+An invisible NULL if passes checks otherwise throws an informative error.
 }
 \description{
-Checks loaded lake exploitation data and returns a TRUE if passes all the tests.
+Checks loaded lake exploitation data and returns an invisible NULL if passes
+all the tests.
 Otherwise stops with an informative error.
 }
-
+\seealso{
+input_lex_data
+}

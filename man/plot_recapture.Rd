@@ -12,4 +12,3 @@ plot_recapture(data)
 \description{
 Plots recaptures for a \code{detect_data} object.
 }
-

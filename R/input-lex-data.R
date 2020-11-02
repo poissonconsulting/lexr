@@ -1,14 +1,12 @@
 #' Inputs Lake Exploitation Data
 #'
 #' Inputs lake exploitation
-#' data from an R data package structured like \code{qlexdatr}.
+#' data from an R data package structured like \code{klexdatr}.
 #'
 #' @param package A string of the data package.
 #' @export
-input_lex_data <- function(package = "qlexdatr") {
-  check_string(package)
-
-  section <- station <- deployment <- capture <- recapture <- detection <- NULL
+input_lex_data <- function(package = "klexdatr") {
+  chk_string(package)
 
   data("section", "station", "deployment", "capture",
        "recapture", "detection",

@@ -15,4 +15,3 @@ A flag indicating whether x is lex data.
 \description{
 Is Lex Data
 }
-

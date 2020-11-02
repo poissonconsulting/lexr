@@ -13,4 +13,3 @@ check_analysis_data(data)
 Checks lake exploitation analysis data and returns an invisible copy of the data.
 Otherwise stops with an informative error.
 }
-

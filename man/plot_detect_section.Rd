@@ -13,4 +13,3 @@ plot_detect_section(data)
 Plots the color-coded sections for a \code{detect_data} object
 produced by the \code{\link{make_detect_data}} function.
 }
-

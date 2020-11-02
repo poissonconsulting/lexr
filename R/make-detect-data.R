@@ -376,8 +376,10 @@ make_detect_data <-  function(
   end_date = max(lubridate::date(capture$DateTimeTagExpire)),
   hourly_interval = 24L, recovery_days = 0L) {
 
-  check_scalar(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
-  check_scalar(recovery_days, c(0L, 365L))
+  chk_whole_number(hourly_interval)
+  chk_subset(hourly_interval, c(1L,2L,3L,4L,6L,12L,24L))
+  chk_whole_number(recovery_days)
+  chk_range(recovery_days, c(0L, 365L))
 
   check_date(start_date)
   check_date(end_date)

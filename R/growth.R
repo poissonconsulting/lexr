@@ -27,8 +27,10 @@ growth_no <- function(length, years) {
 #' growth_vb(100L, -1)
 #' growth_vb(2000L, 1)
 growth_vb <- function(length, years, linf = 1000, k = 0.19) {
-  check_scalar(linf, c(100, 1000))
-  check_scalar(k, c(0, 1))
+  chk_number(linf)
+  chk_range(linf, c(100, 1000))
+  chk_number(k)
+  chk_range(k)
 
   increment <- (linf - length) * (1 - exp(-k * years))
   new_length <- length + increment

@@ -4,8 +4,12 @@
 \alias{filter_detect_data}
 \title{Filter Detect Data}
 \usage{
-filter_detect_data(data, capture = data$capture, section = data$section,
-  alive_only = FALSE)
+filter_detect_data(
+  data,
+  capture = data$capture,
+  section = data$section,
+  alive_only = FALSE
+)
 }
 \arguments{
 \item{data}{The detect_data object.}
@@ -22,4 +26,3 @@ A lex_data object.
 \description{
 Filter Detect Data
 }
-
