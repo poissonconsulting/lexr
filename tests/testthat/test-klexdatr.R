@@ -1,5 +1,3 @@
-context("klexdatr")
-
 test_that("klexdatr", {
   require(klexdatr)
   require(dplyr)

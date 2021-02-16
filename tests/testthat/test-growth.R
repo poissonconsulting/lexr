@@ -1,5 +1,3 @@
-context("growth")
-
 test_that("growth_no", {
   expect_identical(growth_no(0, -1), 0)
   expect_identical(growth_no(2000, -1), 2000)
